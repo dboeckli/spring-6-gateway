@@ -2,14 +2,15 @@ spring:
   application:
     name: spring-6-gateway
     
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:9000
+  
   cloud:
     gateway:
       routes:
-        - id: spring-6-auth-server
-          uri: http://localhost:9000
-          enabled: true
-          predicates:
-            - Path=/oauth2/**
         - id: spring-6-rest-mvc
           uri: http://localhost:8081
           enabled: true
