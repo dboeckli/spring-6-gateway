@@ -39,7 +39,8 @@ logging:
     org.springframework.web.reactive: DEBUG
     reactor.ipc.netty: DEBUG
     reactor.netty: DEBUG
-    
+    org.zalando.logbook: TRACE
+
 management:
   health:
     readinessstate:
