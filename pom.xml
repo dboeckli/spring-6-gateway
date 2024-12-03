@@ -87,6 +87,23 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-build-infos</id>
+                        <goals>
+                            <goal>build-info</goal>
+                        </goals>
+                        <configuration>
+                            <additionalProperties>
+                                <mavenUser>${user.name}</mavenUser>
+                                <javaVersion>${java.version}</javaVersion>
+                                <javaVendor>${java.vendor}</javaVendor>
+                                <!--<commit-id>${buildNumber}</commit-id>-->
+                                <!--<docker-repository>${docker.push.repository}/${docker.image.prefix}/${project.artifactId}</docker-repository>-->
+                            </additionalProperties>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
