@@ -13,15 +13,34 @@
     <artifactId>spring-6-gateway</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     
-    <name>spring-6-gateway</name>
+    <name>${project.artifactId}</name>
     <description>spring-6-gateway</description>
+
+    <scm>
+        <connection>scm:git:https://github.com/${organization.name}/${project.artifactId}.git</connection>
+        <developerConnection>scm:git:https://github.com/${organization.name}/${project.artifactId}.git</developerConnection>
+        <url>https://github.com/${organization.name}/${project.artifactId}.git</url>
+        <tag>HEAD</tag>
+    </scm>
     
     <properties>
         <java.version>21</java.version>
         <spring-cloud.version>2024.0.0-RC1</spring-cloud.version>
 
+        <organization.name>dboeckli</organization.name>
+
         <logbook.version>3.10.0</logbook.version>
         <logstash-logback.version>8.0</logstash-logback.version>
+
+        <!-- Sonar -->
+        <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+        <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
+        <sonar.language>java</sonar.language>
+        <jacoco.version>0.8.12</jacoco.version>
+
+        <git-commit-id-maven-plugin.version>9.0.1</git-commit-id-maven-plugin.version>
+        <!--suppress UnresolvedMavenProperty -->
+        <buildNumber>${git.commit.id.abbrev}</buildNumber>
     </properties>
 
     <profiles>
@@ -110,6 +129,38 @@
     </dependencyManagement>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <configuration>
+                        <archive>
+                            <manifest>
+                                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                                <addClasspath>true</addClasspath>
+                                <classpathPrefix>lib/</classpathPrefix>
+                                <!-- Force the use of '-SNAPSHOT' version naming -->
+                                <useUniqueVersions>false</useUniqueVersions>
+                            </manifest>
+                            <manifestEntries>
+                                <Implementation-Title>${project.name}</Implementation-Title>
+                                <groupId>${project.groupId}</groupId>
+                                <artifactId>${project.artifactId}</artifactId>
+                                <Implementation-Version>${project.version}</Implementation-Version>
+                                <git-SHA-1>${buildNumber}</git-SHA-1>
+                                <source-url>${project.scm.url}</source-url>
+                                <BuildDate>${maven.build.timestamp}</BuildDate>
+                                <Built-By>${user.name}</Built-By>
+                                <Build-Jdk>${java.version}</Build-Jdk>
+                                <packaging>${project.packaging}</packaging>
+                            </manifestEntries>
+                        </archive>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -130,7 +181,80 @@
                             </additionalProperties>
                         </configuration>
                     </execution>
+
+                    <execution>
+                        <id>build-docker-image</id>
+                        <goals>
+                            <goal>build-image-no-fork</goal>
+                        </goals>
+                    </execution>
                 </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.version}</version>
+                <executions>
+                    <execution>
+                        <id>jacoco-prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                        <configuration>
+                            <append>true</append>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>jacoco-create-report</id>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>target/jacoco-reports</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!--
+            this plugin generates some git properties. We use the "git.commit.id.abbrev" variable which we append
+            to the docker image id for builds in jenkins (docker.application.image.tag). See "jenkins" profile at the top.
+            -->
+            <plugin>
+                <groupId>io.github.git-commit-id</groupId>
+                <artifactId>git-commit-id-maven-plugin</artifactId>
+                <version>${git-commit-id-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>get-the-git-infos</id>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                        <phase>initialize</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <verbose>true</verbose>
+                    <generateGitPropertiesFile>true</generateGitPropertiesFile>
+                    <generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
+                    <commitIdGenerationMode>full</commitIdGenerationMode>
+                    <runOnlyOnce>true</runOnlyOnce>
+                    <skipPoms>false</skipPoms>
+                </configuration>
             </plugin>
         </plugins>
     </build>
