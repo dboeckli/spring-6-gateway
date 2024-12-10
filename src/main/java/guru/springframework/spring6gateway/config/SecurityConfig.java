@@ -26,6 +26,7 @@ public class SecurityConfig {
     public SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http) {
 
         http.authorizeExchange(authorizeExchangeSpec -> authorizeExchangeSpec
+                .pathMatchers("/oauth2/**", "/oauth2/token").permitAll()
                 .anyExchange().authenticated())
             .oauth2ResourceServer(oAuth2ResourceServerSpec -> oAuth2ResourceServerSpec
                 .jwt(Customizer.withDefaults()))
