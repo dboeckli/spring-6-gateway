@@ -11,9 +11,26 @@ Example request you can find in the restRequest directory
 
 This repository has examples from my course [Reactive Programming with Spring Framework 5](https://www.udemy.com/reactive-programming-with-spring-framework-5/?couponCode=GITHUB_REPO_SF5B2G)
 
-## Docker RUN
+## Docker
+
+### create image
 ```shell
-docker run --name gateway -d -p 8080:8080 -e SPRING_PROFILES_ACTIVE=docker --link auth-server:auth-server spring-6-gateway:0.0.1-SNAPSHOT
+.\mvnw clean package spring-boot:build-image
+```
+or just run
+```shell
+.\mvnw clean install
+```
+
+### run image
+
+Hint: remove the daemon flag -d to see what is happening, else it run in background
+
+```shell
+docker run --name gateway -d -p 8080:8080 -e SPRING_PROFILES_ACTIVE=docker --link auth-server:auth-server --link rest-mvc:rest-mvc spring-6-gateway:0.0.1-SNAPSHOT
+docker stop gateway
+docker rm gateway
+docker start gateway
 ```
 
 ## More Docker commands
