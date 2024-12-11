@@ -24,7 +24,7 @@ or just run
 
 ### run image
 
-Hint: remove the daemon flag -d to see what is happening, else it run in background
+Hint: remove the daemon flag -d to see what is happening, else it runs in background!
 
 ```shell
 docker run --name gateway -d -p 8080:8080 -e SPRING_PROFILES_ACTIVE=docker --link auth-server:auth-server --link rest-mvc:rest-mvc spring-6-gateway:0.0.1-SNAPSHOT
