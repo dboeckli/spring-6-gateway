@@ -295,7 +295,7 @@
 
             <!--
             this plugin generates some git properties. We use the "git.commit.id.abbrev" variable which we append
-            to the docker image id for builds in jenkins (docker.application.image.tag). See "jenkins" profile at the top.
+            to the docker image id for builds in jenkins (docker.application.image.tag). See "jenkins" profile at the top
             -->
             <plugin>
                 <groupId>io.github.git-commit-id</groupId>
