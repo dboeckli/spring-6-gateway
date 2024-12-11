@@ -27,6 +27,8 @@ services:
   # docker run --name auth-server -d -p 9000:9000 spring-6-auth-server:0.0.1-SNAPSHOT 
   auth-server:
     container_name: auth-server
+    # image from docker hup
+    #image: domboeckli/spring-6-auth-server:0.0.1-SNAPSHOT
     image: spring-6-auth-server:0.0.1-SNAPSHOT
     ports:
       - "9000:9000"
@@ -35,6 +37,8 @@ services:
   #docker run --name rest-mvc -d -p 8081:8080 -e SPRING_PROFILES_ACTIVE=localmysql -e SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://auth-server:9000 -e SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/restdb -e SERVER_PORT=8080 --link auth-server:auth-server --link mysql:mysql spring-6-rest-mvc:0.0.1-SNAPSHOT
   rest-mvc:
     container_name: rest-mvc
+    # image from docker hup
+    #image: domboeckli/spring-6-rest-mvc:0.0.1-SNAPSHOT
     image: spring-6-rest-mvc:0.0.1-SNAPSHOT
     ports:
       - "8081:8080"
@@ -51,6 +55,8 @@ services:
   # docker run --name reactive-mongo -d -p 8083:8080 -e SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://auth-server:9000 -e SERVER_PORT=8080 -e SPRING_DATA_MONGODB_URI=mongodb://mongo:27017/sfg -e SPRING_DATA_MONGODB_USERNAME=root -e SPRING_DATA_MONGODB_PASSWORD=secret --link auth-server:auth-server --link mongo:mongo spring-6-reactive-mongo:0.0.1-SNAPSHOT
   reactive-mongo:
     container_name: reactive-mongo
+    # image from docker hup
+    #image: domboeckli/spring-6-reactive-mongo:0.0.1-SNAPSHOT
     image: spring-6-reactive-mongo:0.0.1-SNAPSHOT
     ports:
       - "8083:8080"
@@ -68,6 +74,8 @@ services:
   # docker run --name reactive -d -p 8082:8080 -e SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://auth-server:9000 -e SERVER_PORT=8080 --link auth-server:auth-server spring-6-reactive:0.0.1-SNAPSHOT
   reactive:
     container_name: reactive
+    # image from docker hup
+    #image: domboeckli/spring-6-reactive:0.0.1-SNAPSHOT
     image: spring-6-reactive:0.0.1-SNAPSHOT
     ports:
       - "8082:8080"
@@ -81,6 +89,8 @@ services:
   # docker run --name gateway -d -p 8080:8080 -e SPRING_PROFILES_ACTIVE=docker -e SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://auth-server:9000 --link auth-server:auth-server --link rest-mvc:rest-mvc --link reactive:reactive --link reactive-mongo:reactive-mongo spring-6-gateway:0.0.1-SNAPSHOT
   gateway:
     container_name: gateway
+    # image from docker hup
+    #image: domboeckli/spring-6-gateway:0.0.1-SNAPSHOT
     image: spring-6-gateway:0.0.1-SNAPSHOT
     expose:
       - 8080
