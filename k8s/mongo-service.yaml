@@ -13,6 +13,6 @@ spec:
     targetPort: 27017
   selector:
     app: mongo
-  type: ClusterIP
+  clusterIP: None
 status:
   loadBalancer: {}

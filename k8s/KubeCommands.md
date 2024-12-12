@@ -133,6 +133,27 @@ Apply Service for reactive
 kubectl apply -f reactive-service.yaml
 ```
 
+## reactive-mongo
+
+Create Deployment for reactive-mongo
+```bash
+kubectl create deployment reactive-mongo --image=spring-6-reactive-mongo:0.0.1-SNAPSHOT --dry-run=client -o yaml > reactive-mongo-deployment.yaml
+```
+
+Apply Deployment for reactive-mongo
+```bash
+kubectl apply -f reactive-mongo-deployment.yaml
+```
+reactive
+Create Service for reactive-mongo
+```bash
+kubectl create service clusterip reactive-mongo --tcp=8083:8080 --dry-run=client -o yaml > reactive-mongo-service.yaml
+```
+
+Apply Service for reactive-mongo
+```bash
+kubectl apply -f reactive-mongo-service.yaml
+```
 
 ## Port forward to Gateway
 ```bash
