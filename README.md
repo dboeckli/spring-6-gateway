@@ -9,7 +9,7 @@ Server runs on port 8080. Requires that other projects are up and running
 * spring-6-reactive-mongo on port 8083
 Example request you can find in the restRequest directory
 
-This repository has examples from my course [Reactive Programming with Spring Framework 5](https://www.udemy.com/reactive-programming-with-spring-framework-5/?couponCode=GITHUB_REPO_SF5B2G)
+![alt text](guru.png "Overview")
 
 ## Docker
 
@@ -28,6 +28,8 @@ or just run
 ```shell
 .\mvnw clean install
 ```
+
+Do this for all above projects to get the images into the local docker registry
 
 ### run image
 
