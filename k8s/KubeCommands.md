@@ -1,9 +1,15 @@
-# Images
+# Kubernetes
+
+## Images
 * `spring-6-gateway:0.0.1-SNAPSHOT`
 * `spring-6-auth-server:0.0.1-SNAPSHOT`
 * `spring-6-rest-mvc:0.0.1-SNAPSHOT`
 * `spring-6-reactive:0.0.1-SNAPSHOT`
 * `reactive-mongo:0.0.1-SNAPSHOT`
+
+![alt text](../guru.png "Overview")
+
+## Commands
 
 Display all K8s resources in the default namespace
 ```bash
