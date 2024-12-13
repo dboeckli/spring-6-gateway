@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: auth-server
+  name: auth-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-server
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: auth-server
+    spec:
+      containers:
+      - image: spring-6-auth-server:0.0.1-SNAPSHOT
+        name: spring-6-auth-server
+        resources: {}
+        env:
+          - name: SPRING_SECURITY_OAUTH2_AUTHORIZATION_SERVER_ISSUER
+            value: http://auth-server:9000
+          - name: SECURITY_OAUTH2_AUTHORIZATION_SERVER_TOKEN_ACCESS_TOKEN_TIME_TO_LIVE_SECONDS
+            value: "1200"
+          - name: SECURITY_OAUTH2_AUTHORIZATION_SERVER_TOKEN_REFRESH_TOKEN_TIME_TO_LIVE_SECONDS
+            value: "7200"
+        startupProbe:
+          httpGet:
+            path: /actuator/health
+            port: 9000
+          failureThreshold: 30
+          periodSeconds: 10    
+        livenessProbe:
+          httpGet:
+            path: /actuator/health/liveness
+            port: 9000
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /actuator/health/readiness
+            port: 9000
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          failureThreshold: 3

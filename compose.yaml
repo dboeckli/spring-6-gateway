@@ -27,7 +27,7 @@ services:
   # docker run --name auth-server -d -p 9000:9000 spring-6-auth-server:0.0.1-SNAPSHOT 
   auth-server:
     container_name: auth-server
-    # image from docker hup
+    # image from docker hub
     #image: domboeckli/spring-6-auth-server:0.0.1-SNAPSHOT
     image: spring-6-auth-server:0.0.1-SNAPSHOT
     ports:

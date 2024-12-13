@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: reactive-mongo
+  name: reactive-mongo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: reactive-mongo
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: reactive-mongo
+    spec:
+      containers:
+      - image: spring-6-reactive-mongo:0.0.1-SNAPSHOT
+        name: spring-6-reactive-mongo
+        resources: {}
+        env:
+          - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI
+            value: http://auth-server:9000
+          - name: SERVER_PORT
+            value: "8080"
+          - name: SPRING_DATA_MONGODB_URI
+            value: mongodb://mongo:27017/sfg
+          - name: SPRING_DATA_MONGODB_USERNAME
+            value: root
+          - name: SPRING_DATA_MONGODB_PASSWORD
+            value: secret  
+        livenessProbe:
+          httpGet:
+            path: /actuator/health/liveness
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /actuator/health/readiness
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          failureThreshold: 3
