@@ -1,7 +1,6 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  creationTimestamp: null
   labels:
     app: auth-server
   name: auth-server
@@ -13,7 +12,6 @@ spec:
   strategy: {}
   template:
     metadata:
-      creationTimestamp: null
       labels:
         app: auth-server
     spec:
@@ -30,4 +28,23 @@ spec:
             value: restdb
           - name: MYSQL_ROOT_PASSWORD
             value: password
-status: {}
+        startupProbe:
+          httpGet:
+            path: /actuator/health
+            port: 9000
+          failureThreshold: 30
+          periodSeconds: 10    
+        livenessProbe:
+          httpGet:
+            path: /actuator/health/liveness
+            port: 9000
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /actuator/health/readiness
+            port: 9000
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          failureThreshold: 3

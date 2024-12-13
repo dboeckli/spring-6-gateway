@@ -105,12 +105,15 @@ Apply Deployment for rest-mvc
 ```bash
 kubectl apply -f rest-mvc-deployment.yaml
 ```
-rest-mvc
 Create Service for rest-mvc
 ```bash
 kubectl create service clusterip rest-mvc --tcp=8081:8080 --dry-run=client -o yaml > rest-mvc-service.yaml
 ```
 
+Apply Service for reactive
+```bash
+kubectl apply -f rest-mvc-service.yaml
+```
 ## reactive
 
 Create Deployment for reactive
