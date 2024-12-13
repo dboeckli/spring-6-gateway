@@ -83,8 +83,8 @@ kubectl delete deployment reactive
 kubectl delete service reactive-mongo
 kubectl delete deployment reactive-mongo
 
-kubectl delete gateway mongo
-kubectl delete gateway mongo
+kubectl delete service gateway
+kubectl delete deployment gateway
 ```
 
 ## Mongo
@@ -165,7 +165,7 @@ kubectl apply -f rest-mvc-deployment.yaml
 ```
 Create Service for rest-mvc
 ```bash
-kubectl create service clusterip rest-mvc --tcp=8081:8080 --dry-run=client -o yaml > rest-mvc-service.yaml
+kubectl create service clusterip rest-mvc --tcp=8080:8080 --dry-run=client -o yaml > rest-mvc-service.yaml
 ```
 
 Apply Service for rest-mvc
@@ -186,7 +186,7 @@ kubectl apply -f reactive-deployment.yaml
 reactive
 Create Service for reactive
 ```bash
-kubectl create service clusterip reactive --tcp=8082:8080 --dry-run=client -o yaml > reactive-service.yaml
+kubectl create service clusterip reactive --tcp=8080:8080 --dry-run=client -o yaml > reactive-service.yaml
 ```
 
 Apply Service for reactive
@@ -208,7 +208,7 @@ kubectl apply -f reactive-mongo-deployment.yaml
 
 Create Service for reactive-mongo
 ```bash
-kubectl create service clusterip reactive-mongo --tcp=8083:8080 --dry-run=client -o yaml > reactive-mongo-service.yaml
+kubectl create service clusterip reactive-mongo --tcp=8080:8080 --dry-run=client -o yaml > reactive-mongo-service.yaml
 ```
 
 Apply Service for reactive-mongo

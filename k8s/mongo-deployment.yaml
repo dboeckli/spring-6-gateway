@@ -19,6 +19,11 @@ spec:
       - image: mongo:6.0
         name: mongo
         resources: {}
+        env:
+          - name: MONGO_INITDB_ROOT_USERNAME
+            value: root
+          - name: MONGO_INITDB_ROOT_PASSWORD
+            value: secret
         readinessProbe:
           exec:
             command:
