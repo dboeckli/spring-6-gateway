@@ -11,6 +11,8 @@
 
 ## Commands
 
+### Display resources
+
 Display all K8s resources in the default namespace
 ```bash
 kubectl get all
@@ -19,6 +21,53 @@ kubectl get all
 Display all K8s resources in the default namespace with more details
 ```bash 
 kubectl get all -o wide
+```
+
+### View logs 
+```bash 
+kubectl logs mongo-<pod-id>
+```
+```bash 
+kubectl logs mysql-<pod-id>
+```
+```bash 
+kubectl logs auth-server-<pod-id>
+```
+```bash 
+kubectl logs rest-mvc-<pod-id>
+```
+```bash 
+kubectl logs reactive-<pod-id>
+```
+```bash 
+kubectl logs reactive-mongo-<pod-id>
+```
+```bash 
+kubectl logs gateway-<pod-id>
+```
+
+### Delete all services and deployments
+```bash
+kubectl delete service mongo
+kubectl delete deployment mongo
+
+kubectl delete service mysql
+kubectl delete deployment mysql
+
+kubectl delete service auth-server
+kubectl delete deployment auth-server
+
+kubectl delete service rest-mvc
+kubectl delete deployment rest-mvc
+
+kubectl delete service reactive
+kubectl delete deployment reactive
+
+kubectl delete service reactive-mongo
+kubectl delete deployment reactive-mongo
+
+kubectl delete gateway mongo
+kubectl delete gateway mongo
 ```
 
 ## Mongo
@@ -42,20 +91,6 @@ Apply Service for Mongo
 kubectl apply -f mongo-service.yaml
 ```
 
-Delete Service for Mongo
-```bash
-kubectl delete service mongo
-```
-
-Delete Deployment for Mongo
-```bash
-kubectl delete deployment mongo
-```
-
-View logs for Mongo
-```bash 
-kubectl logs mongo-<pod-id>
-```
 ## Mysql
 
 Create Deployment for Mysql
@@ -116,7 +151,7 @@ Create Service for rest-mvc
 kubectl create service clusterip rest-mvc --tcp=8081:8080 --dry-run=client -o yaml > rest-mvc-service.yaml
 ```
 
-Apply Service for reactive
+Apply Service for rest-mvc
 ```bash
 kubectl apply -f rest-mvc-service.yaml
 ```
@@ -153,7 +188,7 @@ Apply Deployment for reactive-mongo
 ```bash
 kubectl apply -f reactive-mongo-deployment.yaml
 ```
-reactive
+
 Create Service for reactive-mongo
 ```bash
 kubectl create service clusterip reactive-mongo --tcp=8083:8080 --dry-run=client -o yaml > reactive-mongo-service.yaml

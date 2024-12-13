@@ -16,13 +16,13 @@ spec:
         app: mongo
     spec:
       containers:
-      - image: mongo
+      - image: mongo:6.0
         name: mongo
         resources: {}
         readinessProbe:
           exec:
             command:
-              - mongo
+              - mongosh
               - --eval
               - "db.adminCommand('ping')"
           initialDelaySeconds: 10
@@ -31,7 +31,7 @@ spec:
         livenessProbe:
           exec:
             command:
-              - mongo
+              - mongosh
               - --eval
               - "db.adminCommand('ping')"
           initialDelaySeconds: 30
