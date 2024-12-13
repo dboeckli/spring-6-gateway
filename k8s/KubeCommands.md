@@ -238,9 +238,64 @@ Apply Service for gateway
 kubectl apply -f gateway-service.yaml
 ```
 
+## Expose port 
+
 ### Port forward to Gateway
 This is exposing the gateway to the outside world on the port 8080
 TODO: This is just a workaround
 ```bash
 kubectl port-forward service/gateway 8080:8080
 ```
+
+Instead of starting port-forwarding we can do the same with ingress
+
+### Ingress
+
+Install Ingress Controller
+```bash
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/cloud/deploy.yaml
+```
+
+And wait for installation
+```bash
+kubectl wait --namespace ingress-nginx --for=condition=ready pod --selector=app.kubernetes.io/component=controller --timeout=120s
+```
+
+The Ingress Controller listen on port 80 and 443 by default
+Check:
+```bash
+kubectl get pods -n ingress-nginx
+kubectl get svc -n ingress-nginx 
+```
+
+Now we change the port 80 to 8080
+```bash
+kubectl edit svc ingress-nginx-controller -n ingress-nginx
+```
+Now we can create a new file 'ingress-nginx-controller.yaml' and paste the content there
+In the file we change the port 80 to 8080 and save the file.
+
+Deploy changed Ingress Controller
+```bash
+kubectl apply -f ingress-nginx-controller.yaml
+```
+
+Check again if ingress controller is listening on port 8080:
+```bash
+kubectl get svc -n ingress-nginx
+```
+
+Finally we create an ingress for our gateway
+```bash
+kubectl create ingress gateway-ingress --rule="/*=gateway:8080" --class=nginx --annotation="kubernetes.io/ingress.class=nginx" --dry-run=client -o yaml > gateway-ingress.yaml
+```  
+
+Apply Service for gateway
+```bash
+kubectl apply -f gateway-ingress.yaml
+``` 
+
+Check ingress
+```bash
+kubectl get ingress
+``` 
