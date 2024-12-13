@@ -20,14 +20,12 @@ spec:
         name: spring-6-auth-server
         resources: {}
         env:
-          - name: MYSQL_USER
-            value: restadmin
-          - name: MYSQL_PASSWORD
-            value: password
-          - name: MYSQL_DATABASE
-            value: restdb
-          - name: MYSQL_ROOT_PASSWORD
-            value: password
+          - name: SPRING_SECURITY_OAUTH2_AUTHORIZATION_SERVER_ISSUER
+            value: http://auth-server:9000
+          - name: SECURITY_OAUTH2_AUTHORIZATION_SERVER_TOKEN_ACCESS_TOKEN_TIME_TO_LIVE_SECONDS
+            value: "1200"
+          - name: SECURITY_OAUTH2_AUTHORIZATION_SERVER_TOKEN_REFRESH_TOKEN_TIME_TO_LIVE_SECONDS
+            value: "7200"
         startupProbe:
           httpGet:
             path: /actuator/health

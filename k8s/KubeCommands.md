@@ -1,5 +1,19 @@
 # Kubernetes
 
+## Table of Contents
+- [Images](#images)
+- [Commands](#commands)
+    - [Display resources](#display-resources)
+    - [View logs](#view-logs)
+    - [Delete all services and deployments](#delete-all-services-and-deployments)
+- [Mongo](#mongo)
+- [MySQL](#mysql)
+- [Auth-server](#auth-server)
+- [rest-mvc](#rest-mvc)
+- [reactive](#reactive)
+- [reactive-mongo](#reactive-mongo)
+- [gateway](#gateway)
+
 ## Images
 * `spring-6-gateway:0.0.1-SNAPSHOT`
 * `spring-6-auth-server:0.0.1-SNAPSHOT`
@@ -24,6 +38,9 @@ kubectl get all -o wide
 ```
 
 ### View logs 
+
+Use parameter -f to follow the logs
+
 ```bash 
 kubectl logs mongo-<pod-id>
 ```
@@ -199,7 +216,31 @@ Apply Service for reactive-mongo
 kubectl apply -f reactive-mongo-service.yaml
 ```
 
-## Port forward to Gateway
+## gateway
+
+Create Deployment for gateway
+```bash
+kubectl create deployment gateway --image=spring-6-gateway:0.0.1-SNAPSHOT --dry-run=client -o yaml > gateway-deployment.yaml
+```
+
+Apply Deployment for gateway
+```bash
+kubectl apply -f gateway-deployment.yaml
+```
+
+Create Service for gateway
+```bash
+kubectl create service clusterip gateway --tcp=8080:8080 --dry-run=client -o yaml > gateway-service.yaml
+```
+
+Apply Service for gateway
+```bash
+kubectl apply -f gateway-service.yaml
+```
+
+### Port forward to Gateway
+This is exposing the gateway to the outside world on the port 8080
+TODO: This is just a workaround
 ```bash
 kubectl port-forward service/gateway 8080:8080
 ```
