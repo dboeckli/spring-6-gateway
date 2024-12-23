@@ -5,6 +5,8 @@ run-name: >
 on:
   push:
     branches: [ "main", "master", "feature/**", "release/**" ]
+  pull_request:
+    branches: [ "main", "master" ]
   schedule:
     - cron: 5 5 * * MON-FRI # daily at 5:05 am (Except on Weekends)
 jobs:
