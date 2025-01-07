@@ -8,7 +8,7 @@ on:
   pull_request:
     branches: [ "main", "master" ]  
   schedule:
-    - cron: 5 5 * * MON-FRI # daily at 5:05 am (Except on Weekends)
+    - cron: '5 2 * * *' # daily at 2:05
 jobs:
 
   setup:
@@ -139,3 +139,4 @@ jobs:
         with:
           files: |
             ./target/surefire-reports/TEST-*.xml
+            ./target/failsafe-reports/TEST-*.xml
