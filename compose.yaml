@@ -29,7 +29,7 @@ services:
     container_name: auth-server
     # image from docker hub
     #image: domboeckli/spring-6-auth-server:0.0.1-SNAPSHOT
-    image: spring-6-auth-server:0.0.1-SNAPSHOT
+    image: local/spring-6-auth-server:0.0.1-SNAPSHOT
     ports:
       - "9000:9000"
     expose:
@@ -39,7 +39,7 @@ services:
     container_name: rest-mvc
     # image from docker hup
     #image: domboeckli/spring-6-rest-mvc:0.0.1-SNAPSHOT
-    image: spring-6-rest-mvc:0.0.1-SNAPSHOT
+    image: local/spring-6-rest-mvc:0.0.1-SNAPSHOT
     ports:
       - "8081:8080"
     expose:
@@ -57,7 +57,7 @@ services:
     container_name: reactive-mongo
     # image from docker hup
     #image: domboeckli/spring-6-reactive-mongo:0.0.1-SNAPSHOT
-    image: spring-6-reactive-mongo:0.0.1-SNAPSHOT
+    image: local/spring-6-reactive-mongo:0.0.1-SNAPSHOT
     ports:
       - "8083:8080"
     expose:
@@ -76,7 +76,7 @@ services:
     container_name: reactive
     # image from docker hup
     #image: domboeckli/spring-6-reactive:0.0.1-SNAPSHOT
-    image: spring-6-reactive:0.0.1-SNAPSHOT
+    image: local/spring-6-reactive:0.0.1-SNAPSHOT
     ports:
       - "8082:8080"
     expose:
@@ -91,7 +91,7 @@ services:
     container_name: gateway
     # image from docker hup
     #image: domboeckli/spring-6-gateway:0.0.1-SNAPSHOT
-    image: spring-6-gateway:0.0.1-SNAPSHOT
+    image: local/spring-6-gateway:0.0.1-SNAPSHOT
     expose:
       - 8080
     ports:
