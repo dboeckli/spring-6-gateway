@@ -17,7 +17,7 @@ import java.util.Objects;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 @Slf4j
-public class ActuatorInfoTest {
+class ActuatorInfoTest {
 
     @Autowired
     private WebTestClient webTestClient;

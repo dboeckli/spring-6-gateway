@@ -13,8 +13,7 @@ public class LogbookConfig {
     @Bean
     public Sink LogbookLogStash(){
         HttpLogFormatter formatter = new JsonHttpLogFormatter();
-        LogstashLogbackSink sink = new LogstashLogbackSink(formatter);
-        return sink;
+        return new LogstashLogbackSink(formatter);
     }
     
 }
