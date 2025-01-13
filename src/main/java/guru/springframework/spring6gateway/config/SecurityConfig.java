@@ -15,7 +15,7 @@ public class SecurityConfig {
 
     @Bean
     @Order(1)
-    public SecurityWebFilterChain actuatorSecurityFilterChain(ServerHttpSecurity http) throws Exception {
+    public SecurityWebFilterChain actuatorSecurityFilterChain(ServerHttpSecurity http) {
         http.securityMatcher(EndpointRequest.toAnyEndpoint())
             .authorizeExchange(authorize -> authorize.anyExchange().permitAll());
         return http.build();
