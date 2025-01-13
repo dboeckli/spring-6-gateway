@@ -11,7 +11,7 @@ import org.zalando.logbook.logstash.LogstashLogbackSink;
 public class LogbookConfig {
 
     @Bean
-    public Sink LogbookLogStash(){
+    public Sink logbookLogStash() {
         HttpLogFormatter formatter = new JsonHttpLogFormatter();
         return new LogstashLogbackSink(formatter);
     }
