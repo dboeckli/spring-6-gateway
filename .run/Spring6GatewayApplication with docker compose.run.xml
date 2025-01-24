@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Spring6GatewayApplication with docker compose" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <option name="ACTIVE_PROFILES" value="with_docker_compose" />
+    <module name="spring-6-gateway" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="guru.springframework.spring6gateway.Spring6GatewayApplication" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

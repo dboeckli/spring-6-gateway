@@ -1,0 +1,71 @@
+spring:
+  application:
+    name: spring-6-gateway
+    
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:9000
+          
+  docker:
+    compose:
+      enabled: true
+      stop:
+        command: down
+      skip:
+        in-tests: false
+  
+  cloud:
+    gateway:
+      routes:
+        - id: spring-6-rest-mvc
+          uri: http://localhost:8081
+          enabled: true
+          predicates:
+            - Path=/api/v1/**
+        - id: spring-6-reactive
+          uri: http://localhost:8082
+          enabled: true
+          predicates:
+            - Path=/api/v2/*
+        - id: spring-6-reactive-mongo
+          uri: http://localhost:8083
+          enabled: true
+          predicates:
+            - Path=/api/v3/*
+        - id: spring-6-auth-server
+          uri: http://localhost:9000
+          enabled: true
+          predicates:
+            - Path=/oauth2/**
+          
+      httpserver:
+        wiretap: true
+      httpclient:
+        wiretap: true
+        
+logging:
+  level:
+    org.springframework.cloud.gateway: TRACE
+    org.springframework.http.server.reactive: DEBUG
+    org.springframework.web.reactive: DEBUG
+    reactor.ipc.netty: DEBUG
+    reactor.netty: DEBUG
+    org.zalando.logbook: TRACE
+
+management:
+  health:
+    readinessstate:
+      enabled: true
+    livenessstate:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always    
