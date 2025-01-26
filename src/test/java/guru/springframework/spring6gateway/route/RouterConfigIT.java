@@ -46,7 +46,7 @@ class RouterConfigIT {
         checkAppReady("http://host.docker.internal:8082");
         checkAppReady("http://host.docker.internal:8083");
         this.webClient = WebClient.create("http://localhost:" + port);
-        this.authToken = getAuthToken(webClient);
+        this.authToken = getAuthToken();
     }
 
     @Test
@@ -128,11 +128,11 @@ class RouterConfigIT {
         assertNotNull(firstBeer.get("beerName"));
     }
 
-    private String getAuthToken(WebClient authClient) {
+    private String getAuthToken() {
         String credentials = "messaging-client:secret";
         String encodedCredentials = Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
 
-        return authClient.post()
+        return webClient.post()
             .uri("/oauth2/token")
             .header("Authorization", "Basic " + encodedCredentials)
             .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -155,7 +155,7 @@ class RouterConfigIT {
         WebClient webClientForActuator = WebClient.create(url);
 
         Awaitility.await()
-            .atMost(60, TimeUnit.SECONDS)
+            .atMost(90, TimeUnit.SECONDS)
             .pollInterval(1, TimeUnit.SECONDS)
             .until(() -> {
                 try {
