@@ -42,7 +42,7 @@ services:
     expose:
       - 9000
     environment:
-      SPRING_SECURITY_OAUTH2_AUTHORIZATION_SERVER_ISSUER: "http://localhost:9000"
+      SPRING_SECURITY_OAUTH2_AUTHORIZATION_SERVER_ISSUER: "http://host.docker.internal:9000"
       
   rest-mvc:
     container_name: rest-mvc
@@ -53,7 +53,7 @@ services:
       - 8081
     environment:
       SPRING_PROFILES_ACTIVE: localmysql
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://auth-server:9000
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://host.docker.internal:9000
       SERVER_PORT: 8081
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/restdb
       LOGGING_LEVEL_ORG_APACHE_KAFKA_CLIENTS_NETWORKCLIENT: ERROR
@@ -73,7 +73,7 @@ services:
     expose:
       - 8083
     environment:
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://auth-server:9000
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://host.docker.internal:9000
       SERVER_PORT: 8083
       SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/sfg
       SPRING_DATA_MONGODB_USERNAME: root
@@ -94,7 +94,7 @@ services:
     expose:
       - 8082
     environment:
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://auth-server:9000
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://host.docker.internal:9000
       SERVER_PORT: 8082
     depends_on:
       auth-server:

@@ -11,3 +11,11 @@ Authorization: Basic messaging-client secret
 Content-Type: application/x-www-form-urlencoded
 
 grant_type=client_credentials&client_id=user&client_secret=password&scope=message.read message.write
+
+### this retrieves the bearer token. use the token in the request below. When running via gateway we need to retrieve the token via gateway!
+POST http://host.docker.internal:9000/oauth2/token
+Authorization: Basic messaging-client secret
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=client_credentials&client_id=user&client_secret=password&scope=message.read message.write
+
