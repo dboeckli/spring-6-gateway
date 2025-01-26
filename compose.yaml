@@ -49,8 +49,8 @@ services:
     #      - host.docker.internal  
     extra_hosts:
     #  - "host.docker.internal:host-gateway"    
-      - "host.docker.internal:172.17.0.1"
-    #  - "host.docker.internal:172.18.0.1"
+    #  - "host.docker.internal:172.17.0.1"
+      - "host.docker.internal:172.18.0.1"
   
   rest-mvc:
     container_name: rest-mvc
