@@ -164,6 +164,14 @@ jobs:
       - name: Add host.docker.internal to /etc/hosts
         run: |
           echo "127.0.0.1 host.docker.internal" | sudo tee -a /etc/hosts
+          echo "Verifying host.docker.internal entry:"
+          dig +short host.docker.internal
+          if [ "$(dig +short host.docker.internal)" = "127.0.0.1" ]; then
+            echo "host.docker.internal correctly resolves to 127.0.0.1"
+          else
+            echo "Error: host.docker.internal does not resolve to 127.0.0.1"
+            exit 1
+          fi
       
       - name: Run Maven Build
         env:
