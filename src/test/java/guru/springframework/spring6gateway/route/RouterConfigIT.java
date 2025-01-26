@@ -42,9 +42,9 @@ class RouterConfigIT {
 
     @BeforeEach
     public void setup() {
-        checkAppReady("http://host.docker.internal:8081");
-        checkAppReady("http://host.docker.internal:8082");
-        checkAppReady("http://host.docker.internal:8083");
+        checkAppReady("http://localhost:8081"); // spring-6-rest-mvc
+        checkAppReady("http://localhost:8082"); // spring-6-reactive
+        checkAppReady("http://localhost:8083"); // spring-6-reactive-mongo
         this.webClient = WebClient.create("http://localhost:" + port);
         this.authToken = getAuthToken();
     }
