@@ -153,6 +153,7 @@ class RouterConfigIT {
 
     public static void checkAppReady(String url) {
         WebClient webClientForActuator = WebClient.create(url);
+        log.info("readyness check for {}", url);
 
         Awaitility.await()
             .atMost(90, TimeUnit.SECONDS)

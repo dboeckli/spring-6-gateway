@@ -43,7 +43,9 @@ services:
       - 9000
     environment:
       SPRING_SECURITY_OAUTH2_AUTHORIZATION_SERVER_ISSUER: "http://host.docker.internal:9000"
-      
+    extra_hosts:
+      - "host.docker.internal:host-gateway"    
+  
   rest-mvc:
     container_name: rest-mvc
     image: domboeckli/spring-6-rest-mvc:0.0.1-SNAPSHOT
@@ -64,6 +66,8 @@ services:
       auth-server:
         condition: service_started
         required: true
+    extra_hosts:
+      - "host.docker.internal:host-gateway"    
       
   reactive-mongo:
     container_name: reactive-mongo
@@ -85,6 +89,8 @@ services:
       auth-server:
         condition: service_started
         required: true
+    extra_hosts:
+      - "host.docker.internal:host-gateway"      
 
   reactive:
     container_name: reactive
@@ -100,3 +106,5 @@ services:
       auth-server:
         condition: service_started
         required: true
+    extra_hosts:
+      - "host.docker.internal:host-gateway"    
