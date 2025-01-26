@@ -21,11 +21,12 @@ import reactor.test.StepVerifier;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Base64;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("with_docker_compose")
@@ -41,7 +42,9 @@ class RouterConfigIT {
 
     @BeforeEach
     public void setup() {
-        checkMvcReady("http://host.docker.internal:8081");
+        checkAppReady("http://host.docker.internal:8081");
+        checkAppReady("http://host.docker.internal:8082");
+        checkAppReady("http://host.docker.internal:8083");
         this.webClient = WebClient.create("http://localhost:" + port);
         this.authToken = getAuthToken(webClient);
     }
@@ -55,17 +58,74 @@ class RouterConfigIT {
             .header("Authorization", "Bearer " + authToken)
             .accept(MediaType.APPLICATION_JSON)
             .retrieve()
-            .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {});
+            .bodyToMono(new ParameterizedTypeReference<>() {
+            });
 
         StepVerifier.create(response)
             .consumeNextWith(responseHolder::set)
             .verifyComplete();
 
         Map<String, Object> storedResponse = responseHolder.get();
-        log.info("Full response:" + storedResponse);
-    
+        log.info("V1 Full response:" + storedResponse);
+
         Integer totalElements = (Integer) storedResponse.get("totalElements");
         assertEquals(2413, totalElements);
+    }
+
+    @Test
+    void testV2ListBeers() {
+        AtomicReference<List<Map<String, Object>>> responseHolder = new AtomicReference<>();
+
+        Mono<List<Map<String, Object>>> response = webClient.get()
+            .uri("/api/v2/beer")
+            .header("Authorization", "Bearer " + authToken)
+            .accept(MediaType.APPLICATION_JSON)
+            .retrieve()
+            .bodyToMono(new ParameterizedTypeReference<>() {
+            });
+
+        StepVerifier.create(response)
+            .consumeNextWith(responseHolder::set)
+            .verifyComplete();
+
+        List<Map<String, Object>> storedResponse = responseHolder.get();
+        log.info("V2 Full response: {}", storedResponse);
+
+        assertFalse(storedResponse.isEmpty());
+        assertEquals(3, storedResponse.size());
+
+        // Überprüfen Sie das erste Element in der Liste
+        Map<String, Object> firstBeer = storedResponse.getFirst();
+        assertNotNull(firstBeer.get("id"));
+        assertNotNull(firstBeer.get("beerName"));
+    }
+
+    @Test
+    void testV3ListBeers() {
+        AtomicReference<List<Map<String, Object>>> responseHolder = new AtomicReference<>();
+
+        Mono<List<Map<String, Object>>> response = webClient.get()
+            .uri("/api/v3/beer")
+            .header("Authorization", "Bearer " + authToken)
+            .accept(MediaType.APPLICATION_JSON)
+            .retrieve()
+            .bodyToMono(new ParameterizedTypeReference<>() {
+            });
+
+        StepVerifier.create(response)
+            .consumeNextWith(responseHolder::set)
+            .verifyComplete();
+
+        List<Map<String, Object>> storedResponse = responseHolder.get();
+        log.info("V3 Full response: {}", storedResponse);
+
+        assertFalse(storedResponse.isEmpty());
+        assertEquals(3, storedResponse.size());
+
+        // Überprüfen Sie das erste Element in der Liste
+        Map<String, Object> firstBeer = storedResponse.getFirst();
+        assertNotNull(firstBeer.get("id"));
+        assertNotNull(firstBeer.get("beerName"));
     }
 
     private String getAuthToken(WebClient authClient) {
@@ -91,7 +151,7 @@ class RouterConfigIT {
             .block();
     }
 
-    public static void checkMvcReady(String url) {
+    public static void checkAppReady(String url) {
         WebClient webClientForActuator = WebClient.create(url);
 
         Awaitility.await()
