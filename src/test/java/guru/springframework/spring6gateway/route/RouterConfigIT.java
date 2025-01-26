@@ -1,12 +1,17 @@
 package guru.springframework.spring6gateway.route;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -14,14 +19,17 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Base64;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("with_docker_compose")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @Slf4j
 class RouterConfigIT {
 
@@ -33,6 +41,7 @@ class RouterConfigIT {
 
     @BeforeEach
     public void setup() {
+        checkMvcReady("http://host.docker.internal:8081");
         this.webClient = WebClient.create("http://localhost:" + port);
         this.authToken = getAuthToken(webClient);
     }
@@ -80,5 +89,39 @@ class RouterConfigIT {
                 return response.substring(start, end);
             })
             .block();
+    }
+
+    public static void checkMvcReady(String url) {
+        WebClient webClientForActuator = WebClient.create(url);
+
+        Awaitility.await()
+            .atMost(60, TimeUnit.SECONDS)
+            .pollInterval(1, TimeUnit.SECONDS)
+            .until(() -> {
+                try {
+                    return webClientForActuator.get()
+                        .uri(url + "/actuator/health/readiness")
+                        .retrieve()
+                        .bodyToMono(String.class)
+                        .map(body -> {
+                            log.info("Readiness check response: {}", body);
+                            JsonNode jsonNode;
+                            try {
+                                jsonNode = new ObjectMapper().readTree(body);
+                            } catch (JsonProcessingException e) {
+                                throw new RuntimeException(e);
+                            }
+                            String status = jsonNode.path("status").asText();
+                            log.info("Application status: {}", status);
+                            return "UP".equals(status);
+                        })
+                        .onErrorReturn(false)
+                        .block(Duration.ofSeconds(5));
+                } catch (Exception e) {
+                    log.warn("Error checking MVC readiness: ", e);
+                    return false;
+                }
+            });
+        log.info("MVC application is ready.");
     }
 }
