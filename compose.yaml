@@ -43,13 +43,13 @@ services:
       - 9000
     environment:
       SPRING_SECURITY_OAUTH2_AUTHORIZATION_SERVER_ISSUER: "http://host.docker.internal:9000"
-    networks:
-      default:
-        aliases:
-          - host.docker.internal  
-    #extra_hosts:
+    #networks:
+    #  default:
+    #    aliases:
+    #      - host.docker.internal  
+    extra_hosts:
     #  - "host.docker.internal:host-gateway"    
-    #  - "host.docker.internal:172.17.0.1"
+      - "host.docker.internal:172.17.0.1"
     #  - "host.docker.internal:172.18.0.1"
   
   rest-mvc:
