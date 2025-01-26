@@ -161,6 +161,10 @@ jobs:
           server-id: github # Value of the distributionManagement/repository/id field of the pom.xml.
           settings-path: ${{ github.workspace }} # location for the settings.xml file       
 
+      - name: Add host.docker.internal to /etc/hosts
+        run: |
+          echo "127.0.0.1 host.docker.internal" | sudo tee -a /etc/hosts
+      
       - name: Run Maven Build
         env:
           GITHUB_ACTOR: ${{ github.actor }}
