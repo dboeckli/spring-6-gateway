@@ -67,7 +67,7 @@ services:
         condition: service_started
         required: true
     extra_hosts:
-      - "host.docker.internal:host-gateway"    
+      - "host.docker.internal:172.17.0.1"    
       
   reactive-mongo:
     container_name: reactive-mongo
@@ -90,7 +90,7 @@ services:
         condition: service_started
         required: true
     extra_hosts:
-      - "host.docker.internal:host-gateway"      
+      - "host.docker.internal:172.18.0.1"      
 
   reactive:
     container_name: reactive
