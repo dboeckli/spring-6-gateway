@@ -1,0 +1,24 @@
+### spring-6-gateway
+GET http://localhost:8080/v3/api-docs
+Accept: application/json
+Content-Type: application/json
+
+### spring-6-rest-mvc
+GET http://localhost:8080/api/v1/v3/api-docs
+Accept: application/json
+Content-Type: application/json
+
+### spring-6-reactive
+GET http://localhost:8080/api/v2/v3/api-docs
+Accept: application/json
+Content-Type: application/json
+
+### spring-6-reactive-mongo
+GET http://localhost:8080/api/v3/v3/api-docs
+Accept: application/json
+Content-Type: application/json
+
+### spring-6-auth
+GET http://localhost:8080/oauth2/v3/api-docs
+Accept: application/json
+Content-Type: application/json

@@ -48,7 +48,7 @@ services:
   
   rest-mvc:
     container_name: rest-mvc
-    image: domboeckli/spring-6-rest-mvc:0.0.1-SNAPSHOT
+    image: domboeckli/spring-6-rest-mvc:0.0.3-SNAPSHOT
     ports:
       - "8081:8081"
     expose:

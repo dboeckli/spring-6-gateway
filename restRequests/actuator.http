@@ -40,3 +40,23 @@ Accept: application/json
 
 ### actuator get loggers
 GET localhost:8080/actuator/loggers
+
+### spring-6-rest-mvc
+GET http://localhost:8080/api/v1/actuator/info
+Accept: application/json
+Content-Type: application/json
+
+### spring-6-reactive
+GET http://localhost:8080/api/v2/actuator/info
+Accept: application/json
+Content-Type: application/json
+
+### spring-6-reactive- mongo
+GET http://localhost:8080/api/v3/actuator/info
+Accept: application/json
+Content-Type: application/json
+
+### spring-6-auth
+GET http://localhost:8080/oauth2/actuator/info
+Accept: application/json
+Content-Type: application/json
