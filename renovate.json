@@ -17,5 +17,11 @@
     }
   ],
   "ignoreDeps": ["maven"],
-  "schedule": ["before 5am every day"]
+  "schedule": ["before 5am every day"],
+  "onboarding": false,
+  "platformAutomerge": true,
+  "dependencyDashboard": true,
+  "prHourlyLimit": 0,
+  "prConcurrentLimit": 0,
+  "baseBranches": ["master"]
 }
