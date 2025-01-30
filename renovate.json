@@ -24,4 +24,5 @@
   "prHourlyLimit": 0,
   "prConcurrentLimit": 0,
   "baseBranches": ["master"]
+  "branchPrefix": "feature/renovate-"
 }
