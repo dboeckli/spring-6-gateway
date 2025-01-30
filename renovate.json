@@ -23,6 +23,6 @@
   "dependencyDashboard": true,
   "prHourlyLimit": 0,
   "prConcurrentLimit": 0,
-  "baseBranches": ["master"]
+  "baseBranches": ["master"],
   "branchPrefix": "feature/renovate-"
 }
