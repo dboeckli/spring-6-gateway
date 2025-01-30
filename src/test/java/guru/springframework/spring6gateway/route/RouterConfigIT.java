@@ -7,6 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
@@ -25,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -49,8 +53,8 @@ class RouterConfigIT {
         this.authToken = getAuthToken();
     }
 
-    @Test
-    void testV1ListBeers() {
+    @Test 
+    void testV1RestMvcListBeers() {
         AtomicReference<Map<String, Object>> responseHolder = new AtomicReference<>();
 
         Mono<Map<String, Object>> response = webClient.get()
@@ -73,7 +77,7 @@ class RouterConfigIT {
     }
 
     @Test
-    void testV2ListBeers() {
+    void testV2ReactiveListBeers() {
         AtomicReference<List<Map<String, Object>>> responseHolder = new AtomicReference<>();
 
         Mono<List<Map<String, Object>>> response = webClient.get()
@@ -101,7 +105,7 @@ class RouterConfigIT {
     }
 
     @Test
-    void testV3ListBeers() {
+    void testV3ReactiveMongoListBeers() {
         AtomicReference<List<Map<String, Object>>> responseHolder = new AtomicReference<>();
 
         Mono<List<Map<String, Object>>> response = webClient.get()
@@ -126,6 +130,81 @@ class RouterConfigIT {
         Map<String, Object> firstBeer = storedResponse.getFirst();
         assertNotNull(firstBeer.get("id"));
         assertNotNull(firstBeer.get("beerName"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("actuatorTestArguments")
+    void testActuator(String apiVersion, String uri, String expectedArtifact, String expectedName, String expectedGroup) {
+        AtomicReference<Map<String, Object>> responseHolder = new AtomicReference<>();
+
+        Mono<Map<String, Object>> response = webClient.get()
+            .uri(uri)
+            .header("Authorization", "Bearer " + authToken)
+            .accept(MediaType.APPLICATION_JSON)
+            .retrieve()
+            .bodyToMono(new ParameterizedTypeReference<>() {
+            });
+
+        StepVerifier.create(response)
+            .consumeNextWith(responseHolder::set)
+            .verifyComplete();
+
+        Map<String, Object> storedResponse = responseHolder.get();
+        log.info("{} Actuator Info response: {}", apiVersion, storedResponse);
+        assertNotNull(storedResponse);
+
+        Map<String, Object> build = (Map<String, Object>) storedResponse.get("build");
+        assertNotNull(build);
+
+        assertNotNull(build.get("version"));
+        assertEquals(expectedArtifact, build.get("artifact"));
+        assertEquals(expectedName, build.get("name"));
+        assertEquals(expectedGroup, build.get("group"));
+    }
+
+    private static Stream<Arguments> actuatorTestArguments() {
+        return Stream.of(
+            Arguments.of("V1", "/api/v1/actuator/info", "spring-6-rest-mvc", "spring-6-rest-mvc", "ch.dboeckli.springframeworkguru.spring-rest-mvc"),
+            Arguments.of("V2", "/api/v2/actuator/info", "spring-6-reactive", "spring-6-reactive", "guru.springframework"),
+            Arguments.of("V3", "/api/v3/actuator/info", "spring-6-reactive-mongo", "spring-6-reactive-mongo", "guru.springframework"),
+            Arguments.of("Auth", "/oauth2/actuator/info", "spring-6-auth-server", "spring-6-auth-server", "guru.springframework")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("openApiDocsTestArguments")
+    void testOpenApiDocs(String apiVersion, String uri, String expectedTitle) {
+        AtomicReference<Map<String, Object>> responseHolder = new AtomicReference<>();
+
+        Mono<Map<String, Object>> response = webClient.get()
+            .uri(uri)
+            .header("Authorization", "Bearer " + authToken)
+            .accept(MediaType.APPLICATION_JSON)
+            .retrieve()
+            .bodyToMono(new ParameterizedTypeReference<>() {
+            });
+
+        StepVerifier.create(response)
+            .consumeNextWith(responseHolder::set)
+            .verifyComplete();
+
+        Map<String, Object> storedResponse = responseHolder.get();
+        log.info("{} OpenAPI Docs response: {}", apiVersion, storedResponse);
+        assertNotNull(storedResponse);
+
+        Map<String, Object> info = (Map<String, Object>) storedResponse.get("info");
+        assertNotNull(info);
+        assertEquals(expectedTitle, info.get("title"));
+        assertNotNull(info.get("version"));
+    }
+
+    private static Stream<Arguments> openApiDocsTestArguments() {
+        return Stream.of(
+            Arguments.of("V1", "/api/v1/v3/api-docs", "spring-6-rest-mvc"),
+            Arguments.of("V2", "/api/v2/v3/api-docs", "spring-6-reactive"),
+            Arguments.of("V3", "/api/v3/v3/api-docs", "spring-6-reactive-mongo"),
+            Arguments.of("Auth", "/oauth2/v3/api-docs", "spring-6-auth-server")
+        );
     }
 
     private String getAuthToken() {

@@ -82,13 +82,13 @@ spring:
           predicates:
             - Path=/oauth2/v3/api-docs,/oauth2/v3/api-docs/**
           filters:
-            - StripPrefix=2
+            - StripPrefix=1
         - id: spring-6-auth-server-actuator
           uri: http://host.docker.internal:9000
           predicates:
             - Path=/oauth2/actuator,/oauth2/actuator/**
           filters:
-            - StripPrefix=2
+            - StripPrefix=1
         - id: spring-6-auth-server
           uri: http://host.docker.internal:9000
           enabled: true
