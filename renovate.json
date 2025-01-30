@@ -16,5 +16,6 @@
       "matchUpdateTypes": ["minor", "patch"]
     }
   ],
-  "ignoreDeps": ["maven"]
+  "ignoreDeps": ["maven"],
+  "schedule": ["before 5am every day"]
 }
