@@ -1,0 +1,9 @@
+### spring-6-gateway
+GET http://localhost:8080/v3/api-docs
+Accept: application/json
+Content-Type: application/json
+
+### spring-6-reactive
+GET http://localhost:8080/api/v2/v3/api-docs
+Accept: application/json
+Content-Type: application/json

@@ -19,21 +19,76 @@ spring:
   cloud:
     gateway:
       routes:
+        # spring-6-rest-mvc
+        - id: spring-6-rest-mvc-api-docs
+          uri: http://host.docker.internal:8081
+          predicates:
+            - Path=/api/v1/v3/api-docs,/api/v1/v3/api-docs/**
+          filters:
+            - StripPrefix=2
+        - id: spring-6-rest-mvc-actuator
+          uri: http://host.docker.internal:8081
+          predicates:
+            - Path=/api/v1/actuator,/api/v1/actuator/**
+          filters:
+            - StripPrefix=2
         - id: spring-6-rest-mvc
           uri: http://host.docker.internal:8081
           enabled: true
           predicates:
             - Path=/api/v1/**
+            
+        # spring-6-reactive
+        - id: spring-6-reactive-api-docs
+          uri: http://host.docker.internal:8082
+          predicates:
+            - Path=/api/v2/v3/api-docs,/api/v2/v3/api-docs/**
+          filters:
+            - StripPrefix=2
+        - id: spring-6-reactive-actuator
+          uri: http://host.docker.internal:8082
+          predicates:
+            - Path=/api/v2/actuator,/api/v2/actuator/**
+          filters:
+            - StripPrefix=2
         - id: spring-6-reactive
           uri: http://host.docker.internal:8082
           enabled: true
           predicates:
-            - Path=/api/v2/*
+            - Path=/api/v2/**
+            
+        # spring-6-reactive-mongo
+        - id: spring-6-reactive-mongo-api-docs
+          uri: http://host.docker.internal:8083
+          predicates:
+            - Path=/api/v3/v3/api-docs,/api/v3/v3/api-docs/**
+          filters:
+            - StripPrefix=2
+        - id: spring-6-reactive-mongo-actuator
+          uri: http://host.docker.internal:8083
+          predicates:
+            - Path=/api/v3/actuator,/api/v3/actuator/**
+          filters:
+            - StripPrefix=2
         - id: spring-6-reactive-mongo
           uri: http://host.docker.internal:8083
           enabled: true
           predicates:
-            - Path=/api/v3/*
+            - Path=/api/v3/**
+        
+        # spring-6-auth-server
+        - id: spring-6-auth-server-api-docs
+          uri: http://host.docker.internal:9000
+          predicates:
+            - Path=/oauth2/v3/api-docs,/oauth2/v3/api-docs/**
+          filters:
+            - StripPrefix=2
+        - id: spring-6-auth-server-actuator
+          uri: http://host.docker.internal:9000
+          predicates:
+            - Path=/oauth2/actuator,/oauth2/actuator/**
+          filters:
+            - StripPrefix=2
         - id: spring-6-auth-server
           uri: http://host.docker.internal:9000
           enabled: true
@@ -68,4 +123,40 @@ management:
     health:
       probes:
         enabled: true
-      show-details: always    
+      show-details: always  
+        
+springdoc:
+  show-actuator: false
+  show-oauth2-endpoints: false
+  api-docs:
+    enabled: true
+  swagger-ui:
+    oauth:
+      # do that not on production!
+      client-id: messaging-client
+      client-secret: secret
+    urls:
+      - name: gateway-service
+        url: /v3/api-docs
+      - name: spring-6-rest-mvc
+        url: /api/v1/v3/api-docs 
+      - name: spring-6-reactive
+        url: /api/v2/v3/api-docs
+      - name: spring-6-reactive-mongo
+        url: /api/v3/v3/api-docs  
+      - name: spring-6-auth-server
+        url: /oauth2/v3/api-docs
+
+security:
+  authorization-url: http://host.docker.internal:9000/oauth2/auth
+  token-url: http://host.docker.internal:9000/oauth2/token
+  refresh-url: http://host.docker.internal:9000/oauth2/refresh-token
+  cors:
+    # gateway project runs on port 8080
+    allowed-origins: 
+      - http://localhost:8080
+      - http://127.0.0.1:8080
+      - http://host.docker.internal:8081
+      - http://host.docker.internal:8082
+      - http://host.docker.internal:8083
+      - http://host.docker.internal:9000
