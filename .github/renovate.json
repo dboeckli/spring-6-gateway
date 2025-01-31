@@ -34,17 +34,6 @@
       "automerge": false,
       "automergeType": "pr",
       "ignoreTests": true
-    },
-    {
-      "matchDatasources": [
-        "docker"
-      ],
-      "matchCurrentVersion": "/(^\\d+$|latest)/",
-      "rangeStrategy": "pin",
-      "pinDigests": false,
-      "automerge": false,
-      "automergeType": "pr",
-      "ignoreTests": true
     }
   ],
   "ignoreDeps": [
