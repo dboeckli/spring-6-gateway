@@ -10,6 +10,9 @@
   "docker-compose": {
     "enabled": true
   },
+  "docker": {
+    "registryUrls": ["https://registry.hub.docker.com"]
+  },
   "packageRules": [
     {
       "matchDatasources": [
