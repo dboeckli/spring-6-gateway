@@ -11,7 +11,7 @@
     "enabled": true
   },
   "docker": {
-    "registryUrls": ["https://registry.hub.docker.com"]
+    "registryUrls": ["https://index.docker.io"]
   },
   "packageRules": [
     {
@@ -22,6 +22,7 @@
         "/^domboeckli//"
       ],
       "versioning": "maven",
+      "allowedVersions": "/^[0-9]+\\.[0-9]+\\.[0-9]+(-SNAPSHOT)?$/",
       "ignoreUnstable": false,
       "automerge": false,
       "automergeType": "pr",
