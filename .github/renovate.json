@@ -1,0 +1,68 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "mergeConfidence:all-badges",
+    "config:recommended"
+  ],
+  "enabledManagers": [
+    "docker-compose"
+  ],
+  "docker-compose": {
+    "enabled": true
+  },
+  "packageRules": [
+    {
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchPackageNames": [
+        "/^domboeckli//"
+      ],
+      "versioning": "maven",
+      "ignoreUnstable": false,
+      "automerge": false,
+      "automergeType": "pr",
+      "ignoreTests": true
+    },
+    {
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchPackageNames": [
+        "!/^domboeckli//"
+      ],
+      "automerge": false,
+      "automergeType": "pr",
+      "ignoreTests": true
+    },
+    {
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchCurrentVersion": "/(^\\d+$|latest)/",
+      "rangeStrategy": "pin",
+      "pinDigests": false,
+      "automerge": false,
+      "automergeType": "pr",
+      "ignoreTests": true
+    }
+  ],
+  "ignoreDeps": [
+    "maven"
+  ],
+  "schedule": [
+    "before 5am"
+  ],
+  "platformAutomerge": false,
+  "dependencyDashboard": false,
+  "prHourlyLimit": 0,
+  "prConcurrentLimit": 0,
+  "baseBranches": [
+    "master"
+  ],
+  "branchPrefix": "feature/renovate-",
+  "separateMinorPatch": true,
+  "separateMajorMinor": true,
+  "automerge": false,
+  "rebaseWhen": "conflicted"
+}
