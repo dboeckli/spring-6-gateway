@@ -10,6 +10,9 @@
   "docker-compose": {
     "enabled": true
   },
+  "docker": {
+    "registryUrls": ["https://registry.hub.docker.com"]
+  },
   "packageRules": [
     {
       "matchDatasources": [
@@ -31,17 +34,6 @@
       "matchPackageNames": [
         "!/^domboeckli//"
       ],
-      "automerge": false,
-      "automergeType": "pr",
-      "ignoreTests": true
-    },
-    {
-      "matchDatasources": [
-        "docker"
-      ],
-      "matchCurrentVersion": "/(^\\d+$|latest)/",
-      "rangeStrategy": "pin",
-      "pinDigests": false,
       "automerge": false,
       "automergeType": "pr",
       "ignoreTests": true
