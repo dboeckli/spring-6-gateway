@@ -108,3 +108,53 @@ services:
         required: true
     extra_hosts:
       - "host.docker.internal:host-gateway"    
+        
+  busybox:
+    image: busybox:1.37.0
+    container_name: busybox
+    depends_on:
+      auth-server:
+        condition: service_started
+        required: true
+      rest-mvc:
+        condition: service_started
+        required: true
+      reactive-mongo:
+        condition: service_started
+        required: true
+      reactive:
+        condition: service_started
+        required: true  
+    healthcheck:
+      test: [ "CMD", "sh", "-c", "
+            echo 'Checking BusyBox readiness...' &&
+            test -f /bin/sh &&
+            wget -qO- http://auth-server:9000/actuator/health/readiness | grep -q '\"status\":\"UP\"' &&
+            wget -qO- http://rest-mvc:8081/actuator/health/readiness | grep -q '\"status\":\"UP\"' &&
+            wget -qO- http://reactive-mongo:8083/actuator/health/readiness | grep -q '\"status\":\"UP\"' &&
+            wget -qO- http://reactive:8082/actuator/health/readiness | grep -q '\"status\":\"UP\"'
+          " ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: >
+      /bin/sh -c '
+      while true; do
+        auth_health=$$(wget -q -O - http://auth-server:9000/actuator/health/readiness 2>/dev/null)
+        mvc_health=$$(wget -q -O - http://rest-mvc:8081/actuator/health/readiness 2>/dev/null)
+        reactive-mongo_health=$$(wget -q -O - http://reactive-mongo:8083/actuator/health/readiness 2>/dev/null)
+        reactive-health=$$(wget -q -O - http://reactive:8082/actuator/health/readiness 2>/dev/null)
+
+        echo "{
+          \"timestamp\": \"$$(date -Iseconds)\",
+          \"services\": {
+            \"auth-server\": $$auth_health,
+            \"rest-mvc\": $$mvc_health,
+            \"reactive-mongo\": $$reactive-mongo_health
+            \"reactive-health\": $$reactive-health
+          }
+        }"
+
+        sleep 30
+      done
+      '            
