@@ -142,19 +142,18 @@ services:
       while true; do
         auth_health=$$(wget -q -O - http://auth-server:9000/actuator/health/readiness 2>/dev/null)
         mvc_health=$$(wget -q -O - http://rest-mvc:8081/actuator/health/readiness 2>/dev/null)
-        reactive-mongo_health=$$(wget -q -O - http://reactive-mongo:8083/actuator/health/readiness 2>/dev/null)
-        reactive-health=$$(wget -q -O - http://reactive:8082/actuator/health/readiness 2>/dev/null)
+        reactive_mongo_health=$$(wget -q -O - http://reactive-mongo:8083/actuator/health/readiness 2>/dev/null)
+        reactive_health=$$(wget -q -O - http://reactive:8082/actuator/health/readiness 2>/dev/null)
 
         echo "{
           \"timestamp\": \"$$(date -Iseconds)\",
           \"services\": {
             \"auth-server\": $$auth_health,
             \"rest-mvc\": $$mvc_health,
-            \"reactive-mongo\": $$reactive-mongo_health
-            \"reactive-health\": $$reactive-health
+            \"reactive-mongo\": $$reactive_mongo_health,
+            \"reactive\": $$reactive_health
           }
         }"
-
-        sleep 30
+        sleep 15
       done
       '            
