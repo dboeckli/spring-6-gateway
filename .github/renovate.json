@@ -43,6 +43,9 @@
   "ignoreDeps": [
     "maven"
   ],
+  "ignorePaths": [
+    "docker-manual/compose.yaml"
+  ],
   "schedule": [
     "before 5am"
   ],
