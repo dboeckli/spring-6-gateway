@@ -7,7 +7,12 @@ Server runs on port 8080. Requires that other projects are up and running
 * spring-6-rest-mvc on port 8081
 * spring-6-reactive on port 8082
 * spring-6-reactive-mongo on port 8083
+* spring-6-data-rest on port 8084
 Example request you can find in the restRequest directory
+
+## Urls
+* openapi: http://localhost:8080/swagger-ui/index.html
+* actuator: http://localhost:8080/api/v3/actuator/info
 
 ![alt text](guru.png "Overview")
 
@@ -19,6 +24,7 @@ Example request you can find in the restRequest directory
 * spring-6-rest-mvc:0.0.1-SNAPSHOT
 * spring-6-reactive:0.0.1-SNAPSHOT
 * spring-6-reactive-mongo:0.0.1-SNAPSHOT
+* spring-6-data-rest:0.0.1-SNAPSHOT
 
 ### create image
 ```shell

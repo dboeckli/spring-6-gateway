@@ -182,3 +182,22 @@ security:
       - http://host.docker.internal:8083
       - http://host.docker.internal:8084
       - http://host.docker.internal:9000
+        
+logbook:
+  filter:
+    enabled: true
+  format:
+    style: http
+  obfuscate:
+    headers:
+      - Authorization
+      - X-Secret
+    parameters:
+      - access_token
+      - password
+  predicate:
+    exclude:
+      - path: /actuator/health/**
+      # this is a workaround to fix logbook bug when log level is set on trace  
+      - path: /web/**
+      - path: /webjars/**        
