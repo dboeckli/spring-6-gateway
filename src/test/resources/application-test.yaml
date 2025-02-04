@@ -26,6 +26,11 @@ spring:
           enabled: true
           predicates:
             - Path=/api/v3/*
+        - id: spring-6-data-rest
+          uri: ${wiremock.server.baseUrl}
+          enabled: true
+          predicates:
+            - Path=/api/v4/*
       httpserver:
         wiretap: true
       httpclient:

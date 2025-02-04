@@ -8,13 +8,33 @@ GET http://localhost:8080/api/v1/v3/api-docs
 Accept: application/json
 Content-Type: application/json
 
+### 
+GET http://host.docker.internal:8081/v3/api-docs
+Accept: application/json
+Content-Type: application/json
+
 ### spring-6-reactive
 GET http://localhost:8080/api/v2/v3/api-docs
 Accept: application/json
 Content-Type: application/json
 
+###
+GET http://host.docker.internal:8082/v3/api-docs
+Accept: application/json
+Content-Type: application/json
+
 ### spring-6-reactive-mongo
 GET http://localhost:8080/api/v3/v3/api-docs
+Accept: application/json
+Content-Type: application/json
+
+###
+GET http://host.docker.internal:8083/v3/api-docs
+Accept: application/json
+Content-Type: application/json
+
+### spring-6-data-rest
+GET http://localhost:8080/api/v4/v3/api-docs
 Accept: application/json
 Content-Type: application/json
 

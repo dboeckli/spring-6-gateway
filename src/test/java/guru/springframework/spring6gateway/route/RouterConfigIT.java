@@ -49,6 +49,7 @@ class RouterConfigIT {
         checkAppReady("http://localhost:8081"); // spring-6-rest-mvc
         checkAppReady("http://localhost:8082"); // spring-6-reactive
         checkAppReady("http://localhost:8083"); // spring-6-reactive-mongo
+        checkAppReady("http://localhost:8084"); // spring-6-data-rest
         this.webClient = WebClient.create("http://localhost:" + port);
         this.authToken = getAuthToken();
     }
@@ -98,7 +99,6 @@ class RouterConfigIT {
         assertFalse(storedResponse.isEmpty());
         assertEquals(3, storedResponse.size());
 
-        // Überprüfen Sie das erste Element in der Liste
         Map<String, Object> firstBeer = storedResponse.getFirst();
         assertNotNull(firstBeer.get("id"));
         assertNotNull(firstBeer.get("beerName"));
@@ -126,9 +126,41 @@ class RouterConfigIT {
         assertFalse(storedResponse.isEmpty());
         assertEquals(3, storedResponse.size());
 
-        // Überprüfen Sie das erste Element in der Liste
         Map<String, Object> firstBeer = storedResponse.getFirst();
         assertNotNull(firstBeer.get("id"));
+        assertNotNull(firstBeer.get("beerName"));
+    }
+
+    @Test
+    void testV4DataRestListBeers() {
+        AtomicReference<Map<String, Object>> responseHolder = new AtomicReference<>();
+
+        Mono<Map<String, Object>> response = webClient.get()
+            .uri("/api/v4/beer")
+            .header("Authorization", "Bearer " + authToken)
+            .accept(MediaType.APPLICATION_JSON)
+            .retrieve()
+            .bodyToMono(new ParameterizedTypeReference<>() {
+            });
+
+        StepVerifier.create(response)
+            .consumeNextWith(responseHolder::set)
+            .verifyComplete();
+
+        Map<String, Object> storedResponse = responseHolder.get();
+        log.info("V4 Full response: {}", storedResponse);
+
+        assertNotNull(storedResponse);
+        assertTrue(storedResponse.containsKey("_embedded"));
+
+        Map<String, Object> embedded = (Map<String, Object>) storedResponse.get("_embedded");
+        assertTrue(embedded.containsKey("beers"));
+
+        List<Map<String, Object>> beerList = (List<Map<String, Object>>) embedded.get("beers");
+        assertFalse(beerList.isEmpty());
+        assertTrue(beerList.size() <= 30);
+
+        Map<String, Object> firstBeer = beerList.getFirst();
         assertNotNull(firstBeer.get("beerName"));
     }
 
@@ -167,6 +199,7 @@ class RouterConfigIT {
             Arguments.of("V1", "/api/v1/actuator/info", "spring-6-rest-mvc", "spring-6-rest-mvc", "ch.dboeckli.springframeworkguru.spring-rest-mvc"),
             Arguments.of("V2", "/api/v2/actuator/info", "spring-6-reactive", "spring-6-reactive", "guru.springframework"),
             Arguments.of("V3", "/api/v3/actuator/info", "spring-6-reactive-mongo", "spring-6-reactive-mongo", "guru.springframework"),
+            Arguments.of("V4", "/api/v4/actuator/info", "spring-6-data-rest", "spring-6-data-rest", "guru.springframework"),
             Arguments.of("Auth", "/oauth2/actuator/info", "spring-6-auth-server", "spring-6-auth-server", "guru.springframework")
         );
     }
@@ -203,6 +236,7 @@ class RouterConfigIT {
             Arguments.of("V1", "/api/v1/v3/api-docs", "spring-6-rest-mvc"),
             Arguments.of("V2", "/api/v2/v3/api-docs", "spring-6-reactive"),
             Arguments.of("V3", "/api/v3/v3/api-docs", "spring-6-reactive-mongo"),
+            Arguments.of("V4", "/api/v4/v3/api-docs", "spring-6-data-rest"),
             Arguments.of("Auth", "/oauth2/v3/api-docs", "spring-6-auth-server")
         );
     }

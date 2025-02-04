@@ -56,6 +56,11 @@ GET http://localhost:8080/api/v3/actuator/info
 Accept: application/json
 Content-Type: application/json
 
+### spring-6-data-rest
+GET http://localhost:8080/api/v4/actuator/info
+Accept: application/json
+Content-Type: application/json
+
 ### spring-6-auth
 GET http://localhost:8080/oauth2/actuator/info
 Accept: application/json
