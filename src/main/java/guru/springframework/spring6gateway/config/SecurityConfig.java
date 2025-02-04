@@ -85,7 +85,17 @@ public class SecurityConfig {
                     "/api/v3/v3/api-docs.yaml",
                     "/api/v3/v3/api-docs/**",
                     "/api/v3/swagger-ui/**",
-                    "/api/v3/swagger-ui.html")
+                    "/api/v3/swagger-ui.html",
+
+                    // spring-6-data-rest
+                    "/api/v4/actuator/**",
+                    "/api/v4/actuator",
+                    "/api/v4/v3/api-docs",
+                    "/api/v4/v3/api-docs.yaml",
+                    "/api/v4/v3/api-docs/**",
+                    "/api/v4/swagger-ui/**",
+                    "/api/v4/swagger-ui.html")
+                      
                 .permitAll()
                 .anyExchange().permitAll())
             .oauth2ResourceServer(oAuth2ResourceServerSpec -> oAuth2ResourceServerSpec

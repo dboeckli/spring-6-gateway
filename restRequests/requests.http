@@ -16,4 +16,9 @@ GET http://localhost:8080/api/v3/beer
 Accept: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
 
+### spring-6-data-rest
+GET http://localhost:8080/api/v4/beer
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
 

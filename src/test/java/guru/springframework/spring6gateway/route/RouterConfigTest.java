@@ -95,5 +95,21 @@ class RouterConfigTest {
             .jsonPath("$.message").isEqualTo("Hello from mocked Reactive Mongo!");
     }
 
+    @Test
+    void testSpring6DataRestRoute() {
+        stubFor(get(urlEqualTo("/api/v1/data-rest/test"))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody("{\"message\":\"Hello from mocked Data Rest!\"}")));
+
+        webTestClient.get().uri("/api/v1/data-rest/test")
+            .exchange()
+            .expectStatus().isOk()
+            .expectHeader().valueEquals("Content-Type", "application/json")
+            .expectBody()
+            .jsonPath("$.message").isEqualTo("Hello from mocked Data Rest!");
+    }
+
     
 }

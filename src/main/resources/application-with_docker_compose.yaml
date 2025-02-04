@@ -75,6 +75,25 @@ spring:
           enabled: true
           predicates:
             - Path=/api/v3/**
+              
+        # spring-6-data-rest
+        - id: spring-6-data-rest-api-docs
+          uri: http://host.docker.internal:8084
+          predicates:
+            - Path=/api/v4/v3/api-docs,/api/v4/v3/api-docs/**
+          filters:
+            - StripPrefix=2
+        - id: spring-6-data-rest-actuator
+          uri: http://host.docker.internal:8084
+          predicates:
+            - Path=/api/v4/actuator,/api/v4/actuator/**
+          filters:
+            - StripPrefix=2
+        - id: spring-6-data-rest
+          uri: http://host.docker.internal:8084
+          enabled: true
+          predicates:
+            - Path=/api/v4/**      
         
         # spring-6-auth-server
         - id: spring-6-auth-server-api-docs
@@ -94,7 +113,7 @@ spring:
           enabled: true
           predicates:
             - Path=/oauth2/**
-          
+              
       httpserver:
         wiretap: true
       httpclient:
@@ -143,7 +162,9 @@ springdoc:
       - name: spring-6-reactive
         url: /api/v2/v3/api-docs
       - name: spring-6-reactive-mongo
-        url: /api/v3/v3/api-docs  
+        url: /api/v3/v3/api-docs
+      - name: spring-6-data-rest
+        url: /api/v4/v3/api-docs  
       - name: spring-6-auth-server
         url: /oauth2/v3/api-docs
 
@@ -159,4 +180,5 @@ security:
       - http://host.docker.internal:8081
       - http://host.docker.internal:8082
       - http://host.docker.internal:8083
+      - http://host.docker.internal:8084
       - http://host.docker.internal:9000

@@ -107,8 +107,24 @@ services:
         condition: service_started
         required: true
     extra_hosts:
-      - "host.docker.internal:host-gateway"    
-        
+      - "host.docker.internal:host-gateway" 
+      
+  data-rest:
+    container_name: data-rest
+    image: domboeckli/spring-6-data-rest:0.0.1-SNAPSHOT
+    ports:
+      - "8084:8084"
+    expose:
+      - 8084
+    environment:
+      SERVER_PORT: 8084
+    depends_on:
+      auth-server:
+        condition: service_started
+        required: true
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+  
   busybox:
     image: busybox:1.37.0
     container_name: busybox
@@ -125,6 +141,9 @@ services:
       reactive:
         condition: service_started
         required: true  
+      data-rest:
+        condition: service_started
+        required: true  
     healthcheck:
       test: [ "CMD", "sh", "-c", "
             echo 'Checking BusyBox readiness...' &&
@@ -132,7 +151,8 @@ services:
             wget -qO- http://auth-server:9000/actuator/health/readiness | grep -q '\"status\":\"UP\"' &&
             wget -qO- http://rest-mvc:8081/actuator/health/readiness | grep -q '\"status\":\"UP\"' &&
             wget -qO- http://reactive-mongo:8083/actuator/health/readiness | grep -q '\"status\":\"UP\"' &&
-            wget -qO- http://reactive:8082/actuator/health/readiness | grep -q '\"status\":\"UP\"'
+            wget -qO- http://reactive:8082/actuator/health/readiness | grep -q '\"status\":\"UP\"' &&
+            wget -qO- http://data-rest:8084/actuator/health/readiness | grep -q '\"status\":\"UP\"'
           " ]
       interval: 10s
       timeout: 5s
@@ -144,6 +164,7 @@ services:
         mvc_health=$$(wget -q -O - http://rest-mvc:8081/actuator/health/readiness 2>/dev/null)
         reactive_mongo_health=$$(wget -q -O - http://reactive-mongo:8083/actuator/health/readiness 2>/dev/null)
         reactive_health=$$(wget -q -O - http://reactive:8082/actuator/health/readiness 2>/dev/null)
+        data_rest_health=$$(wget -q -O - http://data-rest:8084/actuator/health/readiness 2>/dev/null)
 
         echo "{
           \"timestamp\": \"$$(date -Iseconds)\",
@@ -151,7 +172,8 @@ services:
             \"auth-server\": $$auth_health,
             \"rest-mvc\": $$mvc_health,
             \"reactive-mongo\": $$reactive_mongo_health,
-            \"reactive\": $$reactive_health
+            \"reactive\": $$reactive_health,
+            \"data-rest\": $$data_rest_health
           }
         }"
         sleep 15
