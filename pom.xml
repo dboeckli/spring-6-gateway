@@ -287,12 +287,13 @@
                             <goal>start</goal>
                             <goal>stop</goal>
                         </goals>
-                        <phase>pre-integration-test</phase>
+                        <!-- we put it at the end to make sure to not disturb the integration tests -->
+                        <phase>post-integration-test</phase>
                         <configuration>
                             <skip>${skip.start.stop.springboot}</skip>
                             <wait>1000</wait> <!-- 1000 milliseconds is default -->
                             <maxAttempts>120</maxAttempts> <!-- 30 attempts is default, combined with wait it results to 30 sec. We wait 60 seconds. -->
-                            <profiles>local</profiles>
+                            <profiles>with_docker_compose</profiles>
                             <arguments>
                                 <argument>-Xmx1024m</argument>
                                 <argument>--server.port=${tomcat.http.port}</argument>
