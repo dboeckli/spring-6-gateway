@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
@@ -23,6 +24,9 @@ class ActuatorInfoTest {
     private WebTestClient webTestClient;
     
     @Autowired
+    BuildProperties buildProperties;
+    
+    @Autowired
     ObjectMapper objectMapper;
 
     @Test
@@ -35,8 +39,8 @@ class ActuatorInfoTest {
             .jsonPath("$.build.javaVersion").isEqualTo("21")
             .jsonPath("$.build.commit-id").isNotEmpty()
             .jsonPath("$.build.javaVendor").isNotEmpty()
-            .jsonPath("$.build.artifact").isEqualTo("spring-6-gateway")
-            .jsonPath("$.build.group").isEqualTo("guru.springframework")
+            .jsonPath("$.build.artifact").isEqualTo(buildProperties.getArtifact())
+            .jsonPath("$.build.group").isEqualTo(buildProperties.getGroup())
             .returnResult();
 
         String jsonResponse = new String(Objects.requireNonNull(result.getResponseBody()));
