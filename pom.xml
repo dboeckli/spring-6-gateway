@@ -39,7 +39,7 @@
         <skip.start.stop.springboot>false</skip.start.stop.springboot>
 
         <logbook.version>3.11.0</logbook.version>
-        <logstash-logback.version>8.0</logstash-logback.version>
+        <logstash-logback.version>8.1</logstash-logback.version>
 
         <!-- https://springdoc.org/#what-is-the-compatibility-matrix-of-springdoc-openapi-with-spring-boot -->
         <springdoc.openapi.version>2.8.6</springdoc.openapi.version>
