@@ -42,7 +42,7 @@
         <logstash-logback.version>8.1</logstash-logback.version>
 
         <!-- https://springdoc.org/#what-is-the-compatibility-matrix-of-springdoc-openapi-with-spring-boot -->
-        <springdoc.openapi.version>2.8.6</springdoc.openapi.version>
+        <springdoc.openapi.version>2.8.8</springdoc.openapi.version>
         <springdoc-openapi-maven-plugin.version>1.4</springdoc-openapi-maven-plugin.version>
 
         <wiremock.version>3.10.0</wiremock.version>
