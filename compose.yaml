@@ -13,9 +13,9 @@ services:
       - "3306"
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "restadmin", "-ppassword" ]
-      interval: 10s
+      interval: 20s
       timeout: 5s
-      retries: 5
+      retries: 10
       
   mongo:
     container_name: mongo
