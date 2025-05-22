@@ -27,7 +27,7 @@ spec:
           - name: MYSQL_DATABASE
             value: restmvcdb  
           - name: MYSQL_ROOT_PASSWORD
-            value: password
+            value: verysecret
         readinessProbe:
           exec:
             command:
