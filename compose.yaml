@@ -5,8 +5,8 @@ services:
     environment:
       MYSQL_USER: restadmin
       MYSQL_PASSWORD: password
-      MYSQL_DATABASE: restdb
-      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: restmvcdb
+      MYSQL_ROOT_PASSWORD: verysecret
     ports:
       - "3306:3306"
     expose:
@@ -36,7 +36,7 @@ services:
       
   auth-server:
     container_name: auth-server
-    image: domboeckli/spring-6-auth-server:0.0.3-SNAPSHOT
+    image: domboeckli/spring-6-auth-server:0.0.4-SNAPSHOT
     ports:
       - "9000:9000"
     expose:
@@ -54,7 +54,7 @@ services:
     expose:
       - 8081
     environment:
-      SPRING_PROFILES_ACTIVE: localmysql
+      SPRING_PROFILES_ACTIVE: mysql
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://host.docker.internal:9000
       SERVER_PORT: 8081
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/restdb
