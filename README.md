@@ -44,7 +44,7 @@ Do this for all above projects to get the images into the local docker registry
 
 ## Kubernetes
 
-[Kubernetes Documentation](k8s/KubeCommands.md)
+[Kubernetes Documentation](k8s-manual/KubeCommands.md)
 
 The approach having all kubernetes files of the other projects here should be reworked. the kubernetes files should go into the 
 appropriate projects, templating with helm and deployment into a kubernetes environment should be considered.
