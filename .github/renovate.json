@@ -5,15 +5,48 @@
     "config:recommended"
   ],
   "enabledManagers": [
-    "docker-compose"
+    "docker-compose",
+    "maven-wrapper",
+    "kubernetes",
+    "helm-values",
+    "helmv3"
   ],
+  "maven-wrapper": {
+    "managerFilePatterns": [
+      "/(^|/)mvnw$/",
+      "/(^|/)mvnw.cmd$/",
+      "/(^|/).mvn/wrapper/maven-wrapper.properties$/"
+    ],
+    "versioning": "maven"
+  },
   "docker-compose": {
     "enabled": true
   },
-  "docker": {
-    "registryUrls": ["https://index.docker.io"]
+  "kubernetes": {
+    "managerFilePatterns": [
+      "/k8s/.+\\.ya?ml$/",
+      "/helm-charts/templates/.+\\.ya?ml$/"
+    ]
+  },
+  "helm-values": {
+    "managerFilePatterns": [
+      "/helm-charts/.+/values\\.ya?ml$/"
+    ]
+  },
+  "helmv3": {
+    "managerFilePatterns": [
+      "/(^|/)Chart\\.ya?ml$/"
+    ]
   },
   "packageRules": [
+    {
+      "matchCategories": [
+        "docker"
+      ],
+      "registryUrls": [
+        "https://index.docker.io"
+      ]
+    },
     {
       "matchDatasources": [
         "docker"
@@ -43,14 +76,11 @@
   "ignoreDeps": [
     "maven"
   ],
-  "ignorePaths": [
-    "docker-manual/compose.yaml"
-  ],
   "schedule": [
     "before 5am"
   ],
   "platformAutomerge": false,
-  "dependencyDashboard": false,
+  "dependencyDashboard": true,
   "prHourlyLimit": 0,
   "prConcurrentLimit": 0,
   "baseBranches": [
