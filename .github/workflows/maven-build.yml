@@ -205,6 +205,7 @@ jobs:
             target/surefire-reports/
 
       - name: get helm version and namespace
+        if: false # TODO: ENABLE ME
         id: get_helm_version_and_namespace
         env:
           ARTIFACT_ID: ${{needs.setup.outputs.ARTIFACT_ID}}
