@@ -57,7 +57,7 @@ services:
       SPRING_PROFILES_ACTIVE: mysql
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://host.docker.internal:9000
       SERVER_PORT: 8081
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/restdb
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/restmvcdb
       LOGGING_LEVEL_ORG_APACHE_KAFKA_CLIENTS_NETWORKCLIENT: ERROR
     depends_on:
       mysql:
