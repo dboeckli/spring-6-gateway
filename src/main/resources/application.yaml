@@ -10,6 +10,10 @@ spring:
   
   cloud:
     gateway:
+      httpserver:
+        wiretap: true
+      httpclient:
+        wiretap: true
       routes:
         - id: spring-6-rest-mvc
           uri: http://localhost:8081
@@ -26,18 +30,14 @@ spring:
           enabled: true
           predicates:
             - Path=/api/v3/*
-      httpserver:
-        wiretap: true
-      httpclient:
-        wiretap: true
-        
+
 logging:
   level:
-    org.springframework.cloud.gateway: TRACE
-    org.springframework.http.server.reactive: DEBUG
-    org.springframework.web.reactive: DEBUG
-    reactor.ipc.netty: DEBUG
-    reactor.netty: DEBUG
+    org.springframework.cloud.gateway: INFO
+    org.springframework.http.server.reactive: INFO
+    org.springframework.web.reactive: INFO
+    reactor.ipc.netty: INFO
+    reactor.netty: INFO
     org.zalando.logbook: TRACE
     
 logbook:
