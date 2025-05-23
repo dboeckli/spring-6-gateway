@@ -6,6 +6,26 @@ Accept: application/json
 GET http://localhost:{{gateway-port}}/actuator/info
 Accept: application/json
 
+### actuator info
+GET http://localhost:{{auth-server-port}}/actuator/info
+Accept: application/json
+
+### actuator info
+GET http://localhost:{{rest-mvc-port}}/actuator/info
+Accept: application/json
+
+### actuator info
+GET http://localhost:{{reactive-port}}/actuator/info
+Accept: application/json
+
+### actuator info
+GET http://localhost:{{reactive-mongo-port}}/actuator/info
+Accept: application/json
+
+### actuator info
+GET http://localhost:{{data-rest}}/actuator/info
+Accept: application/json
+
 ### actuator health
 GET http://localhost:{{gateway-port}}/actuator/health
 Accept: application/json
