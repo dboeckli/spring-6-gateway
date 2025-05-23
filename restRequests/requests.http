@@ -1,23 +1,22 @@
-# First you need to retrieve a valid token with the auth server request
 ### spring-6-rest-mvc
-GET http://localhost:8080/api/v1/beer/listBeers
+GET http://localhost:{{gateway-port}}/api/v1/beer/listBeers
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
 
 ### spring-6-reactive
-GET http://localhost:8080/api/v2/beer
+GET http://localhost:{{gateway-port}}/api/v2/beer
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
 
 ### spring-6-reactive-mongo
-GET http://localhost:8080/api/v3/beer
+GET http://localhost:{{gateway-port}}/api/v3/beer
 Accept: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
 
 ### spring-6-data-rest
-GET http://localhost:8080/api/v4/beer
+GET http://localhost:{{gateway-port}}/api/v4/beer
 Accept: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
 

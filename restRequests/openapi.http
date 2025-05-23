@@ -1,44 +1,46 @@
 ### spring-6-gateway
-GET http://localhost:8080/v3/api-docs
+GET http://localhost:{{gateway-port}}/v3/api-docs
 Accept: application/json
 Content-Type: application/json
 
 ### spring-6-rest-mvc
-GET http://localhost:8080/api/v1/v3/api-docs
+GET http://localhost:{{gateway-port}}/api/v1/v3/api-docs
 Accept: application/json
 Content-Type: application/json
 
 ### 
-GET http://host.docker.internal:8081/v3/api-docs
+GET http://host.docker.internal:{{rest-mvc-port}}/v3/api-docs
 Accept: application/json
 Content-Type: application/json
 
 ### spring-6-reactive
-GET http://localhost:8080/api/v2/v3/api-docs
+GET http://localhost:{{gateway-port}}/api/v2/v3/api-docs
 Accept: application/json
 Content-Type: application/json
 
 ###
-GET http://host.docker.internal:8082/v3/api-docs
+GET http://host.docker.internal:{{reactive-port}}/v3/api-docs
 Accept: application/json
 Content-Type: application/json
 
 ### spring-6-reactive-mongo
-GET http://localhost:8080/api/v3/v3/api-docs
+GET http://localhost:{{gateway-port}}/api/v3/v3/api-docs
 Accept: application/json
 Content-Type: application/json
 
 ###
-GET http://host.docker.internal:8083/v3/api-docs
+GET http://host.docker.internal:{{reactive-mongo-port}}/v3/api-docs
 Accept: application/json
 Content-Type: application/json
 
 ### spring-6-data-rest
-GET http://localhost:8080/api/v4/v3/api-docs
+GET http://localhost:{{gateway-port}}/api/v4/v3/api-docs
 Accept: application/json
 Content-Type: application/json
 
 ### spring-6-auth
-GET http://localhost:8080/oauth2/v3/api-docs
+GET http://localhost:{{gateway-port}}/oauth2/v3/api-docs
 Accept: application/json
 Content-Type: application/json
+
+## TODO: ADD MORE HERE. DATA-REST ETC

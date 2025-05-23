@@ -1,21 +1,30 @@
 ### this retrieves the bearer token. use the token in the request below
-POST http://localhost:9000/oauth2/token
+POST http://localhost:{{auth-server-port}}/oauth2/token
 Authorization: Basic messaging-client secret
 Content-Type: application/x-www-form-urlencoded
 
 grant_type=client_credentials
 
 ### this retrieves the bearer token. use the token in the request below. When running via gateway we need to retrieve the token via gateway!
-POST http://localhost:8080/oauth2/token
+POST http://localhost:{{gateway-port}}/oauth2/token
 Authorization: Basic messaging-client secret
 Content-Type: application/x-www-form-urlencoded
 
 grant_type=client_credentials
 
 ### this retrieves the bearer token. use the token in the request below. When running via gateway we need to retrieve the token via gateway!
-POST http://host.docker.internal:9000/oauth2/token
+POST http://host.docker.internal:{{auth-server-port}}/oauth2/token
 Authorization: Basic messaging-client secret
 Content-Type: application/x-www-form-urlencoded
 
 grant_type=client_credentials
+
+###
+GET http://localhost:{{auth-server-port}}/.well-known/openid-configuration
+Authorization: Basic messaging-client secret
+Content-Type: application/x-www-form-urlencoded
+
+### actuator
+GET http://localhost:{{auth-server-port}}/actuator/info
+Accept: application/json
 

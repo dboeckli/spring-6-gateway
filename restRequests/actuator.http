@@ -1,67 +1,42 @@
 ### actuator
-GET http://localhost:8080/actuator
+GET http://localhost:{{gateway-port}}/actuator
 Accept: application/json
 
 ### actuator info
-GET http://localhost:8080/actuator/info
+GET http://localhost:{{gateway-port}}/actuator/info
 Accept: application/json
 
 ### actuator health
-GET http://localhost:8080/actuator/health
+GET http://localhost:{{gateway-port}}/actuator/health
 Accept: application/json
 
 ### actuator health
-GET http://localhost:8080/actuator/health/readiness
+GET http://localhost:{{gateway-port}}/actuator/health/readiness
 Accept: application/json
 
 ### actuator health
-GET http://localhost:8080/actuator/health/liveness
+GET http://localhost:{{gateway-port}}/actuator/health/liveness
 Accept: application/json
 
 ### actuator metrics
-GET localhost:8080/actuator/metrics
+GET localhost:{{gateway-port}}/actuator/metrics
 Accept: application/json
 
 ### actuator env
-GET localhost:8080/actuator/env
+GET localhost:{{gateway-port}}/actuator/env
 Accept: application/json
 
 ### actuator env
-GET localhost:8080/actuator/configprops
+GET localhost:{{gateway-port}}/actuator/configprops
 Accept: application/json
 
 ### actuator beans
-GET localhost:8080/actuator/beans
+GET localhost:{{gateway-port}}/actuator/beans
 Accept: application/json
 
 ### actuator caches
-GET localhost:8080/actuator/caches
+GET localhost:{{gateway-port}}/actuator/caches
 Accept: application/json
 
 ### actuator get loggers
-GET localhost:8080/actuator/loggers
-
-### spring-6-rest-mvc
-GET http://localhost:8080/api/v1/actuator/info
-Accept: application/json
-Content-Type: application/json
-
-### spring-6-reactive
-GET http://localhost:8080/api/v2/actuator/info
-Accept: application/json
-Content-Type: application/json
-
-### spring-6-reactive- mongo
-GET http://localhost:8080/api/v3/actuator/info
-Accept: application/json
-Content-Type: application/json
-
-### spring-6-data-rest
-GET http://localhost:8080/api/v4/actuator/info
-Accept: application/json
-Content-Type: application/json
-
-### spring-6-auth
-GET http://localhost:8080/oauth2/actuator/info
-Accept: application/json
-Content-Type: application/json
+GET localhost:{{gateway-port}}/actuator/loggers

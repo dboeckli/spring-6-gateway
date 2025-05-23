@@ -21,7 +21,7 @@
 * `spring-6-reactive:0.0.1-SNAPSHOT`
 * `reactive-mongo:0.0.1-SNAPSHOT`
 
-![alt text](../guru.png "Overview")
+![alt text](../docs/guru.png "Overview")
 
 ## Commands
 

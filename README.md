@@ -14,7 +14,7 @@ Example request you can find in the restRequest directory
 * openapi: http://localhost:8080/swagger-ui/index.html
 * actuator: http://localhost:8080/api/v3/actuator/info
 
-![alt text](guru.png "Overview")
+![alt text](docs/guru.png "Overview")
 
 ## Docker
 
