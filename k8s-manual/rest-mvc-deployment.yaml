@@ -27,7 +27,7 @@ spec:
           - name: SERVER_PORT
             value: "8080"
           - name: SPRING_DATASOURCE_URL
-            value: jdbc:mysql://mysql:3306/restdb  
+            value: jdbc:mysql://mysql:3306/restmvcdb  
         livenessProbe:
           httpGet:
             path: /actuator/health/liveness

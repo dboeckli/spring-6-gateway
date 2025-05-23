@@ -5,17 +5,17 @@ services:
     environment:
       MYSQL_USER: restadmin
       MYSQL_PASSWORD: password
-      MYSQL_DATABASE: restdb
-      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: restmvcdb
+      MYSQL_ROOT_PASSWORD: verysecret
     ports:
       - "3306:3306"
     expose:
       - "3306"
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "restadmin", "-ppassword" ]
-      interval: 10s
+      interval: 20s
       timeout: 5s
-      retries: 5
+      retries: 10
       
   mongo:
     container_name: mongo
@@ -36,7 +36,7 @@ services:
       
   auth-server:
     container_name: auth-server
-    image: domboeckli/spring-6-auth-server:0.0.3-SNAPSHOT
+    image: domboeckli/spring-6-auth-server:0.0.4-SNAPSHOT
     ports:
       - "9000:9000"
     expose:
@@ -54,10 +54,10 @@ services:
     expose:
       - 8081
     environment:
-      SPRING_PROFILES_ACTIVE: localmysql
+      SPRING_PROFILES_ACTIVE: mysql
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://host.docker.internal:9000
       SERVER_PORT: 8081
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/restdb
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/restmvcdb
       LOGGING_LEVEL_ORG_APACHE_KAFKA_CLIENTS_NETWORKCLIENT: ERROR
     depends_on:
       mysql:
