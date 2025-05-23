@@ -563,8 +563,8 @@
                         </goals>
                         <configuration>
                             <skip>${skip.start.stop.springboot}</skip>
-                            <wait>1000</wait> <!-- 1000 milliseconds is default -->
-                            <maxAttempts>240</maxAttempts> <!-- 30 attempts is default, combined with wait it results to 30 sec. We wait 240 seconds. -->
+                            <wait>3000</wait> <!-- 1000 milliseconds is default -->
+                            <maxAttempts>240</maxAttempts> <!-- 30 attempts is default, combined with wait it results to 30 sec. We wait 720 seconds. -->
                             <profiles>docker</profiles>
                             <arguments>
                                 <argument>-Xmx1024m</argument>

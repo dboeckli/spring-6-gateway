@@ -70,7 +70,15 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
           server-id: github # Value of the distributionManagement/repository/id field of the pom.xml.
-          settings-path: ${{ github.workspace }} # location for the settings.xml file  
+          settings-path: ${{ github.workspace }} # location for the settings.xml file
+
+      - name: Add host.docker.internal to /etc/hosts
+        run: |
+          echo "Adding host.docker.internal to /etc/hosts:"
+          echo "127.0.0.1 host.docker.internal" | sudo tee -a /etc/hosts
+          echo "------- Current content of /etc/hosts:"
+          cat /etc/hosts
+          echo "------- " 
 
       - name: Create k8s Kind Cluster
         uses: helm/kind-action@v1.12.0
