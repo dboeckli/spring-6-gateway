@@ -1,0 +1,80 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: @project.artifactId@
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 30080
+  selector:
+    app: @project.artifactId@
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: @project.artifactId@
+  labels:
+    app: @project.artifactId@
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: @project.artifactId@
+  template:
+    metadata:
+      labels:
+        app: @project.artifactId@
+    spec:
+      initContainers:
+        - name: wait-for-auth-server
+          image: busybox:1.37.0
+          command: [ 'sh', '-c', 'until nc -z auth-server 9000; do echo "[busybox: wait-for-auth-server] waiting for auth-server"; sleep 2; done; echo "[busybox: wait-for-auth-server] auth-server is available"' ]
+        - name: wait-for-rest-mvc
+          image: busybox:1.37.0
+          command: [ 'sh', '-c', 'until nc -z rest-mvc 8081; do echo "[busybox: wait-for-rest-mvc] waiting for rest-mvc"; sleep 2; done; echo "[busybox: wait-for-rest-mvc] rest-mvc is available"' ]
+
+      containers:
+        - name: @project.artifactId@
+          image: @docker.repo@/@project.artifactId@:@project.version@
+          env:
+            - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI
+              value: "http://auth-server:9000"
+            - name: SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_SPRINGAUTH_AUTHORIZATION_URI
+              value: "http://auth-server:9000/oauth2/authorize"
+            - name: SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_SPRINGAUTH_TOKEN_URI
+              value: "http://auth-server:9000/oauth2/token"
+            - name: SECURITY_AUTH_SERVER_HEALTH_URL
+              value: "http://auth-server:9000"
+            - name: REST_MVCURL
+              value: "http://rest-mvc:8081"
+            - name: REST_GATEWAYURL
+              value: "http://rest-mvc:8081"  # no gateway here. we go directly to the mvc server
+          ports:
+            - name: http
+              containerPort: 8080
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            failureThreshold: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            #initialDelaySeconds: 300
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            #initialDelaySeconds: 300
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6

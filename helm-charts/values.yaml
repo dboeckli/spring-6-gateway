@@ -1,0 +1,83 @@
+global:
+  timezone: Europe/Zurich
+  timezonePath: /etc/localtime
+  springDebug: false
+  namespace: spring-6-gateway
+
+replicaCount: 1
+
+image:
+  repository: @docker.repo@/@project.artifactId@
+  tag: @project.version@
+
+service:
+  type: NodePort
+  port: 8080
+  targetPort: 8080
+  nodePort: 30080
+
+externalAccess:
+  host: "localhost"
+  protocol: "http"
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 1Gi
+  requests:
+    cpu: 250m
+    memory: 512Mi
+
+probes:
+  startup:
+    failureThreshold: 30
+    periodSeconds: 10
+  readiness:
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+  liveness:
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+
+mysql:
+  database: restmvcdb
+
+  port: 3306
+  targetPort: 3306
+  nodePort: 30306
+
+  user: restadmin
+  password: password
+
+  rootPassword: verysecret
+
+authServer:
+  port: 9000
+  targetPort: 9000
+  nodePort: 30900
+
+restMvc:
+  port: 8081
+  targetPort: 8081
+  nodePort: 30081
+
+ingress:
+  enabled: false
+
+# Section for overriding values in subcharts defined in the Chart.yaml
+
+spring-6-auth-server:
+  spring:
+    issuer:
+      uri: "http://spring-6-gateway-spring-6-auth-server.spring-6-gateway.svc.cluster.local:9000"
+
+spring-6-rest-mvc:
+  authServer:
+    enabled: false
+  mysql:
+    enabled: false
+  spring:
+    oauth2ResourceServer:
+      issuerUri: "http://spring-6-gateway-spring-6-auth-server.spring-6-gateway.svc.cluster.local:9000"
