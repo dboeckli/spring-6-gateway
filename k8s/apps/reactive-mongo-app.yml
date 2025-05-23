@@ -1,0 +1,87 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: reactive-mongo
+spec:
+  type: NodePort
+  ports:
+    - port: 8083
+      targetPort: 8083
+      nodePort: 30083
+  selector:
+    app: reactive-mongo
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reactive-mongo
+  labels:
+    app: reactive-mongo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: reactive-mongo
+  template:
+    metadata:
+      labels:
+        app: reactive-mongo
+    spec:
+      initContainers:
+        - name: wait-for-mongo
+          image: busybox:1.37.0
+          command: [ 'sh', '-c', 'until nc -z mongodb 27017; do echo "[busybox: wait-for-mongodb] waiting for mongodb"; sleep 2; done; echo "[busybox: wait-for-mongodb] mongodb is available"' ]
+      containers:
+        - name: reactive-mongo
+          image: domboeckli/spring-6-reactive-mongo:0.0.1-SNAPSHOT
+          env:
+            - name: SPRING_DATA_MONGODB_HOST
+              value: "mongodb"
+            - name: SPRING_DATA_MONGODB_PORT
+              value: "27017"
+            - name: SPRING_DATA_MONGODB_URI
+              value: "mongodb://mongodb:27017/sfg"
+            - name: SPRING_DATA_MONGODB_DATABASE
+              value: "sfg"
+            - name: SPRING_DATA_MONGODB_USERNAME
+              value: "root"
+            - name: SPRING_DATA_MONGODB_PASSWORD
+              value: "secret"
+            - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI
+              value: "http://auth-server:9000"   
+            - name: SECURITY_AUTH_SERVER_HEALTH_URL
+              value: "http://auth-server:9000"  
+              
+            - name: SECURITY_AUTHORIZATION_URL_FOR_OPENAPI
+              value: "http://localhost:30900/oauth2/auth"
+            - name: SECURITY_TOKEN_URL_FOR_OPENAPI
+              value: "http://localhost:30900/oauth2/token"
+            - name: SECURITY_REFRESH_URL_FOR_OPENAPI
+              value: "http://localhost:30900/oauth2/refresh-token"  
+          ports:
+            - name: http
+              containerPort: 8083
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            failureThreshold: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            #initialDelaySeconds: 300
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            #initialDelaySeconds: 300
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
