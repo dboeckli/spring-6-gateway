@@ -10,7 +10,7 @@
     
     <groupId>guru.springframework</groupId>
     <artifactId>spring-6-gateway</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.0.3-SNAPSHOT</version>
     
     <name>${project.artifactId}</name>
     <description>spring-6-gateway</description>
