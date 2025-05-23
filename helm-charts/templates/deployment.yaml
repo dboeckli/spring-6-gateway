@@ -33,13 +33,6 @@ spec:
             - name: JAVA_TIMEZONE
               value: "{{ .Values.global.timezone }}"
 
-            - name: SECURITY_AUTH_SERVER_HEALTH_URL
-              value: "http://{{ .Release.Name }}-spring-6-auth-server.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.authServer.port }}"
-            - name: REST_MVCURL
-              value: "http://{{ .Release.Name }}-spring-6-rest-mvc.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.restMvc.port }}"
-            # no gateway here. we go directly to the mvc server
-            - name: REST_GATEWAYURL
-              value: "http://{{ .Release.Name }}-spring-6-rest-mvc.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.restMvc.port }}"
             - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI
               value: "http://{{ .Release.Name }}-spring-6-auth-server.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.authServer.port }}"
             - name: SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_SPRINGAUTH_AUTHORIZATION_URI
@@ -47,15 +40,73 @@ spec:
             - name: SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_SPRINGAUTH_TOKEN_URI
               value: "http://{{ .Release.Name }}-spring-6-auth-server.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.authServer.port }}/oauth2/token"
 
+            # TODO: USE GATEWAY URL HERE PROPABLY LOCALHOST:30080/oauth2/auth
             - name: SECURITY_AUTHORIZATION_URL_FOR_OPENAPI
               value: "{{ .Values.externalAccess.protocol }}://{{ .Values.externalAccess.host}}:{{ .Values.authServer.nodePort }}/oauth2/auth"
             - name: SECURITY_TOKEN_URL_FOR_OPENAPI
               value: "{{ .Values.externalAccess.protocol }}://{{ .Values.externalAccess.host}}:{{ .Values.authServer.nodePort }}/oauth2/token"
             - name: SECURITY_REFRESH_URL_FOR_OPENAPI
               value: "{{ .Values.externalAccess.protocol }}://{{ .Values.externalAccess.host}}:{{ .Values.authServer.nodePort }}/oauth2/refresh-token"
-          envFrom:
-            - secretRef:
-                name: {{ include "application-template.fullname" . }}-spring-mysql-secrets
+
+            # Gateway routes
+
+            # spring-6-auth-server
+            # openapi
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_0_ID
+              value: "spring-6-auth-server-api-docs"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_0_URI
+              value: "http://{{ .Release.Name }}-spring-6-auth-server.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.authServer.port }}"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_0_PREDICATES_0
+              value: "Path=/oauth2/v3/api-docs,/oauth2/v3/api-docs/**"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_0_FILTERS_0
+              value: "StripPrefix=1"
+
+            # actuator
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_1_ID
+              value: "spring-6-auth-server-actuator"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_1_URI
+              value: "http://{{ .Release.Name }}-spring-6-auth-server.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.authServer.port }}"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_1_PREDICATES_0
+              value: "Path=/oauth2/actuator,/oauth2/actuator/**"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_1_FILTERS_0
+              value: "StripPrefix=1"
+
+            # rest
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_2_ID
+              value: "spring-6-auth-server"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_2_URI
+              value: "http://{{ .Release.Name }}-spring-6-auth-server.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.authServer.port }}"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_2_PREDICATES_0
+              value: "Path=/oauth2/**"
+
+            # spring-6-rest-mvc
+            # openapi
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_3_ID
+              value: "spring-6-rest-mvc-api-docs"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_3_URI
+              value: "http://{{ .Release.Name }}-spring-6-rest-mvc.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.restMvc.port }}"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_3_PREDICATES_0
+              value: "Path=/api/v1/v3/api-docs,/api/v1/v3/api-docs/**"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_3_FILTERS_0
+              value: "StripPrefix=2"
+
+            # actuator
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_4_ID
+              value: "spring-6-rest-mvc-actuator"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_4_URI
+              value: "http://{{ .Release.Name }}-spring-6-rest-mvc.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.restMvc.port }}"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_4_PREDICATES_0
+              value: "Path=/api/v1/actuator,/api/v1/actuator/**"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_4_FILTERS_0
+              value: "StripPrefix=2"
+
+            # rest
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_5_ID
+              value: "spring-6-rest-mvc"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_5_URI
+              value: "http://{{ .Release.Name }}-spring-6-rest-mvc.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.restMvc.port }}"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_5_PREDICATES_0
+              value: "Path=/api/v1/**"
           ports:
             - name: http
               containerPort: {{ .Values.service.targetPort }}

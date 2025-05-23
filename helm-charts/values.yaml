@@ -81,3 +81,12 @@ spring-6-rest-mvc:
   spring:
     oauth2ResourceServer:
       issuerUri: "http://spring-6-gateway-spring-6-auth-server.spring-6-gateway.svc.cluster.local:9000"
+
+spring-6-reactive-mongo:
+  authServer:
+    enabled: false
+  mongodb:
+    enabled: false
+  spring:
+    oauth2ResourceServer:
+      issuerUri: "http://spring-6-gateway-spring-6-auth-server.spring-6-gateway.svc.cluster.local:9000"

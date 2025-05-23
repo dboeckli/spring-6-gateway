@@ -17,3 +17,15 @@ dependencies:
   - name: spring-6-rest-mvc
     version: "v0.0.3-SNAPSHOT"
     repository: "oci://registry-1.docker.io/domboeckli"
+  - name: spring-6-reactive-mongo-mongodb
+    version: "v0.0.1-SNAPSHOT"
+    repository: "oci://registry-1.docker.io/domboeckli"
+  - name: spring-6-reactive-mongo
+    version: "v0.0.1-SNAPSHOT"
+    repository: "oci://registry-1.docker.io/domboeckli"
+  - name: spring-6-data-rest
+    version: "v0.0.1-SNAPSHOT"
+    repository: "oci://registry-1.docker.io/domboeckli"
+  - name: spring-6-reactive
+    version: "v0.0.1-SNAPSHOT"
+    repository: "oci://registry-1.docker.io/domboeckli"
