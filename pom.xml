@@ -32,7 +32,7 @@
            Please use the following instructions: https://spring.io/projects/spring-cloud
            Please refer to the section: "Table 1. Release train Spring Boot compatibility"
          -->
-        <spring-cloud.version>2024.0.1</spring-cloud.version>
+        <spring-cloud.version>2025.0.0</spring-cloud.version>
 
         <github.acions.build>false</github.acions.build>
         <skip.docker.publish>true</skip.docker.publish>
@@ -54,7 +54,6 @@
         <sonar.language>java</sonar.language>
         <jacoco.version>0.8.13</jacoco.version>
 
-        <git-commit-id-maven-plugin.version>9.0.1</git-commit-id-maven-plugin.version>
         <!--suppress UnresolvedMavenProperty -->
         <buildNumber>${git.commit.id.abbrev}</buildNumber>
     </properties>
@@ -450,7 +449,6 @@
             <plugin>
                 <groupId>io.github.git-commit-id</groupId>
                 <artifactId>git-commit-id-maven-plugin</artifactId>
-                <version>${git-commit-id-maven-plugin.version}</version>
                 <executions>
                     <execution>
                         <id>get-the-git-infos</id>
