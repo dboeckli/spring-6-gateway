@@ -60,4 +60,28 @@ management:
     health:
       probes:
         enabled: true
-      show-details: always    
+      show-details: always
+
+springdoc:
+  show-actuator: true
+  show-oauth2-endpoints: true
+  api-docs:
+    enabled: true
+  swagger-ui:
+    oauth:
+      # do that not on production!
+      client-id: messaging-client
+      client-secret: secret
+    urls:
+      - name: gateway-service
+        url: /v3/api-docs
+      - name: spring-6-rest-mvc
+        url: /api/v1/v3/api-docs
+      - name: spring-6-reactive
+        url: /api/v2/v3/api-docs
+      - name: spring-6-reactive-mongo
+        url: /api/v3/v3/api-docs
+      - name: spring-6-data-rest
+        url: /api/v4/v3/api-docs
+      - name: spring-6-auth-server
+        url: /oauth2/v3/api-docs

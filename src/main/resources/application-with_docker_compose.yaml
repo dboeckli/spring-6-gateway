@@ -151,8 +151,8 @@ management:
       show-details: always  
         
 springdoc:
-  show-actuator: false
-  show-oauth2-endpoints: false
+  show-actuator: true
+  show-oauth2-endpoints: true
   api-docs:
     enabled: true
   swagger-ui:
@@ -217,3 +217,4 @@ logbook:
       - path: /web/**
       - path: /webjars/**
       # Add more exclusions as needed
+

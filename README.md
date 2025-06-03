@@ -11,7 +11,9 @@ Server runs on port 8080. Requires that other projects are up and running
 Example request you can find in the restRequest directory
 
 ## Urls
-* openapi: http://localhost:8080/swagger-ui/index.html
+* openapi: 
+  * http://localhost:8080/swagger-ui/index.html
+  * http://localhost:30080/swagger-ui/index.html
 * actuator: http://localhost:8080/api/v3/actuator/info
 
 ![alt text](docs/guru.png "Overview")
