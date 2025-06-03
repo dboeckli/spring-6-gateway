@@ -67,7 +67,7 @@ jobs:
           mvn -B process-resources -s $GITHUB_WORKSPACE/settings.xml
           cat target/k8s/app.yml
           echo "Deploying Application $APPLICATION_NAME with version $VERSION"
-          kubectl apply -f target/k8s/ --v=6
+          kubectl apply -f target/k8s/ --v=6 -R
 
       - name: Wait for Pods to be ready
         env:
