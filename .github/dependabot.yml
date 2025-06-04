@@ -19,9 +19,6 @@ updates:
       - maven-dboeckli
     ignore:
       - dependency-name: org.apache.maven:*
-    branch-name:
-      separator: "-"
-      prefix: "feature/dependabot-"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
