@@ -11,9 +11,6 @@ registries:
     username: dboeckli@gmail.com
     password: ${{secrets.DBOECKLI_GITHUB_ACCESS_TOKEN}}
 updates:
-  - branch-name:
-      separator: "-"
-      prefix: "feature/dependabot-"
   - package-ecosystem: maven
     directory: "/"
     schedule:
@@ -22,6 +19,9 @@ updates:
       - maven-dboeckli
     ignore:
       - dependency-name: org.apache.maven:*
+    branch-name:
+      separator: "-"
+      prefix: "feature/dependabot-"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
