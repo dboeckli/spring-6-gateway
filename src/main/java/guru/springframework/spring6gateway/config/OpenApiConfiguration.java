@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.security.OAuthFlows;
 import io.swagger.v3.oas.annotations.security.OAuthScope;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.info.BuildProperties;
@@ -41,6 +42,7 @@ import org.springframework.context.annotation.Configuration;
 )
 @Configuration
 @RequiredArgsConstructor
+@Slf4j
 public class OpenApiConfiguration {
 
     private final BuildProperties buildProperties;

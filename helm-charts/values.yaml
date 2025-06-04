@@ -42,16 +42,14 @@ probes:
     failureThreshold: 6
 
 mysql:
-  database: restmvcdb
-
   port: 3306
   targetPort: 3306
   nodePort: 30306
 
-  user: restadmin
-  password: password
-
-  rootPassword: verysecret
+mongodb:
+  port: 27017
+  targetPort: 27017
+  nodePort: 30017
 
 authServer:
   port: 9000
@@ -62,6 +60,21 @@ restMvc:
   port: 8081
   targetPort: 8081
   nodePort: 30081
+
+reactive:
+  port: 8082
+  targetPort: 8082
+  nodePort: 30082
+
+dataRest:
+  port: 8084
+  targetPort: 8084
+  nodePort: 30084
+
+reactiveMongo:
+  port: 8083
+  targetPort: 8083
+  nodePort: 30083
 
 ingress:
   enabled: false

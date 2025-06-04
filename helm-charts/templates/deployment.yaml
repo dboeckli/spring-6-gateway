@@ -19,9 +19,27 @@ spec:
         - name: wait-for-mysql
           image: busybox:1.37.0
           command: [ 'sh', '-c', 'until nc -z {{ .Release.Name }}-spring-6-rest-mvc-mysql.{{ .Release.Namespace }}.svc.cluster.local {{ .Values.mysql.port }}; do echo "[busybox: wait-for-mysql] waiting for mysql"; sleep 2; done; echo "[busybox: wait-for-mysql] mysql is available"' ]
+
+        - name: wait-for-mongodb
+          image: busybox:1.37.0
+          command: [ 'sh', '-c', 'until nc -z {{ .Release.Name }}-spring-6-reactive-mongo-mongodb.{{ .Release.Namespace }}.svc.cluster.local {{ .Values.mongodb.port }}; do echo "[busybox: wait-for-mongodb] waiting for mongodb"; sleep 2; done; echo "[busybox: wait-for-mongodb] mongodb is available"' ]
+
         - name: wait-for-auth-server
           image: busybox:1.37.0
           command: [ 'sh', '-c', 'until nc -z {{ .Release.Name }}-spring-6-auth-server.{{ .Release.Namespace }}.svc.cluster.local {{ .Values.authServer.port }}; do echo "[busybox: wait-for-auth-server] waiting for auth-server"; sleep 2; done; echo "[busybox: wait-for-auth-server] auth-server is available"' ]
+
+        - name: wait-for-reactive
+          image: busybox:1.37.0
+          command: [ 'sh', '-c', 'until nc -z {{ .Release.Name }}-spring-6-reactive.{{ .Release.Namespace }}.svc.cluster.local {{ .Values.reactive.port }}; do echo "[busybox: wait-for-reactive] waiting for reactive"; sleep 2; done; echo "[busybox: wait-for-reactive] reactive is available"' ]
+
+        - name: wait-for-data-rest
+          image: busybox:1.37.0
+          command: [ 'sh', '-c', 'until nc -z {{ .Release.Name }}-spring-6-data-rest.{{ .Release.Namespace }}.svc.cluster.local {{ .Values.dataRest.port }}; do echo "[busybox: wait-for-data-rest] waiting for data-rest"; sleep 2; done; echo "[busybox: wait-for-data-rest] data-rest is available"' ]
+
+        - name: wait-for-reactive-mongo
+          image: busybox:1.37.0
+          command: [ 'sh', '-c', 'until nc -z {{ .Release.Name }}-spring-6-reactive-mongo.{{ .Release.Namespace }}.svc.cluster.local {{ .Values.reactiveMongo.port }}; do echo "[busybox: wait-for-reactive-mongo] waiting for reactive-mongo"; sleep 2; done; echo "[busybox: wait-for-reactive-mongo] reactive-mongo is available"' ]
+
         - name: wait-for-rest-mvc
           image: busybox:1.37.0
           command: [ 'sh', '-c', 'until nc -z {{ .Release.Name }}-spring-6-rest-mvc.{{ .Release.Namespace }}.svc.cluster.local {{ .Values.restMvc.port }}; do echo "[busybox: wait-for-rest-mvc] waiting for rest-mvc"; sleep 2; done; echo "[busybox: wait-for-rest-mvc] rest-mvc is available"' ]
@@ -50,7 +68,10 @@ spec:
 
             # Gateway routes
 
-            # spring-6-auth-server
+            ########################
+            # spring-6-auth-server #
+            ########################
+
             # openapi
             - name: SPRING_CLOUD_GATEWAY_ROUTES_0_ID
               value: "spring-6-auth-server-api-docs"
@@ -79,7 +100,10 @@ spec:
             - name: SPRING_CLOUD_GATEWAY_ROUTES_2_PREDICATES_0
               value: "Path=/oauth2/**"
 
-            # spring-6-rest-mvc
+            #####################
+            # spring-6-rest-mvc #
+            #####################
+
             # openapi
             - name: SPRING_CLOUD_GATEWAY_ROUTES_3_ID
               value: "spring-6-rest-mvc-api-docs"
@@ -107,6 +131,96 @@ spec:
               value: "http://{{ .Release.Name }}-spring-6-rest-mvc.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.restMvc.port }}"
             - name: SPRING_CLOUD_GATEWAY_ROUTES_5_PREDICATES_0
               value: "Path=/api/v1/**"
+
+            #####################
+            # spring-6-reactive #
+            #####################
+
+            # openapi
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_6_ID
+              value: "spring-6-reactive-api-docs"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_6_URI
+              value: "http://{{ .Release.Name }}-spring-6-reactive.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.reactive.port }}"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_6_PREDICATES_0
+              value: "Path=/api/v2/v3/api-docs,/api/v2/v3/api-docs/**"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_6_FILTERS_0
+              value: "StripPrefix=2"
+            # actuator
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_7_ID
+              value: "spring-6-reactive-actuator"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_7_URI
+              value: "http://{{ .Release.Name }}-spring-6-reactive.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.reactive.port }}"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_7_PREDICATES_0
+              value: "Path=/api/v2/actuator,/api/v2/actuator/**"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_7_FILTERS_0
+              value: "StripPrefix=2"
+            # rest
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_8_ID
+              value: "spring-6-reactive"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_8_URI
+              value: "http://{{ .Release.Name }}-spring-6-reactive.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.reactive.port }}"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_8_PREDICATES_0
+              value: "Path=/api/v2/**"
+
+            ###########################
+            # spring-6-reactive-mongo #
+            ###########################
+
+            # openapi
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_9_ID
+              value: "spring-6-reactive-mongo-api-docs"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_9_URI
+              value: "http://{{ .Release.Name }}-spring-6-reactive-mongo.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.reactiveMongo.port }}"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_9_PREDICATES_0
+              value: "Path=/api/v3/v3/api-docs,/api/v3/v3/api-docs/**"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_9_FILTERS_0
+              value: "StripPrefix=2"
+            # actuator
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_10_ID
+              value: "spring-6-reactive-mongo-actuator"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_10_URI
+              value: "http://{{ .Release.Name }}-spring-6-reactive-mongo.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.reactiveMongo.port }}"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_10_PREDICATES_0
+              value: "Path=/api/v3/actuator,/api/v3/actuator/**"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_10_FILTERS_0
+              value: "StripPrefix=2"
+            # rest
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_11_ID
+              value: "spring-6-reactive-mongo"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_11_URI
+              value: "http://{{ .Release.Name }}-spring-6-reactive-mongo.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.reactiveMongo.port }}"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_11_PREDICATES_0
+              value: "Path=/api/v3/**"
+
+            ######################
+            # spring-6-data-rest #
+            ######################
+
+            # openapi
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_12_ID
+              value: "spring-6-data-rest-api-docs"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_12_URI
+              value: "http://{{ .Release.Name }}-spring-6-data-rest.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.dataRest.port }}"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_12_PREDICATES_0
+              value: "Path=/api/v4/v3/api-docs,/api/v4/v3/api-docs/**"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_12_FILTERS_0
+              value: "StripPrefix=2"
+            # actuator
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_13_ID
+              value: "spring-6-data-rest-actuator"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_13_URI
+              value: "http://{{ .Release.Name }}-spring-6-data-rest.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.dataRest.port }}"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_13_PREDICATES_0
+              value: "Path=/api/v4/actuator,/api/v4/actuator/**"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_13_FILTERS_0
+              value: "StripPrefix=2"
+            # rest
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_14_ID
+              value: "spring-6-data-rest"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_14_URI
+              value: "http://{{ .Release.Name }}-spring-6-data-rest.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.dataRest.port }}"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_14_PREDICATES_0
+              value: "Path=/api/v4/**"
           ports:
             - name: http
               containerPort: {{ .Values.service.targetPort }}
