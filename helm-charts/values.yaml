@@ -91,9 +91,9 @@ spring-6-reactive-mongo:
     oauth2ResourceServer:
       issuerUri: "http://spring-6-gateway-spring-6-auth-server.spring-6-gateway.svc.cluster.local:9000"
 
-  spring-6-reactive:
-    authServer:
-      enabled: false
-    spring:
-      oauth2ResourceServer:
-        issuerUri: "http://spring-6-gateway-spring-6-auth-server.spring-6-gateway.svc.cluster.local:9000"
+spring-6-reactive:
+  authServer:
+    enabled: false
+  spring:
+    oauth2ResourceServer:
+      issuerUri: "http://spring-6-gateway-spring-6-auth-server.spring-6-gateway.svc.cluster.local:9000"

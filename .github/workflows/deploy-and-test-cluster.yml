@@ -156,6 +156,8 @@ jobs:
           --set image.tag=${APP_VERSION} \
           --namespace ${NAMESPACE} \
           --create-namespace \
+          --cleanup-on-fail \
+          --atomic \
           --wait --timeout 5m \
           --debug
 
