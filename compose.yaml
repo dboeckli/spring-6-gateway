@@ -20,7 +20,7 @@ services:
       
   mongo:
     container_name: mongo
-    image: mongo:8.0.9
+    image: mongo:8.0.10
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: secret
