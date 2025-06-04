@@ -28,3 +28,7 @@ Content-Type: application/x-www-form-urlencoded
 GET http://localhost:{{auth-server-port}}/actuator/info
 Accept: application/json
 
+### actuator via gateway
+GET http://localhost:{{gateway-port}}/oauth2/actuator/info
+Accept: application/json
+

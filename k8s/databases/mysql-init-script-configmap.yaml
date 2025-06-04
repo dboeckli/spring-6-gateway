@@ -1,0 +1,14 @@
+﻿apiVersion: v1
+data:
+  init.sql: |-
+    DROP DATABASE IF EXISTS restmvcdb;
+    DROP USER IF EXISTS `restadmin`@`%`;
+    CREATE DATABASE IF NOT EXISTS restmvcdb CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+    CREATE USER IF NOT EXISTS `restadmin`@`%` IDENTIFIED BY 'password';
+    GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, REFERENCES, INDEX, ALTER, EXECUTE, CREATE VIEW, SHOW VIEW,
+        CREATE ROUTINE, ALTER ROUTINE, EVENT, TRIGGER ON `restmvcdb`.* TO `restadmin`@`%`;  
+    FLUSH PRIVILEGES;
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: mysql-init-script

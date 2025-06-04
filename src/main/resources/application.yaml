@@ -10,6 +10,10 @@ spring:
   
   cloud:
     gateway:
+      httpserver:
+        wiretap: true
+      httpclient:
+        wiretap: true
       routes:
         - id: spring-6-rest-mvc
           uri: http://localhost:8081
@@ -26,18 +30,14 @@ spring:
           enabled: true
           predicates:
             - Path=/api/v3/*
-      httpserver:
-        wiretap: true
-      httpclient:
-        wiretap: true
-        
+
 logging:
   level:
-    org.springframework.cloud.gateway: TRACE
-    org.springframework.http.server.reactive: DEBUG
-    org.springframework.web.reactive: DEBUG
-    reactor.ipc.netty: DEBUG
-    reactor.netty: DEBUG
+    org.springframework.cloud.gateway: INFO
+    org.springframework.http.server.reactive: INFO
+    org.springframework.web.reactive: INFO
+    reactor.ipc.netty: INFO
+    reactor.netty: INFO
     org.zalando.logbook: TRACE
     
 logbook:
@@ -54,7 +54,30 @@ logbook:
       - password
   predicate:
     exclude:
-      - path: /actuator/health    
+      # Exclude HTML-related calls and specific endpoints that Logbook doesn't handle correctly
+      - path: /actuator/health/**
+
+      - path: /**/h2-console/**  # Exclude H2 console
+      - path: /**/swagger-ui/**  # Exclude Swagger UI if used
+      - path: /**/v3/api-docs/** # Exclude OpenAPI docs if used
+
+      # Exclude HTML-related calls and web resources
+      - path: /**/*.html
+      - path: /**/*.css
+      - path: /**/*.js
+      - path: /**/*.png
+      - path: /**/*.jpg
+      - path: /**/*.jpeg
+      - path: /**/*.gif
+      - path: /**/*.ico
+      - path: /**/favicon.ico
+      - path: /**/webjars/**
+      # Exclude other common web resources
+      - path: /**/assets/**
+      - path: /**/static/**
+      - path: /**/public/**
+      - path: /**/resources/**
+      # Add more exclusions as needed
 
 management:
   health:
@@ -63,11 +86,44 @@ management:
     livenessstate:
       enabled: true
   endpoints:
+    access:
+      default: unrestricted
     web:
       exposure:
         include: "*"
   endpoint:
+    configprops:
+      # WARNING: SECURITY RISK - DO NOT USE IN PRODUCTION ENVIRONMENT
+      # This configuration exposes sensitive data and should only be used for development or testing purposes.
+      # Ensure this is disabled in any environment where security is a concern.
+      show-values: ALWAYS
+    env:
+      show-values: always
     health:
       probes:
         enabled: true
-      show-details: always    
+      show-details: always
+
+springdoc:
+  show-actuator: true
+  show-oauth2-endpoints: true
+  api-docs:
+    enabled: true
+  swagger-ui:
+    oauth:
+      # do that not on production!
+      client-id: messaging-client
+      client-secret: secret
+    urls:
+      - name: gateway-service
+        url: /v3/api-docs
+      - name: spring-6-rest-mvc
+        url: /api/v1/v3/api-docs
+      - name: spring-6-reactive
+        url: /api/v2/v3/api-docs
+      - name: spring-6-reactive-mongo
+        url: /api/v3/v3/api-docs
+      - name: spring-6-data-rest
+        url: /api/v4/v3/api-docs
+      - name: spring-6-auth-server
+        url: /oauth2/v3/api-docs

@@ -1,0 +1,65 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: data-rest
+spec:
+  type: NodePort
+  ports:
+    - port: 8084
+      targetPort: 8084
+      nodePort: 30084
+  selector:
+    app: data-rest
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: data-rest
+  labels:
+    app: data-rest
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: data-rest
+  template:
+    metadata:
+      labels:
+        app: data-rest
+    spec:
+      containers:
+        - name: data-rest
+          image: domboeckli/spring-6-data-rest:0.0.1-SNAPSHOT
+          env:
+            - name: SPRING_APPLICATION_JSON
+              value: |
+                {
+                  "management.endpoint.health.probes.add-additional-paths": true
+                }
+          ports:
+            - name: http
+              containerPort: 8084
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            failureThreshold: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            #initialDelaySeconds: 300
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            #initialDelaySeconds: 300
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6

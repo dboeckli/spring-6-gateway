@@ -1,0 +1,222 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: @project.artifactId@
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 30080
+  selector:
+    app: @project.artifactId@
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: @project.artifactId@
+  labels:
+    app: @project.artifactId@
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: @project.artifactId@
+  template:
+    metadata:
+      labels:
+        app: @project.artifactId@
+    spec:
+      initContainers:
+        - name: wait-for-auth-server
+          image: busybox:1.37.0
+          command: [ 'sh', '-c', 'until nc -z auth-server 9000; do echo "[busybox: wait-for-auth-server] waiting for auth-server"; sleep 2; done; echo "[busybox: wait-for-auth-server] auth-server is available"' ]
+        - name: wait-for-reactive
+          image: busybox:1.37.0
+          command: [ 'sh', '-c', 'until nc -z reactive 8082; do echo "[busybox: wait-for-reactive] waiting for reactive"; sleep 2; done; echo "[busybox: wait-for-reactive] reactive is available"' ]
+        - name: wait-for-data-rest
+          image: busybox:1.37.0
+          command: [ 'sh', '-c', 'until nc -z data-rest 8084; do echo "[busybox: wait-for-data-rest] waiting for data-rest"; sleep 2; done; echo "[busybox: wait-for-data-rest] data-rest is available"' ]
+        - name: wait-for-reactive-mongo
+          image: busybox:1.37.0
+          command: [ 'sh', '-c', 'until nc -z reactive-mongo 8083; do echo "[busybox: wait-for-reactive-mongo] waiting for reactive-mongo"; sleep 2; done; echo "[busybox: wait-for-reactive-mongo] reactive-mongo is available"' ]
+        - name: wait-for-rest-mvc
+          image: busybox:1.37.0
+          command: [ 'sh', '-c', 'until nc -z rest-mvc 8081; do echo "[busybox: wait-for-rest-mvc] waiting for rest-mvc"; sleep 2; done; echo "[busybox: wait-for-rest-mvc] rest-mvc is available"' ]
+
+      containers:
+        - name: @project.artifactId@
+          image: @docker.repo@/@project.artifactId@:@project.version@
+          env:
+            - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI
+              value: "http://auth-server:9000"
+            - name: SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_SPRINGAUTH_AUTHORIZATION_URI
+              value: "http://auth-server:9000/oauth2/authorize"
+            - name: SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_SPRINGAUTH_TOKEN_URI
+              value: "http://auth-server:9000/oauth2/token"
+
+            # Gateway routes
+
+            # spring-6-auth-server
+            # openapi
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_0_ID
+              value: "spring-6-auth-server-api-docs"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_0_URI
+              value: "http://auth-server:9000"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_0_PREDICATES_0
+              value: "Path=/oauth2/v3/api-docs,/oauth2/v3/api-docs/**"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_0_FILTERS_0
+              value: "StripPrefix=1"
+            # actuator
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_1_ID
+              value: "spring-6-auth-server-actuator"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_1_URI
+              value: "http://auth-server:9000"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_1_PREDICATES_0
+              value: "Path=/oauth2/actuator,/oauth2/actuator/**"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_1_FILTERS_0
+              value: "StripPrefix=1"
+            # rest
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_2_ID
+              value: "spring-6-auth-server"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_2_URI
+              value: "http://auth-server:9000"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_2_PREDICATES_0
+              value: "Path=/oauth2/**"
+
+            # spring-6-rest-mvc
+            # openapi
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_3_ID
+              value: "spring-6-rest-mvc-api-docs"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_3_URI
+              value: "http://rest-mvc:8081"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_3_PREDICATES_0
+              value: "Path=/api/v1/v3/api-docs,/api/v1/v3/api-docs/**"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_3_FILTERS_0
+              value: "StripPrefix=2"
+            # actuator
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_4_ID
+              value: "spring-6-rest-mvc-actuator"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_4_URI
+              value: "http://rest-mvc:8081"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_4_PREDICATES_0
+              value: "Path=/api/v1/actuator,/api/v1/actuator/**"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_4_FILTERS_0
+              value: "StripPrefix=2"
+            # rest
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_5_ID
+              value: "spring-6-rest-mvc"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_5_URI
+              value: "http://rest-mvc:8081"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_5_PREDICATES_0
+              value: "Path=/api/v1/**"
+
+            # spring-6-reactive
+            # openapi
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_6_ID
+              value: "spring-6-reactive-api-docs"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_6_URI
+              value: "http://reactive:8082"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_6_PREDICATES_0
+              value: "Path=/api/v2/v3/api-docs,/api/v2/v3/api-docs/**"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_6_FILTERS_0
+              value: "StripPrefix=2"
+            # actuator
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_7_ID
+              value: "spring-6-reactive-actuator"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_7_URI
+              value: "http://reactive:8082"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_7_PREDICATES_0
+              value: "Path=/api/v2/actuator,/api/v2/actuator/**"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_7_FILTERS_0
+              value: "StripPrefix=2"
+            # rest
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_8_ID
+              value: "spring-6-reactive"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_8_URI
+              value: "http://reactive:8082"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_8_PREDICATES_0
+              value: "Path=/api/v2/**"
+
+            # spring-6-reactive-mongo
+            # openapi
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_9_ID
+              value: "spring-6-reactive-mongo-api-docs"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_9_URI
+              value: "http://reactive-mongo:8083"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_9_PREDICATES_0
+              value: "Path=/api/v3/v3/api-docs,/api/v3/v3/api-docs/**"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_9_FILTERS_0
+              value: "StripPrefix=2"
+            # actuator
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_10_ID
+              value: "spring-6-reactive-mongo-actuator"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_10_URI
+              value: "http://reactive-mongo:8083"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_10_PREDICATES_0
+              value: "Path=/api/v3/actuator,/api/v3/actuator/**"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_10_FILTERS_0
+              value: "StripPrefix=2"
+            # rest
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_11_ID
+              value: "spring-6-reactive-mongo"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_11_URI
+              value: "http://reactive-mongo:8083"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_11_PREDICATES_0
+              value: "Path=/api/v3/**"
+
+            # spring-6-data-rest
+            # openapi
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_12_ID
+              value: "spring-6-data-rest-api-docs"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_12_URI
+              value: "http://data-rest:8084"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_12_PREDICATES_0
+              value: "Path=/api/v4/v3/api-docs,/api/v4/v3/api-docs/**"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_12_FILTERS_0
+              value: "StripPrefix=2"
+            # actuator
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_13_ID
+              value: "spring-6-data-rest-actuator"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_13_URI
+              value: "http://data-rest:8084"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_13_PREDICATES_0
+              value: "Path=/api/v4/actuator,/api/v4/actuator/**"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_13_FILTERS_0
+              value: "StripPrefix=2"
+            # rest
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_14_ID
+              value: "spring-6-data-rest"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_14_URI
+              value: "http://data-rest:8084"
+            - name: SPRING_CLOUD_GATEWAY_ROUTES_14_PREDICATES_0
+              value: "Path=/api/v4/**"
+
+
+          ports:
+            - name: http
+              containerPort: 8080
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            failureThreshold: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            #initialDelaySeconds: 300
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            #initialDelaySeconds: 300
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6

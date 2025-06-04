@@ -11,7 +11,9 @@ Server runs on port 8080. Requires that other projects are up and running
 Example request you can find in the restRequest directory
 
 ## Urls
-* openapi: http://localhost:8080/swagger-ui/index.html
+* openapi: 
+  * http://localhost:8080/swagger-ui/index.html
+  * http://localhost:30080/swagger-ui/index.html
 * actuator: http://localhost:8080/api/v3/actuator/info
 
 ![alt text](docs/guru.png "Overview")
@@ -44,7 +46,83 @@ Do this for all above projects to get the images into the local docker registry
 
 ## Kubernetes
 
-[Kubernetes Documentation](k8s-manual/KubeCommands.md)
+[Kubernetes Documentation Manual](k8s-manual/KubeCommands.md)
 
 The approach having all kubernetes files of the other projects here should be reworked. the kubernetes files should go into the 
 appropriate projects, templating with helm and deployment into a kubernetes environment should be considered.
+
+To run maven filtering for destination target/k8s and destination target/helm run:
+```bash
+mvn clean install -DskipTests 
+```
+
+### Deployment with Kubernetes
+
+Deployment goes into the default namespace.
+
+To deploy all resources:
+```bash
+kubectl apply -f target/k8s/ -R
+```
+
+To remove all resources:
+```bash
+kubectl delete -f target/k8s/ -R
+```
+
+Check
+```bash
+kubectl get deployments -o wide
+kubectl get pods -o wide
+```
+
+You can use the actuator rest call to verify via port 30080
+
+### Deployment with Helm
+
+Be aware that we are using a different namespace here (not default).
+
+Go to the directory where the tgz file has been created after 'mvn install'
+```powershell
+cd target/helm/repo
+```
+
+unpack
+```powershell
+$file = Get-ChildItem -Filter spring-6-gateway-v*.tgz | Select-Object -First 1
+tar -xvf $file.Name
+```
+
+install
+```powershell
+$APPLICATION_NAME = Get-ChildItem -Directory | Where-Object { $_.LastWriteTime -ge $file.LastWriteTime } | Select-Object -ExpandProperty Name
+helm upgrade --install $APPLICATION_NAME ./$APPLICATION_NAME --namespace spring-6-gateway --create-namespace --wait --timeout 5m --debug
+```
+
+show logs and show event
+```powershell
+kubectl get pods -n spring-6-gateway
+```
+replace $POD with pods from the command above
+```powershell
+kubectl logs $POD -n spring-6-gateway --all-containers
+```
+
+Show Details and Event
+
+$POD_NAME can be: spring-6-gateway-mongodb, spring-6-gateway
+```powershell
+kubectl describe pod $POD_NAME -n spring-6-gateway
+```
+
+Show Endpoints
+```powershell
+kubectl get endpoints -n spring-6-gateway
+```
+
+uninstall
+```powershell
+helm uninstall $APPLICATION_NAME --namespace spring-6-gateway
+```
+
+You can use the actuator rest call to verify via port 30080

@@ -1,0 +1,86 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rest-mvc
+spec:
+  type: NodePort
+  ports:
+    - port: 8081
+      targetPort: 8081
+      nodePort: 30081
+  selector:
+    app: rest-mvc
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rest-mvc
+  labels:
+    app: rest-mvc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rest-mvc
+  template:
+    metadata:
+      labels:
+        app: rest-mvc
+    spec:
+      initContainers:
+        - name: wait-for-mysql
+          image: busybox:1.37.0
+          command: [ 'sh', '-c', 'until nc -z mysql 3306; do echo "[busybox: wait-for-mysql] waiting for mysql"; sleep 2; done; echo "[busybox: wait-for-mysql] mysql is available"' ]
+        - name: wait-for-auth-server
+          image: busybox:1.37.0
+          command: [ 'sh', '-c', 'until nc -z auth-server 9000; do echo "[busybox: wait-for-auth-server] waiting for auth-server"; sleep 2; done; echo "[busybox: wait-for-auth-server] auth-server is available"' ]
+      containers:
+        - name: rest-mvc
+          image: domboeckli/spring-6-rest-mvc:0.0.3-SNAPSHOT
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: mysql
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mysql://mysql:3306/restmvcdb?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false
+            - name: SPRING_DATASOURCE_USERNAME
+              value: restadmin
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: password
+            - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI
+              value: "http://auth-server:9000"
+            - name: SECURITY_AUTH_SERVER_HEALTH_URL
+              value: "http://auth-server:9000"
+              
+            - name: SECURITY_AUTHORIZATION_URL_FOR_OPENAPI
+              value: "http://localhost:30900/oauth2/auth"
+            - name: SECURITY_TOKEN_URL_FOR_OPENAPI
+              value: "http://localhost:30900/oauth2/token"
+            - name: SECURITY_REFRESH_URL_FOR_OPENAPI
+              value: "http://localhost:30900/oauth2/refresh-token"
+          ports:
+            - name: http
+              containerPort: 8081
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            failureThreshold: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            #initialDelaySeconds: 300
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            #initialDelaySeconds: 300
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
