@@ -102,7 +102,16 @@ public class OpenApiConfiguration {
         log.info("### authorizationUrl: " + authorizationUrl);
         log.info("### tokenUrl: " + authorizationUrl);
         log.info("### refreshUrl: " + authorizationUrl);
+
         log.info("### apiDocsPath: " + apiDocsPath);
+
+        log.info("### mvcUrl: " + mvcUrl);
+        log.info("### authServerUrl: " + authServerUrl);
+        log.info("### reactiveMongoUrl: " + reactiveMongoUrl);
+        log.info("### reactiveUrl: " + reactiveUrl);
+        log.info("### dataRestUrl: " + dataRestUrl);
+
+
         return openApi -> {
             io.swagger.v3.oas.models.info.Info info = openApi.getInfo();
             info.setTitle(buildProperties.getName());
@@ -126,7 +135,7 @@ public class OpenApiConfiguration {
     @Bean
     public GroupedOpenApi mvcRestApi(@Qualifier("customGlobalHeaderOpenApiCustomizer") OpenApiCustomizer customGlobalHeaderOpenApiCustomizer) {
         return GroupedOpenApi.builder()
-            .group("spring-6-rest-mvc-2")
+            .group("spring-6-rest-mvc")
             .addOpenApiCustomizer(customGlobalHeaderOpenApiCustomizer)
             .displayName("Spring 6 Rest MVC Rest-API")
             .pathsToMatch("/api/v1" + apiDocsPath)
@@ -136,6 +145,7 @@ public class OpenApiConfiguration {
                     StringBuilder content = readExternalOpenApiContent(restMvcOpenApiUrl);
                     setOpenApiServer(openApi, "Rest MVC", content);
                     correctActuatorPath(openApi, "/api");
+                    setOauth2Url(openApi);
                 } catch (Exception ex) {
                     throw new RuntimeException("Failed to load OpenAPI definition." ,ex);
                 }
@@ -146,7 +156,7 @@ public class OpenApiConfiguration {
     @Bean
     public GroupedOpenApi reactiveRestApi(@Qualifier("customGlobalHeaderOpenApiCustomizer") OpenApiCustomizer customGlobalHeaderOpenApiCustomizer) {
         return GroupedOpenApi.builder()
-            .group("spring-6-reactive-2")
+            .group("spring-6-reactive")
             .addOpenApiCustomizer(customGlobalHeaderOpenApiCustomizer)
             .displayName("Spring 6 Reactive Rest-API")
             .pathsToMatch("/api/v2" + apiDocsPath)
@@ -156,6 +166,7 @@ public class OpenApiConfiguration {
                     StringBuilder content = readExternalOpenApiContent(restMvcOpenApiUrl);
                     setOpenApiServer(openApi, "Rest Reactive", content);
                     correctActuatorPath(openApi, "/api");
+                    setOauth2Url(openApi);
                 } catch (Exception ex) {
                     throw new RuntimeException("Failed to load OpenAPI definition." ,ex);
                 }
@@ -166,7 +177,7 @@ public class OpenApiConfiguration {
     @Bean
     public GroupedOpenApi reactiveMongoRestApi(@Qualifier("customGlobalHeaderOpenApiCustomizer") OpenApiCustomizer customGlobalHeaderOpenApiCustomizer) {
         return GroupedOpenApi.builder()
-            .group("spring-6-reactive-mongo-2")
+            .group("spring-6-reactive-mongo")
             .addOpenApiCustomizer(customGlobalHeaderOpenApiCustomizer)
             .displayName("Spring 6 Reactive Mongo Rest-API")
             .pathsToMatch("/api/v3" + apiDocsPath)
@@ -174,8 +185,9 @@ public class OpenApiConfiguration {
                 try {
                     URL restMvcOpenApiUrl = new URL(reactiveMongoUrl + apiDocsPath);
                     StringBuilder content = readExternalOpenApiContent(restMvcOpenApiUrl);
-                    setOpenApiServer(openApi, "Rest Reactive", content);
+                    setOpenApiServer(openApi, "Rest Reactive Mongo", content);
                     correctActuatorPath(openApi, "/api");
+                    setOauth2Url(openApi);
                 } catch (Exception ex) {
                     throw new RuntimeException("Failed to load OpenAPI definition." ,ex);
                 }
@@ -186,7 +198,7 @@ public class OpenApiConfiguration {
     @Bean
     public GroupedOpenApi dataRestMongoRestApi(@Qualifier("customGlobalHeaderOpenApiCustomizer") OpenApiCustomizer customGlobalHeaderOpenApiCustomizer) {
         return GroupedOpenApi.builder()
-            .group("spring-6-data-rest-2")
+            .group("spring-6-data-rest")
             .addOpenApiCustomizer(customGlobalHeaderOpenApiCustomizer)
             .displayName("Spring 6 Data Rest Rest-API")
             .pathsToMatch("/api/v4" + apiDocsPath)
@@ -194,8 +206,9 @@ public class OpenApiConfiguration {
                 try {
                     URL restMvcOpenApiUrl = new URL(dataRestUrl + apiDocsPath);
                     StringBuilder content = readExternalOpenApiContent(restMvcOpenApiUrl);
-                    setOpenApiServer(openApi, "Rest Reactive", content);
+                    setOpenApiServer(openApi, "Rest Data-Rest", content);
                     correctActuatorPath(openApi, "/api");
+                    setOauth2Url(openApi);
                 } catch (Exception ex) {
                     throw new RuntimeException("Failed to load OpenAPI definition." ,ex);
                 }
@@ -207,7 +220,7 @@ public class OpenApiConfiguration {
     @Bean
     public GroupedOpenApi authRestApi(@Qualifier("customGlobalHeaderOpenApiCustomizer") OpenApiCustomizer customGlobalHeaderOpenApiCustomizer) {
         return GroupedOpenApi.builder()
-            .group("spring-6-auth-server-2")
+            .group("spring-6-auth-server")
             .addOpenApiCustomizer(customGlobalHeaderOpenApiCustomizer)
             .displayName("Spring 6 Auth Server Rest-API")
             .pathsToMatch("/oauth2/v3" + apiDocsPath)
@@ -296,5 +309,18 @@ public class OpenApiConfiguration {
             }
         }
         return content;
+    }
+
+    private void setOauth2Url(OpenAPI openApi) {
+        openApi.getComponents().getSecuritySchemes().values().stream()
+            .filter(scheme -> scheme.getType() == io.swagger.v3.oas.models.security.SecurityScheme.Type.OAUTH2)
+            .forEach(scheme -> {
+                io.swagger.v3.oas.models.security.OAuthFlows flows = scheme.getFlows();
+                if (flows.getClientCredentials() != null) {
+                    flows.getClientCredentials().tokenUrl(tokenUrl);
+                    flows.getClientCredentials().authorizationUrl(authorizationUrl);
+                    flows.getClientCredentials().refreshUrl(refreshUrl);
+                }
+            });
     }
 }
