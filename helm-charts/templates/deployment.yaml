@@ -70,6 +70,14 @@ spec:
               value: "http://{{ .Release.Name }}-spring-6-auth-server.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.authServer.port }}"
             - name: SECURITY_RESTMVC_HEALTH_URL
               value: "http://{{ .Release.Name }}-spring-6-rest-mvc.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.restMvc.port }}"
+            - name: SECURITY_RESTREACTIVE_HEALTH_URL
+              value: "http://{{ .Release.Name }}-spring-6-reactive.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.reactive.port }}"
+            - name: SECURITY_RESTREACTIVEMONGO_HEALTH_URL
+              value: "http://{{ .Release.Name }}-spring-6-reactive-mongo.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.reactiveMongo.port }}"
+            - name: SECURITY_DATAREST_HEALTH_URL
+              value: "http://{{ .Release.Name }}-spring-6-data-rest.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.dataRest.port }}"
+
+
 
             # GATEWAY ROUTES
 

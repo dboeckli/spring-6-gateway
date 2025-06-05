@@ -73,10 +73,16 @@ public class OpenApiConfiguration {
     @Value("${security.refresh-url-for-openapi}")
     private String refreshUrl;
 
-    @Value("${security.restMvc-health-url}")
-    private String restMvcUrl;
+    @Value("${security.mvc-health-url}")
+    private String mvcUrl;
     @Value("${security.auth-server-health-url}")
     private String authServerUrl;
+    @Value("${security.reactiveMongo-health-url}")
+    private String reactiveMongoUrl;
+    @Value("${security.reactive-health-url}")
+    private String reactiveUrl;
+    @Value("${security.dataRest-health-url}")
+    private String dataRestUrl;
 
     @Value("${springdoc.api-docs.path:#{null}}")
     public String apiDocsPath;
@@ -122,14 +128,14 @@ public class OpenApiConfiguration {
         return GroupedOpenApi.builder()
             .group("spring-6-rest-mvc-2")
             .addOpenApiCustomizer(customGlobalHeaderOpenApiCustomizer)
-            .displayName("Spring 6 Rest MVC Rest API")
+            .displayName("Spring 6 Rest MVC Rest-API")
             .pathsToMatch("/api/v1" + apiDocsPath)
             .addOpenApiCustomizer(openApi -> {
                 try {
-                    URL restMvcOpenApiUrl = new URL(restMvcUrl + apiDocsPath);
+                    URL restMvcOpenApiUrl = new URL(mvcUrl + apiDocsPath);
                     StringBuilder content = readExternalOpenApiContent(restMvcOpenApiUrl);
                     setOpenApiServer(openApi, "Rest MVC", content);
-                    correctActuatorPath(openApi);
+                    correctActuatorPath(openApi, "/api");
                 } catch (Exception ex) {
                     throw new RuntimeException("Failed to load OpenAPI definition." ,ex);
                 }
@@ -138,18 +144,79 @@ public class OpenApiConfiguration {
     }
 
     @Bean
+    public GroupedOpenApi reactiveRestApi(@Qualifier("customGlobalHeaderOpenApiCustomizer") OpenApiCustomizer customGlobalHeaderOpenApiCustomizer) {
+        return GroupedOpenApi.builder()
+            .group("spring-6-reactive-2")
+            .addOpenApiCustomizer(customGlobalHeaderOpenApiCustomizer)
+            .displayName("Spring 6 Reactive Rest-API")
+            .pathsToMatch("/api/v2" + apiDocsPath)
+            .addOpenApiCustomizer(openApi -> {
+                try {
+                    URL restMvcOpenApiUrl = new URL(reactiveUrl + apiDocsPath);
+                    StringBuilder content = readExternalOpenApiContent(restMvcOpenApiUrl);
+                    setOpenApiServer(openApi, "Rest Reactive", content);
+                    correctActuatorPath(openApi, "/api");
+                } catch (Exception ex) {
+                    throw new RuntimeException("Failed to load OpenAPI definition." ,ex);
+                }
+            })
+            .build();
+    }
+
+    @Bean
+    public GroupedOpenApi reactiveMongoRestApi(@Qualifier("customGlobalHeaderOpenApiCustomizer") OpenApiCustomizer customGlobalHeaderOpenApiCustomizer) {
+        return GroupedOpenApi.builder()
+            .group("spring-6-reactive-mongo-2")
+            .addOpenApiCustomizer(customGlobalHeaderOpenApiCustomizer)
+            .displayName("Spring 6 Reactive Mongo Rest-API")
+            .pathsToMatch("/api/v3" + apiDocsPath)
+            .addOpenApiCustomizer(openApi -> {
+                try {
+                    URL restMvcOpenApiUrl = new URL(reactiveMongoUrl + apiDocsPath);
+                    StringBuilder content = readExternalOpenApiContent(restMvcOpenApiUrl);
+                    setOpenApiServer(openApi, "Rest Reactive", content);
+                    correctActuatorPath(openApi, "/api");
+                } catch (Exception ex) {
+                    throw new RuntimeException("Failed to load OpenAPI definition." ,ex);
+                }
+            })
+            .build();
+    }
+
+    @Bean
+    public GroupedOpenApi dataRestMongoRestApi(@Qualifier("customGlobalHeaderOpenApiCustomizer") OpenApiCustomizer customGlobalHeaderOpenApiCustomizer) {
+        return GroupedOpenApi.builder()
+            .group("spring-6-data-rest-2")
+            .addOpenApiCustomizer(customGlobalHeaderOpenApiCustomizer)
+            .displayName("Spring 6 Data Rest Rest-API")
+            .pathsToMatch("/api/v4" + apiDocsPath)
+            .addOpenApiCustomizer(openApi -> {
+                try {
+                    URL restMvcOpenApiUrl = new URL(dataRestUrl + apiDocsPath);
+                    StringBuilder content = readExternalOpenApiContent(restMvcOpenApiUrl);
+                    setOpenApiServer(openApi, "Rest Reactive", content);
+                    correctActuatorPath(openApi, "/api");
+                } catch (Exception ex) {
+                    throw new RuntimeException("Failed to load OpenAPI definition." ,ex);
+                }
+            })
+            .build();
+    }
+
+
+    @Bean
     public GroupedOpenApi authRestApi(@Qualifier("customGlobalHeaderOpenApiCustomizer") OpenApiCustomizer customGlobalHeaderOpenApiCustomizer) {
         return GroupedOpenApi.builder()
             .group("spring-6-auth-server-2")
             .addOpenApiCustomizer(customGlobalHeaderOpenApiCustomizer)
-            .displayName("Spring 6 Auth Server Rest API")
+            .displayName("Spring 6 Auth Server Rest-API")
             .pathsToMatch("/oauth2/v3" + apiDocsPath)
             .addOpenApiCustomizer(openApi -> {
                 try {
                     URL restAuthOpenApiUrl = new URL(authServerUrl + apiDocsPath);
                     StringBuilder content = readExternalOpenApiContent(restAuthOpenApiUrl);
                     setOpenApiServer(openApi, "Rest Auth Server", content);
-                    correctActuatorPath(openApi);
+                    correctActuatorPath(openApi, "/oauth2");
                 } catch (Exception ex) {
                     throw new RuntimeException("Failed to load OpenAPI definition.", ex);
                 }
@@ -157,7 +224,7 @@ public class OpenApiConfiguration {
             .build();
     }
 
-    private void correctActuatorPath(OpenAPI openApi) {
+    private void correctActuatorPath(OpenAPI openApi, String pathPrefix) {
         Paths updatedPaths = new Paths();
         boolean actuatorPathFound = false;
 
@@ -166,7 +233,7 @@ public class OpenApiConfiguration {
             PathItem pathItem = entry.getValue();
 
             if (path.startsWith("/actuator")) {
-                String newPath = "/oauth2" + path;
+                String newPath = pathPrefix + path;
                 updatedPaths.addPathItem(newPath, pathItem);
                 actuatorPathFound = true;
             } else {

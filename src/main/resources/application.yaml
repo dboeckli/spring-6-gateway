@@ -30,6 +30,16 @@ spring:
           enabled: true
           predicates:
             - Path=/api/v3/*
+        - id: spring-6-data-rest
+          uri: http://localhost:8084
+          enabled: true
+          predicates:
+            - Path=/api/v4/*
+        - id: spring-6-auth-server
+          uri: http://localhost:9000
+          enabled: true
+          predicates:
+            - Path=/oauth2/*
 
 logging:
   level:
@@ -118,20 +128,14 @@ springdoc:
     urls:
       - name: gateway-service
         url: /v3/api-docs
-      - name: spring-6-rest-mvc
-        url: /api/v1/v3/api-docs
-      - name: spring-6-reactive
-        url: /api/v2/v3/api-docs
-      - name: spring-6-reactive-mongo
-        url: /api/v3/v3/api-docs
-      - name: spring-6-data-rest
-        url: /api/v4/v3/api-docs
-      - name: spring-6-auth-server
-        url: /oauth2/v3/api-docs
+        displayName: Spring 6 Gateway Rest-Api
 
 security:
   auth-server-health-url: http://host.docker.internal:9000
-  restMvc-health-url: http://host.docker.internal:8081
+  mvc-health-url: http://host.docker.internal:8081
+  reactive-health-url: http://host.docker.internal:8082
+  reactiveMongo-health-url: http://host.docker.internal:8083
+  dataRest-health-url: http://host.docker.internal:8084
 
   authorization-url-for-openapi: http://host.docker.internal:9000/oauth2/auth
   token-url-for-openapi: http://host.docker.internal:9000/oauth2/token
