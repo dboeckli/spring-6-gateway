@@ -75,4 +75,19 @@ management:
     health:
       probes:
         enabled: true
-      show-details: always    
+      show-details: always
+
+security:
+  auth-server-health-url: http://localhost:9000
+  restMvc-health-url: http://localhost:8081
+
+  authorization-url-for-openapi: http://localhost:9000/oauth2/auth
+  token-url-for-openapi: http://localhost:9000/oauth2/token
+  refresh-url-for-openapi: http://localhost/oauth2/refresh-token
+
+  cors:
+    allowed-origins:
+      - http://localhost:8080 # gateway project runs on port 8080
+      - http://127.0.0.1:8080 # gateway project runs on port 8080
+      - http://localhost:30080 # gateway project runs on port 30080
+      - http://127.0.0.1:30080 # gateway project runs on port 30080

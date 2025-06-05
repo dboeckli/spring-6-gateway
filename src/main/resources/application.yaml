@@ -109,6 +109,7 @@ springdoc:
   show-oauth2-endpoints: true
   api-docs:
     enabled: true
+    path: /v3/api-docs
   swagger-ui:
     oauth:
       # do that not on production!
@@ -127,3 +128,20 @@ springdoc:
         url: /api/v4/v3/api-docs
       - name: spring-6-auth-server
         url: /oauth2/v3/api-docs
+
+security:
+  auth-server-health-url: http://host.docker.internal:9000
+  restMvc-health-url: http://host.docker.internal:8081
+
+  authorization-url-for-openapi: http://host.docker.internal:9000/oauth2/auth
+  token-url-for-openapi: http://host.docker.internal:9000/oauth2/token
+  refresh-url-for-openapi: http://host.docker.internal:9000/oauth2/refresh-token
+
+  cors:
+    allowed-origins:
+      - http://localhost:8080 # gateway project runs on port 8080
+      - http://127.0.0.1:8080 # gateway project runs on port 8080
+      - http://localhost:30080 # gateway project runs on port 30080
+      - http://127.0.0.1:30080 # gateway project runs on port 30080
+
+
