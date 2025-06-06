@@ -57,6 +57,7 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: mysql
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://host.docker.internal:9000
+      SECURITY_AUTH_SERVER_HEALTH_URL: http://auth-server:9000
       SERVER_PORT: 8081
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/restmvcdb
       LOGGING_LEVEL_ORG_APACHE_KAFKA_CLIENTS_NETWORKCLIENT: ERROR
@@ -79,6 +80,7 @@ services:
       - 8083
     environment:
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://host.docker.internal:9000
+      SECURITY_AUTH_SERVER_HEALTH_URL: http://auth-server:9000
       SERVER_PORT: 8083
       SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/sfg
       SPRING_DATA_MONGODB_USERNAME: root
@@ -102,6 +104,7 @@ services:
       - 8082
     environment:
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://host.docker.internal:9000
+      SECURITY_AUTH_SERVER_HEALTH_URL: http://auth-server:9000
       SERVER_PORT: 8082
     depends_on:
       auth-server:
