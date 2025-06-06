@@ -57,6 +57,25 @@ spec:
             - name: SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_SPRINGAUTH_TOKEN_URI
               value: "http://auth-server:9000/oauth2/token"
 
+            # These are the addresses used by the openapi Gui
+            - name: SECURITY_AUTHORIZATION_URL_FOR_OPENAPI
+              value: "http://localhost:30080/oauth2/auth"
+            - name: SECURITY_TOKEN_URL_FOR_OPENAPI
+              value: "http://localhost:30080/oauth2/token"
+            - name: SECURITY_REFRESH_URL_FOR_OPENAPI
+              value: "http://localhost:30080/oauth2/refresh-token"
+
+            - name: SECURITY_AUTH_SERVER_HEALTH_URL
+              value: "http://auth-server:9000"
+            - name: SECURITY_MVC_HEALTH_URL
+              value: "http://rest-mvc:8081"
+            - name: SECURITY_REACTIVE_HEALTH_URL
+              value: "http://reactive:8082"
+            - name: SECURITY_REACTIVEMONGO_HEALTH_URL
+              value: "http://reactive-mongo:8083"
+            - name: SECURITY_DATAREST_HEALTH_URL
+              value: "http://data-rest:8084"
+
             # Gateway routes
 
             # spring-6-auth-server
@@ -84,7 +103,7 @@ spec:
             - name: SPRING_CLOUD_GATEWAY_ROUTES_2_URI
               value: "http://auth-server:9000"
             - name: SPRING_CLOUD_GATEWAY_ROUTES_2_PREDICATES_0
-              value: "Path=/oauth2/**"
+              value: "Path=/oauth2/**, /.well-known/**, /userinfo, /{subpath}/.well-known/openid-configuration"
 
             # spring-6-rest-mvc
             # openapi

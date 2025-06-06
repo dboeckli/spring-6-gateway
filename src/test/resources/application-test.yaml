@@ -31,6 +31,11 @@ spring:
           enabled: true
           predicates:
             - Path=/api/v4/*
+        - id: spring-6-auth-server
+          uri: http://localhost:9000
+          enabled: true
+          predicates:
+            - Path=/oauth2/**, /.well-known/**, /userinfo, /{subpath}/.well-known/openid-configuration
       httpserver:
         wiretap: true
       httpclient:
@@ -39,11 +44,11 @@ spring:
 logging:
   level:
     org.springframework.cloud.gateway: TRACE
-    org.springframework.http.server.reactive: DEBUG
-    org.springframework.web.reactive: DEBUG
-    reactor.ipc.netty: DEBUG
-    reactor.netty: DEBUG
-    org.zalando.logbook: TRACE
+    org.springframework.http.server.reactive: INFO
+    org.springframework.web.reactive: INFO
+    reactor.ipc.netty: INFO
+    reactor.netty: INFO
+    org.zalando.logbook: INFO
     
 logbook:
   filter:
@@ -75,4 +80,22 @@ management:
     health:
       probes:
         enabled: true
-      show-details: always    
+      show-details: always
+
+security:
+  auth-server-health-url: http://localhost:9000
+  mvc-health-url: http://localhost:8081
+  reactive-health-url: http://localhost:8082
+  reactiveMongo-health-url: http://localhost:8083
+  dataRest-health-url: http://localhost:8084
+
+  authorization-url-for-openapi: http://localhost:9000/oauth2/auth
+  token-url-for-openapi: http://localhost:9000/oauth2/token
+  refresh-url-for-openapi: http://localhost/oauth2/refresh-token
+
+  cors:
+    allowed-origins:
+      - http://localhost:8080 # gateway project runs on port 8080
+      - http://127.0.0.1:8080 # gateway project runs on port 8080
+      - http://localhost:30080 # gateway project runs on port 30080
+      - http://127.0.0.1:30080 # gateway project runs on port 30080

@@ -116,7 +116,7 @@ spring:
           uri: http://host.docker.internal:9000
           enabled: true
           predicates:
-            - Path=/oauth2/**
+            - Path=/oauth2/**, /.well-known/**, /userinfo, /{subpath}/.well-known/openid-configuration
 
 logging:
   level:
@@ -125,7 +125,7 @@ logging:
     org.springframework.web.reactive: INFO
     reactor.ipc.netty: INFO
     reactor.netty: INFO
-    org.zalando.logbook: TRACE
+    org.zalando.logbook: DEBUG
 
 management:
   health:
@@ -153,6 +153,7 @@ management:
 springdoc:
   show-actuator: true
   show-oauth2-endpoints: true
+  show-spring-cloud-functions: true
   api-docs:
     enabled: true
   swagger-ui:
@@ -163,32 +164,8 @@ springdoc:
     urls:
       - name: gateway-service
         url: /v3/api-docs
-      - name: spring-6-rest-mvc
-        url: /api/v1/v3/api-docs 
-      - name: spring-6-reactive
-        url: /api/v2/v3/api-docs
-      - name: spring-6-reactive-mongo
-        url: /api/v3/v3/api-docs
-      - name: spring-6-data-rest
-        url: /api/v4/v3/api-docs  
-      - name: spring-6-auth-server
-        url: /oauth2/v3/api-docs
+        displayName: Spring 6 Gateway Rest-Api
 
-security:
-  authorization-url: http://host.docker.internal:9000/oauth2/auth
-  token-url: http://host.docker.internal:9000/oauth2/token
-  refresh-url: http://host.docker.internal:9000/oauth2/refresh-token
-  cors:
-    # gateway project runs on port 8080
-    allowed-origins: 
-      - http://localhost:8080
-      - http://127.0.0.1:8080
-      - http://host.docker.internal:8081
-      - http://host.docker.internal:8082
-      - http://host.docker.internal:8083
-      - http://host.docker.internal:8084
-      - http://host.docker.internal:9000
-        
 logbook:
   filter:
     enabled: true
@@ -206,9 +183,13 @@ logbook:
       # Exclude HTML-related calls and specific endpoints that Logbook doesn't handle correctly
       - path: /actuator/health/**
 
-      - path: /**/h2-console/**  # Exclude H2 console
-      - path: /**/swagger-ui/**  # Exclude Swagger UI if used
-      - path: /**/v3/api-docs/** # Exclude OpenAPI docs if used
+      - path: /**/h2-console/**
+      - path: /**/swagger-ui/**
+      - path: /**/v3/api-docs/**
+
+      - path: /h2-console/**
+      - path: /swagger-ui/**
+      - path: /v3/api-docs/**
 
       # Exclude HTML-related calls and web resources
       - path: /**/*.html
@@ -228,3 +209,23 @@ logbook:
       - path: /**/resources/**
       # Add more exclusions as needed
 
+security:
+  auth-server-health-url: http://host.docker.internal:9000
+  mvc-health-url: http://host.docker.internal:8081
+  reactive-health-url: http://host.docker.internal:8082
+  reactiveMongo-health-url: http://host.docker.internal:8083
+  dataRest-health-url: http://host.docker.internal:8084
+
+  authorization-url-for-openapi: http://host.docker.internal:8080/oauth2/auth
+  token-url-for-openapi: http://host.docker.internal:8080/oauth2/token
+  refresh-url-for-openapi: http://host.docker.internal:8080/oauth2/refresh-token
+  cors:
+    # gateway project runs on port 8080
+    allowed-origins:
+      - http://localhost:8080
+      - http://127.0.0.1:8080
+      - http://host.docker.internal:8081
+      - http://host.docker.internal:8082
+      - http://host.docker.internal:8083
+      - http://host.docker.internal:8084
+      - http://host.docker.internal:9000
