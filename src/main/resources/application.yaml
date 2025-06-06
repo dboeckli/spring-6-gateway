@@ -10,36 +10,38 @@ spring:
   
   cloud:
     gateway:
-      httpserver:
-        wiretap: true
-      httpclient:
-        wiretap: true
-      routes:
-        - id: spring-6-rest-mvc
-          uri: http://localhost:8081
-          enabled: true
-          predicates:
-            - Path=/api/v1/**
-        - id: spring-6-reactive
-          uri: http://localhost:8082
-          enabled: true
-          predicates:
-            - Path=/api/v2/*
-        - id: spring-6-reactive-mongo
-          uri: http://localhost:8083
-          enabled: true
-          predicates:
-            - Path=/api/v3/*
-        - id: spring-6-data-rest
-          uri: http://localhost:8084
-          enabled: true
-          predicates:
-            - Path=/api/v4/*
-        - id: spring-6-auth-server
-          uri: http://localhost:9000
-          enabled: true
-          predicates:
-            - Path=/oauth2/**, /.well-known/**, /userinfo, /{subpath}/.well-known/openid-configuration
+      server:
+        webflux:
+          httpserver:
+            wiretap: true
+          httpclient:
+            wiretap: true
+          routes:
+            - id: spring-6-rest-mvc
+              uri: http://localhost:8081
+              enabled: true
+              predicates:
+                - Path=/api/v1/**
+            - id: spring-6-reactive
+              uri: http://localhost:8082
+              enabled: true
+              predicates:
+                - Path=/api/v2/*
+            - id: spring-6-reactive-mongo
+              uri: http://localhost:8083
+              enabled: true
+              predicates:
+                - Path=/api/v3/*
+            - id: spring-6-data-rest
+              uri: http://localhost:8084
+              enabled: true
+              predicates:
+                - Path=/api/v4/*
+            - id: spring-6-auth-server
+              uri: http://localhost:9000
+              enabled: true
+              predicates:
+                - Path=/oauth2/**, /.well-known/**, /userinfo, /{subpath}/.well-known/openid-configuration
 
 logging:
   level:

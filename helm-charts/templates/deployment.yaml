@@ -85,31 +85,31 @@ spec:
             ########################
 
             # openapi
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_0_ID
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_0_ID
               value: "spring-6-auth-server-api-docs"
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_0_URI
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_0_URI
               value: "http://{{ .Release.Name }}-spring-6-auth-server.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.authServer.port }}"
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_0_PREDICATES_0
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_0_PREDICATES_0
               value: "Path=/oauth2/v3/api-docs,/oauth2/v3/api-docs/**"
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_0_FILTERS_0
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_0_FILTERS_0
               value: "StripPrefix=1"
 
             # actuator
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_1_ID
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_1_ID
               value: "spring-6-auth-server-actuator"
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_1_URI
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_1_URI
               value: "http://{{ .Release.Name }}-spring-6-auth-server.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.authServer.port }}"
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_1_PREDICATES_0
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_1_PREDICATES_0
               value: "Path=/oauth2/actuator,/oauth2/actuator/**"
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_1_FILTERS_0
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_1_FILTERS_0
               value: "StripPrefix=1"
 
             # rest
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_2_ID
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_2_ID
               value: "spring-6-auth-server"
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_2_URI
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_2_URI
               value: "http://{{ .Release.Name }}-spring-6-auth-server.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.authServer.port }}"
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_2_PREDICATES_0
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_2_PREDICATES_0
               value: "Path=/oauth2/**, /.well-known/**, /userinfo, /{subpath}/.well-known/openid-configuration"
 
             #####################
@@ -117,31 +117,31 @@ spec:
             #####################
 
             # openapi
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_3_ID
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_3_ID
               value: "spring-6-rest-mvc-api-docs"
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_3_URI
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_3_URI
               value: "http://{{ .Release.Name }}-spring-6-rest-mvc.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.restMvc.port }}"
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_3_PREDICATES_0
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_3_PREDICATES_0
               value: "Path=/api/v1/v3/api-docs,/api/v1/v3/api-docs/**"
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_3_FILTERS_0
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_3_FILTERS_0
               value: "StripPrefix=2"
 
             # actuator
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_4_ID
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_4_ID
               value: "spring-6-rest-mvc-actuator"
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_4_URI
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_4_URI
               value: "http://{{ .Release.Name }}-spring-6-rest-mvc.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.restMvc.port }}"
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_4_PREDICATES_0
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_4_PREDICATES_0
               value: "Path=/api/v1/actuator,/api/v1/actuator/**"
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_4_FILTERS_0
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_4_FILTERS_0
               value: "StripPrefix=2"
 
             # rest
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_5_ID
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_5_ID
               value: "spring-6-rest-mvc"
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_5_URI
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_5_URI
               value: "http://{{ .Release.Name }}-spring-6-rest-mvc.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.restMvc.port }}"
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_5_PREDICATES_0
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_5_PREDICATES_0
               value: "Path=/api/v1/**"
 
             #####################
@@ -149,29 +149,29 @@ spec:
             #####################
 
             # openapi
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_6_ID
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_6_ID
               value: "spring-6-reactive-api-docs"
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_6_URI
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_6_URI
               value: "http://{{ .Release.Name }}-spring-6-reactive.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.reactive.port }}"
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_6_PREDICATES_0
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_6_PREDICATES_0
               value: "Path=/api/v2/v3/api-docs,/api/v2/v3/api-docs/**"
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_6_FILTERS_0
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_6_FILTERS_0
               value: "StripPrefix=2"
             # actuator
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_7_ID
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_7_ID
               value: "spring-6-reactive-actuator"
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_7_URI
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_7_URI
               value: "http://{{ .Release.Name }}-spring-6-reactive.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.reactive.port }}"
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_7_PREDICATES_0
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_7_PREDICATES_0
               value: "Path=/api/v2/actuator,/api/v2/actuator/**"
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_7_FILTERS_0
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_7_FILTERS_0
               value: "StripPrefix=2"
             # rest
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_8_ID
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_8_ID
               value: "spring-6-reactive"
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_8_URI
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_8_URI
               value: "http://{{ .Release.Name }}-spring-6-reactive.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.reactive.port }}"
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_8_PREDICATES_0
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_8_PREDICATES_0
               value: "Path=/api/v2/**"
 
             ###########################
@@ -179,29 +179,29 @@ spec:
             ###########################
 
             # openapi
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_9_ID
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_9_ID
               value: "spring-6-reactive-mongo-api-docs"
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_9_URI
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_9_URI
               value: "http://{{ .Release.Name }}-spring-6-reactive-mongo.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.reactiveMongo.port }}"
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_9_PREDICATES_0
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_9_PREDICATES_0
               value: "Path=/api/v3/v3/api-docs,/api/v3/v3/api-docs/**"
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_9_FILTERS_0
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_9_FILTERS_0
               value: "StripPrefix=2"
             # actuator
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_10_ID
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_10_ID
               value: "spring-6-reactive-mongo-actuator"
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_10_URI
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_10_URI
               value: "http://{{ .Release.Name }}-spring-6-reactive-mongo.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.reactiveMongo.port }}"
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_10_PREDICATES_0
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_10_PREDICATES_0
               value: "Path=/api/v3/actuator,/api/v3/actuator/**"
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_10_FILTERS_0
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_10_FILTERS_0
               value: "StripPrefix=2"
             # rest
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_11_ID
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_11_ID
               value: "spring-6-reactive-mongo"
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_11_URI
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_11_URI
               value: "http://{{ .Release.Name }}-spring-6-reactive-mongo.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.reactiveMongo.port }}"
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_11_PREDICATES_0
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_11_PREDICATES_0
               value: "Path=/api/v3/**"
 
             ######################
@@ -209,29 +209,29 @@ spec:
             ######################
 
             # openapi
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_12_ID
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_12_ID
               value: "spring-6-data-rest-api-docs"
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_12_URI
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_12_URI
               value: "http://{{ .Release.Name }}-spring-6-data-rest.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.dataRest.port }}"
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_12_PREDICATES_0
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_12_PREDICATES_0
               value: "Path=/api/v4/v3/api-docs,/api/v4/v3/api-docs/**"
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_12_FILTERS_0
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_12_FILTERS_0
               value: "StripPrefix=2"
             # actuator
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_13_ID
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_13_ID
               value: "spring-6-data-rest-actuator"
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_13_URI
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_13_URI
               value: "http://{{ .Release.Name }}-spring-6-data-rest.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.dataRest.port }}"
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_13_PREDICATES_0
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_13_PREDICATES_0
               value: "Path=/api/v4/actuator,/api/v4/actuator/**"
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_13_FILTERS_0
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_13_FILTERS_0
               value: "StripPrefix=2"
             # rest
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_14_ID
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_14_ID
               value: "spring-6-data-rest"
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_14_URI
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_14_URI
               value: "http://{{ .Release.Name }}-spring-6-data-rest.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.dataRest.port }}"
-            - name: SPRING_CLOUD_GATEWAY_ROUTES_14_PREDICATES_0
+            - name: SPRING_CLOUD_GATEWAY_SERVER_WEBFLUX_ROUTES_14_PREDICATES_0
               value: "Path=/api/v4/**"
           ports:
             - name: http
