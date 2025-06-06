@@ -18,105 +18,107 @@ spring:
   
   cloud:
     gateway:
-      httpserver:
-        wiretap: true
-      httpclient:
-        wiretap: true
-      routes:
-        # spring-6-rest-mvc
-        - id: spring-6-rest-mvc-api-docs
-          uri: http://host.docker.internal:8081
-          predicates:
-            - Path=/api/v1/v3/api-docs,/api/v1/v3/api-docs/**
-          filters:
-            - StripPrefix=2
-        - id: spring-6-rest-mvc-actuator
-          uri: http://host.docker.internal:8081
-          predicates:
-            - Path=/api/v1/actuator,/api/v1/actuator/**
-          filters:
-            - StripPrefix=2
-        - id: spring-6-rest-mvc
-          uri: http://host.docker.internal:8081
-          enabled: true
-          predicates:
-            - Path=/api/v1/**
-            
-        # spring-6-reactive
-        - id: spring-6-reactive-api-docs
-          uri: http://host.docker.internal:8082
-          predicates:
-            - Path=/api/v2/v3/api-docs,/api/v2/v3/api-docs/**
-          filters:
-            - StripPrefix=2
-        - id: spring-6-reactive-actuator
-          uri: http://host.docker.internal:8082
-          predicates:
-            - Path=/api/v2/actuator,/api/v2/actuator/**
-          filters:
-            - StripPrefix=2
-        - id: spring-6-reactive
-          uri: http://host.docker.internal:8082
-          enabled: true
-          predicates:
-            - Path=/api/v2/**
-            
-        # spring-6-reactive-mongo
-        - id: spring-6-reactive-mongo-api-docs
-          uri: http://host.docker.internal:8083
-          predicates:
-            - Path=/api/v3/v3/api-docs,/api/v3/v3/api-docs/**
-          filters:
-            - StripPrefix=2
-        - id: spring-6-reactive-mongo-actuator
-          uri: http://host.docker.internal:8083
-          predicates:
-            - Path=/api/v3/actuator,/api/v3/actuator/**
-          filters:
-            - StripPrefix=2
-        - id: spring-6-reactive-mongo
-          uri: http://host.docker.internal:8083
-          enabled: true
-          predicates:
-            - Path=/api/v3/**
-              
-        # spring-6-data-rest
-        - id: spring-6-data-rest-api-docs
-          uri: http://host.docker.internal:8084
-          predicates:
-            - Path=/api/v4/v3/api-docs,/api/v4/v3/api-docs/**
-          filters:
-            - StripPrefix=2
-        - id: spring-6-data-rest-actuator
-          uri: http://host.docker.internal:8084
-          predicates:
-            - Path=/api/v4/actuator,/api/v4/actuator/**
-          filters:
-            - StripPrefix=2
-        - id: spring-6-data-rest
-          uri: http://host.docker.internal:8084
-          enabled: true
-          predicates:
-            - Path=/api/v4/**      
-        
-        # spring-6-auth-server
-        - id: spring-6-auth-server-api-docs
-          uri: http://host.docker.internal:9000
-          predicates:
-            - Path=/oauth2/v3/api-docs,/oauth2/v3/api-docs/**
-          filters:
-            - StripPrefix=1
-        - id: spring-6-auth-server-actuator
-          uri: http://host.docker.internal:9000
-          predicates:
-            - Path=/oauth2/actuator,/oauth2/actuator/**
-          filters:
-            - StripPrefix=1
-        - id: spring-6-auth-server
-          uri: http://host.docker.internal:9000
-          enabled: true
-          predicates:
-            - Path=/oauth2/**, /.well-known/**, /userinfo, /{subpath}/.well-known/openid-configuration
+      server:
+        webflux:
+          httpserver:
+            wiretap: true
+          httpclient:
+            wiretap: true
+          routes:
+            # spring-6-rest-mvc
+            - id: spring-6-rest-mvc-api-docs
+              uri: http://host.docker.internal:8081
+              predicates:
+                - Path=/api/v1/v3/api-docs,/api/v1/v3/api-docs/**
+              filters:
+                - StripPrefix=2
+            - id: spring-6-rest-mvc-actuator
+              uri: http://host.docker.internal:8081
+              predicates:
+                - Path=/api/v1/actuator,/api/v1/actuator/**
+              filters:
+                - StripPrefix=2
+            - id: spring-6-rest-mvc
+              uri: http://host.docker.internal:8081
+              enabled: true
+              predicates:
+                - Path=/api/v1/**
+
+            # spring-6-reactive
+            - id: spring-6-reactive-api-docs
+              uri: http://host.docker.internal:8082
+              predicates:
+                - Path=/api/v2/v3/api-docs,/api/v2/v3/api-docs/**
+              filters:
+                - StripPrefix=2
+            - id: spring-6-reactive-actuator
+              uri: http://host.docker.internal:8082
+              predicates:
+                - Path=/api/v2/actuator,/api/v2/actuator/**
+              filters:
+                - StripPrefix=2
+            - id: spring-6-reactive
+              uri: http://host.docker.internal:8082
+              enabled: true
+              predicates:
+                - Path=/api/v2/**
+
+            # spring-6-reactive-mongo
+            - id: spring-6-reactive-mongo-api-docs
+              uri: http://host.docker.internal:8083
+              predicates:
+                - Path=/api/v3/v3/api-docs,/api/v3/v3/api-docs/**
+              filters:
+                - StripPrefix=2
+            - id: spring-6-reactive-mongo-actuator
+              uri: http://host.docker.internal:8083
+              predicates:
+                - Path=/api/v3/actuator,/api/v3/actuator/**
+              filters:
+                - StripPrefix=2
+            - id: spring-6-reactive-mongo
+              uri: http://host.docker.internal:8083
+              enabled: true
+              predicates:
+                - Path=/api/v3/**
+
+            # spring-6-data-rest
+            - id: spring-6-data-rest-api-docs
+              uri: http://host.docker.internal:8084
+              predicates:
+                - Path=/api/v4/v3/api-docs,/api/v4/v3/api-docs/**
+              filters:
+                - StripPrefix=2
+            - id: spring-6-data-rest-actuator
+              uri: http://host.docker.internal:8084
+              predicates:
+                - Path=/api/v4/actuator,/api/v4/actuator/**
+              filters:
+                - StripPrefix=2
+            - id: spring-6-data-rest
+              uri: http://host.docker.internal:8084
+              enabled: true
+              predicates:
+                - Path=/api/v4/**
+
+            # spring-6-auth-server
+            - id: spring-6-auth-server-api-docs
+              uri: http://host.docker.internal:9000
+              predicates:
+                - Path=/oauth2/v3/api-docs,/oauth2/v3/api-docs/**
+              filters:
+                - StripPrefix=1
+            - id: spring-6-auth-server-actuator
+              uri: http://host.docker.internal:9000
+              predicates:
+                - Path=/oauth2/actuator,/oauth2/actuator/**
+              filters:
+                - StripPrefix=1
+            - id: spring-6-auth-server
+              uri: http://host.docker.internal:9000
+              enabled: true
+              predicates:
+                - Path=/oauth2/**, /.well-known/**, /userinfo, /{subpath}/.well-known/openid-configuration
 
 logging:
   level:
@@ -216,14 +218,15 @@ security:
   reactiveMongo-health-url: http://host.docker.internal:8083
   dataRest-health-url: http://host.docker.internal:8084
 
-  authorization-url-for-openapi: http://host.docker.internal:8080/oauth2/auth
-  token-url-for-openapi: http://host.docker.internal:8080/oauth2/token
-  refresh-url-for-openapi: http://host.docker.internal:8080/oauth2/refresh-token
+  authorization-url-for-openapi: http://localhost:8080/oauth2/auth
+  token-url-for-openapi: http://localhost:8080/oauth2/token
+  refresh-url-for-openapi: http://localhost:8080/oauth2/refresh-token
   cors:
     # gateway project runs on port 8080
     allowed-origins:
       - http://localhost:8080
       - http://127.0.0.1:8080
+      - http://host.docker.internal:8080
       - http://host.docker.internal:8081
       - http://host.docker.internal:8082
       - http://host.docker.internal:8083

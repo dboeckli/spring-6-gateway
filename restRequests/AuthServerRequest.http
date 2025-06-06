@@ -12,6 +12,13 @@ Content-Type: application/x-www-form-urlencoded
 
 grant_type=client_credentials&scope=message.read message.write
 
+### this retrieves the bearer token. use the token in the request below
+POST http://host.docker.internal:{{gateway-port}}/oauth2/token
+Authorization: Basic messaging-client secret
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=client_credentials&scope=message.read message.write
+
 ### this retrieves the bearer token. use the token in the request below. When running via gateway we need to retrieve the token via gateway!
 POST http://localhost:{{gateway-port}}/oauth2/token
 Authorization: Basic messaging-client secret

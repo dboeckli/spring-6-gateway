@@ -10,37 +10,39 @@ spring:
   
   cloud:
     gateway:
-      routes:
-        - id: spring-6-rest-mvc
-          uri: ${wiremock.server.baseUrl}
-          enabled: true
-          predicates:
-            - Path=/api/v1/**
-        - id: spring-6-reactive
-          uri: ${wiremock.server.baseUrl}
-          enabled: true
-          predicates:
-            - Path=/api/v2/*
-        - id: spring-6-reactive-mongo
-          uri: ${wiremock.server.baseUrl}
-          enabled: true
-          predicates:
-            - Path=/api/v3/*
-        - id: spring-6-data-rest
-          uri: ${wiremock.server.baseUrl}
-          enabled: true
-          predicates:
-            - Path=/api/v4/*
-        - id: spring-6-auth-server
-          uri: http://localhost:9000
-          enabled: true
-          predicates:
-            - Path=/oauth2/**, /.well-known/**, /userinfo, /{subpath}/.well-known/openid-configuration
-      httpserver:
-        wiretap: true
-      httpclient:
-        wiretap: true
-        
+      server:
+        webflux:
+          httpserver:
+            wiretap: true
+          httpclient:
+            wiretap: true
+          routes:
+            - id: spring-6-rest-mvc
+              uri: ${wiremock.server.baseUrl}
+              enabled: true
+              predicates:
+                - Path=/api/v1/**
+            - id: spring-6-reactive
+              uri: ${wiremock.server.baseUrl}
+              enabled: true
+              predicates:
+                - Path=/api/v2/*
+            - id: spring-6-reactive-mongo
+              uri: ${wiremock.server.baseUrl}
+              enabled: true
+              predicates:
+                - Path=/api/v3/*
+            - id: spring-6-data-rest
+              uri: ${wiremock.server.baseUrl}
+              enabled: true
+              predicates:
+                - Path=/api/v4/*
+            - id: spring-6-auth-server
+              uri: http://localhost:9000
+              enabled: true
+              predicates:
+                - Path=/oauth2/**, /.well-known/**, /userinfo, /{subpath}/.well-known/openid-configuration
+
 logging:
   level:
     org.springframework.cloud.gateway: TRACE
