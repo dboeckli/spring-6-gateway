@@ -110,7 +110,7 @@ spec:
             - name: SPRING_CLOUD_GATEWAY_ROUTES_2_URI
               value: "http://{{ .Release.Name }}-spring-6-auth-server.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.authServer.port }}"
             - name: SPRING_CLOUD_GATEWAY_ROUTES_2_PREDICATES_0
-              value: "Path=/oauth2/**"
+              value: "Path=/oauth2/**, /.well-known/**, /userinfo, /{subpath}/.well-known/openid-configuration"
 
             #####################
             # spring-6-rest-mvc #

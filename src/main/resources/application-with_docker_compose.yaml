@@ -116,7 +116,7 @@ spring:
           uri: http://host.docker.internal:9000
           enabled: true
           predicates:
-            - Path=/oauth2/**
+            - Path=/oauth2/**, /.well-known/**, /userinfo, /{subpath}/.well-known/openid-configuration
 
 logging:
   level:
@@ -125,7 +125,7 @@ logging:
     org.springframework.web.reactive: INFO
     reactor.ipc.netty: INFO
     reactor.netty: INFO
-    org.zalando.logbook: TRACE
+    org.zalando.logbook: DEBUG
 
 management:
   health:
@@ -153,6 +153,8 @@ management:
 springdoc:
   show-actuator: true
   show-oauth2-endpoints: true
+  show-login-endpoint: true
+  show-spring-cloud-functions: true
   api-docs:
     enabled: true
   swagger-ui:
@@ -215,9 +217,9 @@ security:
   reactiveMongo-health-url: http://host.docker.internal:8083
   dataRest-health-url: http://host.docker.internal:8084
 
-  authorization-url-for-openapi: http://host.docker.internal:9000/oauth2/auth
-  token-url-for-openapi: http://host.docker.internal:9000/oauth2/token
-  refresh-url-for-openapi: http://host.docker.internal:9000/oauth2/refresh-token
+  authorization-url-for-openapi: http://host.docker.internal:8080/oauth2/auth
+  token-url-for-openapi: http://host.docker.internal:8080/oauth2/token
+  refresh-url-for-openapi: http://host.docker.internal:8080/oauth2/refresh-token
   cors:
     # gateway project runs on port 8080
     allowed-origins:

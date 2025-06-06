@@ -59,11 +59,11 @@ spec:
 
             # These are the addresses used by the openapi Gui
             - name: SECURITY_AUTHORIZATION_URL_FOR_OPENAPI
-              value: "http:://localhost:8080/oauth2/auth"
+              value: "http://localhost:30080/oauth2/auth"
             - name: SECURITY_TOKEN_URL_FOR_OPENAPI
-              value: "http:://localhost:8080/oauth2/token"
+              value: "http://localhost:30080/oauth2/token"
             - name: SECURITY_REFRESH_URL_FOR_OPENAPI
-              value: "http:://localhost:8080/oauth2/refresh-token"
+              value: "http://localhost:30080/oauth2/refresh-token"
 
             - name: SECURITY_AUTH_SERVER_HEALTH_URL
               value: "http://auth-server:9000"
@@ -103,7 +103,7 @@ spec:
             - name: SPRING_CLOUD_GATEWAY_ROUTES_2_URI
               value: "http://auth-server:9000"
             - name: SPRING_CLOUD_GATEWAY_ROUTES_2_PREDICATES_0
-              value: "Path=/oauth2/**"
+              value: "Path=/oauth2/**, /.well-known/**, /userinfo, /{subpath}/.well-known/openid-configuration"
 
             # spring-6-rest-mvc
             # openapi

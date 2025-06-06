@@ -37,9 +37,9 @@ import static org.springdoc.core.utils.Constants.DEFAULT_API_DOCS_URL;
 
 @OpenAPIDefinition(
     info = @Info(
-        title = "TODO",
-        description = "Some long and useful description",
-        version = "TODO",
+        title = "will be replaced with configured values",
+        description = "Gateway API",
+        version = "will be replaced with configured values",
         license = @License(name = "Apache 2.0", url = "https://www.apache.org/licenses/LICENSE-2.0")
     )
 )
@@ -50,9 +50,9 @@ import static org.springdoc.core.utils.Constants.DEFAULT_API_DOCS_URL;
     scheme = "bearer",
     flows = @OAuthFlows(
         clientCredentials = @OAuthFlow(
-            authorizationUrl = "http://host.docker.internal:9000/oauth2/auth",
-            tokenUrl = "http://host.docker.internal:9000/oauth2/token",
-            refreshUrl = "http://host.docker.internal:9000/oauth2/refresh-token",
+            authorizationUrl = "will be replaced with configured values",
+            tokenUrl = "will be replaced with configured values",
+            refreshUrl = "will be replaced with configured values",
             scopes = {
                 @OAuthScope(name = "message.read"),
                 @OAuthScope(name = "message.write")

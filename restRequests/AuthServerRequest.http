@@ -27,9 +27,24 @@ Content-Type: application/x-www-form-urlencoded
 grant_type=client_credentials&scope=message.read message.write
 
 ###
-GET http://localhost:{{auth-server-port}}/.well-known/openid-configuration
+GET http://localhost:{{gateway-port}}/.well-known/openid-configuration
 Authorization: Basic messaging-client secret
 Content-Type: application/x-www-form-urlencoded
+
+###
+GET http://localhost:{{gateway-port}}//.well-known/oauth-authorization-server
+Authorization: Basic messaging-client secret
+Content-Type: application/x-www-form-urlencoded
+
+### ist zurzeit nicht aufgesetzt in auth server
+GET http://localhost:{{auth-server-port}}/userinfo
+Accept: application/json
+Authorization: Bearer {{$auth.token("open-id")}}
+
+### ist zurzeit nicht aufgesetzt in auth server
+GET http://localhost:{{gateway-port}}/userinfo
+Accept: application/json
+Authorization: Bearer {{$auth.token("open-id")}}
 
 ### actuator
 GET http://localhost:{{auth-server-port}}/actuator/info
@@ -38,4 +53,6 @@ Accept: application/json
 ### actuator via gateway
 GET http://localhost:{{gateway-port}}/oauth2/actuator/info
 Accept: application/json
+
+
 
