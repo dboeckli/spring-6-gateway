@@ -89,24 +89,20 @@ spring-6-auth-server:
 spring-6-rest-mvc:
   authServer:
     enabled: false
+    serviceFQDN: "spring-6-gateway-spring-6-auth-server.spring-6-gateway.svc.cluster.local"
   mysql:
     enabled: false
-  spring:
-    oauth2ResourceServer:
-      issuerUri: "http://spring-6-gateway-spring-6-auth-server.spring-6-gateway.svc.cluster.local:9000"
+    serviceFQDN: "spring-6-gateway-spring-6-rest-mvc-mysql.spring-6-gateway.svc.cluster.local"
 
 spring-6-reactive-mongo:
   authServer:
     enabled: false
+    serviceFQDN: "spring-6-gateway-spring-6-auth-server.spring-6-gateway.svc.cluster.local"
   mongodb:
     enabled: false
-  spring:
-    oauth2ResourceServer:
-      issuerUri: "http://spring-6-gateway-spring-6-auth-server.spring-6-gateway.svc.cluster.local:9000"
+    serviceFQDN: "spring-6-gateway-spring-6-reactive-mongo-mongodb.spring-6-gateway.svc.cluster.local"
 
 spring-6-reactive:
   authServer:
     enabled: false
-  spring:
-    oauth2ResourceServer:
-      issuerUri: "http://spring-6-gateway-spring-6-auth-server.spring-6-gateway.svc.cluster.local:9000"
+    serviceFQDN: "spring-6-gateway-spring-6-auth-server.spring-6-gateway.svc.cluster.local"
