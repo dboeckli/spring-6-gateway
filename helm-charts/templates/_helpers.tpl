@@ -49,3 +49,11 @@ Selector labels
 app.kubernetes.io/name: {{ include "application-template.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
+
+{{/*
+Create the FQDN for the service
+*/}}
+{{- define "application-template.serviceFQDN" -}}
+{{- $fullname := include "application-template.fullname" . -}}
+{{- printf "%s.%s.svc.cluster.local" $fullname .Release.Namespace }}
+{{- end }}

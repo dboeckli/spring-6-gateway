@@ -70,10 +70,7 @@ logbook:
       - path: /actuator/health/**
 
       - path: /**/h2-console/**  # Exclude H2 console
-      - path: /**/swagger-ui/**  # Exclude Swagger UI if used
-      - path: /**/v3/api-docs/** # Exclude OpenAPI docs if used
-
-      # Exclude HTML-related calls and web resources
+      - path: /**/swagger-u      # Exclude HTML-related calls and web resources
       - path: /**/*.html
       - path: /**/*.css
       - path: /**/*.js
@@ -88,7 +85,10 @@ logbook:
       - path: /**/assets/**
       - path: /**/static/**
       - path: /**/public/**
-      - path: /**/resources/**
+      - path: /**/resources/**i/**  # Exclude Swagger UI if used
+      - path: /**/v3/api-docs/** # Exclude OpenAPI docs if used
+
+
       # Add more exclusions as needed
 
 management:
@@ -133,7 +133,7 @@ springdoc:
         url: /v3/api-docs
         displayName: Spring 6 Gateway Rest-Api
 
-security:
+security: # TODO: DO NOT USE HOST.DOCKER.INTERNAL. TAKE LOCALHOST
   auth-server-health-url: http://host.docker.internal:9000
   mvc-health-url: http://host.docker.internal:8081
   reactive-health-url: http://host.docker.internal:8082

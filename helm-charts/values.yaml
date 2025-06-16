@@ -46,35 +46,49 @@ mysql:
   targetPort: 3306
   nodePort: 30306
 
+  serviceFQDN:
+
 mongodb:
   port: 27017
   targetPort: 27017
   nodePort: 30017
+
+  serviceFQDN:
 
 authServer:
   port: 9000
   targetPort: 9000
   nodePort: 30900
 
+  serviceFQDN:
+
 restMvc:
   port: 8081
   targetPort: 8081
   nodePort: 30081
+
+  serviceFQDN:
 
 reactive:
   port: 8082
   targetPort: 8082
   nodePort: 30082
 
+  serviceFQDN:
+
 dataRest:
   port: 8084
   targetPort: 8084
   nodePort: 30084
 
+  serviceFQDN:
+
 reactiveMongo:
   port: 8083
   targetPort: 8083
   nodePort: 30083
+
+  serviceFQDN:
 
 ingress:
   enabled: false
@@ -89,24 +103,20 @@ spring-6-auth-server:
 spring-6-rest-mvc:
   authServer:
     enabled: false
+    serviceFQDN: "spring-6-gateway-spring-6-auth-server.spring-6-gateway.svc.cluster.local"
   mysql:
     enabled: false
-  spring:
-    oauth2ResourceServer:
-      issuerUri: "http://spring-6-gateway-spring-6-auth-server.spring-6-gateway.svc.cluster.local:9000"
+    serviceFQDN: "spring-6-gateway-spring-6-rest-mvc-mysql.spring-6-gateway.svc.cluster.local"
 
 spring-6-reactive-mongo:
   authServer:
     enabled: false
+    serviceFQDN: "spring-6-gateway-spring-6-auth-server.spring-6-gateway.svc.cluster.local"
   mongodb:
     enabled: false
-  spring:
-    oauth2ResourceServer:
-      issuerUri: "http://spring-6-gateway-spring-6-auth-server.spring-6-gateway.svc.cluster.local:9000"
+    serviceFQDN: "spring-6-gateway-spring-6-reactive-mongo-mongodb.spring-6-gateway.svc.cluster.local"
 
 spring-6-reactive:
   authServer:
     enabled: false
-  spring:
-    oauth2ResourceServer:
-      issuerUri: "http://spring-6-gateway-spring-6-auth-server.spring-6-gateway.svc.cluster.local:9000"
+    serviceFQDN: "spring-6-gateway-spring-6-auth-server.spring-6-gateway.svc.cluster.local"
