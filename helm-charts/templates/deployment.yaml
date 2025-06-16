@@ -52,7 +52,7 @@ spec:
               value: "{{ .Values.global.timezone }}"
 
             - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI
-              value: "http://{{ .Release.Name }}-spring-6-auth-server.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.authServer.port }}"
+              value: "http://{{ default (printf "%s-spring-6-auth-server.%s.svc.cluster.local" .Release.Name .Release.Namespace) .Values.authServer.serviceFQDN }}:{{ .Values.authServer.port }}"
             - name: SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_SPRINGAUTH_AUTHORIZATION_URI
               value: "http://{{ .Release.Name }}-spring-6-auth-server.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.authServer.port }}/oauth2/authorize"
             - name: SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_SPRINGAUTH_TOKEN_URI
