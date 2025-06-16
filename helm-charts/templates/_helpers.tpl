@@ -51,9 +51,9 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
-Use the spring-6-auth-server service FQDN
+Create the FQDN for the service
 */}}
 {{- define "application-template.serviceFQDN" -}}
 {{- $fullname := include "application-template.fullname" . -}}
-{{- printf "%s-%s.%s.svc.cluster.local" $fullname "spring-6-auth-server" .Release.Namespace }}
-{{- end -}}
+{{- printf "%s.%s.svc.cluster.local" $fullname .Release.Namespace }}
+{{- end }}
