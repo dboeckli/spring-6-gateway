@@ -46,10 +46,14 @@ mysql:
   targetPort: 3306
   nodePort: 30306
 
+  serviceFQDN:
+
 mongodb:
   port: 27017
   targetPort: 27017
   nodePort: 30017
+
+  serviceFQDN:
 
 authServer:
   port: 9000
@@ -63,20 +67,28 @@ restMvc:
   targetPort: 8081
   nodePort: 30081
 
+  serviceFQDN:
+
 reactive:
   port: 8082
   targetPort: 8082
   nodePort: 30082
+
+  serviceFQDN:
 
 dataRest:
   port: 8084
   targetPort: 8084
   nodePort: 30084
 
+  serviceFQDN:
+
 reactiveMongo:
   port: 8083
   targetPort: 8083
   nodePort: 30083
+
+  serviceFQDN:
 
 ingress:
   enabled: false
