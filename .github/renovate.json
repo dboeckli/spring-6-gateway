@@ -20,7 +20,9 @@
         "versioning": "maven"
     },
     "docker-compose": {
-        "enabled": true
+        "enabled": true,
+        "fileMatch": ["^compose\\.ya?ml$/", "^docker-compose\\.ya?ml$/"],
+        "ignorePaths": ["**/docker-manual/**"]
     },
     "kubernetes": {
         "managerFilePatterns": [
