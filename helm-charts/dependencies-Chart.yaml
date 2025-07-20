@@ -1,0 +1,30 @@
+# the first section is ignored. is replaced by the values from the Chart.yaml
+apiVersion: v2
+name: test
+description: test
+type: application
+version: 0.0.1
+appVersion: 0.0.1
+
+dependencies:
+  - name: spring-6-auth-server
+    version: "v0.0.4-SNAPSHOT"
+    repository: "oci://registry-1.docker.io/domboeckli"
+  - name: spring-6-rest-mvc-mysql
+    version: v0.0.3-SNAPSHOT
+    repository: "oci://registry-1.docker.io/domboeckli"
+  - name: spring-6-rest-mvc
+    version: "v0.0.3-SNAPSHOT"
+    repository: "oci://registry-1.docker.io/domboeckli"
+  - name: spring-6-reactive-mongo-mongodb
+    version: "v0.0.1-SNAPSHOT"
+    repository: "oci://registry-1.docker.io/domboeckli"
+  - name: spring-6-reactive-mongo
+    version: "v0.0.1-SNAPSHOT"
+    repository: "oci://registry-1.docker.io/domboeckli"
+  - name: spring-6-data-rest
+    version: "v0.0.1-SNAPSHOT"
+    repository: "oci://registry-1.docker.io/domboeckli"
+  - name: spring-6-reactive
+    version: "v0.0.1-SNAPSHOT"
+    repository: "oci://registry-1.docker.io/domboeckli"
