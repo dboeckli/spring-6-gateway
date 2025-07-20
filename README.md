@@ -8,7 +8,7 @@ Server runs on port 8080. Requires that other projects are up and running
 * spring-6-reactive on port 8082
 * spring-6-reactive-mongo on port 8083
 * spring-6-data-rest on port 8084
-Example request you can find in the restRequest directory
+Example request you can find in the restRequest directory.
 
 ## Urls
 * openapi: 
@@ -133,6 +133,16 @@ helm status $APPLICATION_NAME --namespace spring-6-gateway
 uninstall
 ```powershell
 helm uninstall $APPLICATION_NAME --namespace spring-6-gateway
+```
+
+delete all
+```powershell
+kubectl delete all --all -n spring-6-gateway
+```
+
+create busybox sidecar
+```powershell
+kubectl run busybox-test --rm -it --image=busybox:1.36 --namespace=spring-6-gateway --command -- sh
 ```
 
 You can use the actuator rest call to verify via port 30080
