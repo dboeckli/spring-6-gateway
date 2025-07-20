@@ -21,7 +21,8 @@
     },
     "docker-compose": {
         "enabled": true,
-        "fileMatch": ["^compose\\.ya?ml$/", "^docker-compose\\.ya?ml$/"]
+        "fileMatch": ["^compose\\.ya?ml$/", "^docker-compose\\.ya?ml$/"],
+        "ignorePaths": ["**/docker-manual/**"]
     },
     "kubernetes": {
         "managerFilePatterns": [
