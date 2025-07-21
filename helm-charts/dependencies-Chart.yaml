@@ -8,7 +8,7 @@ appVersion: 0.0.1
 
 dependencies:
   - name: spring-6-auth-server
-    version: "v0.0.4-SNAPSHOT"
+    version: "v0.0.5-SNAPSHOT"
     repository: "oci://registry-1.docker.io/domboeckli"
   - name: spring-6-rest-mvc-mysql
     version: v0.0.3-SNAPSHOT
