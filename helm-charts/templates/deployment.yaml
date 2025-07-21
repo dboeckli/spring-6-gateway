@@ -52,7 +52,7 @@ spec:
           command: [ 'sh', '-c', 'until nc -z {{ default (printf "%s-spring-6-rest-mvc.%s.svc.cluster.local" .Release.Name .Release.Namespace) .Values.restMvc.serviceFQDN }} {{ .Values.restMvc.port }}; do echo "[busybox: wait-for-rest-mvc] waiting for rest-mvc"; sleep 2; done; echo "[busybox: wait-for-rest-mvc] rest-mvc is available"' ]
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.registry }}/{{ .Chart.Name }}:{{ .Chart.AppVersion }}"
+          image: "{{ .Values.image.registry }}/@project.artifactId@:{{ .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: JAVA_TIMEZONE
