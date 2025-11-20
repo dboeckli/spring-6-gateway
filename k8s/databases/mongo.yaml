@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
         - name: mongodb
-          image: mongo:8.2.1
+          image: mongo:8.2.2
           ports:
             - containerPort: 27017
           env:
