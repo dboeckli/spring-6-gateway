@@ -38,7 +38,7 @@ spec:
           command: [ 'sh', '-c', 'until nc -z auth-server 9000; do echo "[busybox: wait-for-auth-server] waiting for auth-server"; sleep 2; done; echo "[busybox: wait-for-auth-server] auth-server is available"' ]
       containers:
         - name: rest-mvc
-          image: domboeckli/spring-6-rest-mvc:0.0.3-SNAPSHOT
+          image: domboeckli/spring-6-rest-mvc:0.0.4-SNAPSHOT
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: mysql
