@@ -82,9 +82,10 @@ services:
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://host.docker.internal:9000
       SECURITY_AUTH_SERVER_HEALTH_URL: http://auth-server:9000
       SERVER_PORT: 8083
-      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/sfg
-      SPRING_DATA_MONGODB_USERNAME: root
-      SPRING_DATA_MONGODB_PASSWORD: secret
+      SPRING_MONGODB_URI: mongodb://root:secret@mongo:27017/sfg?authSource=admin
+      SPRING_MONGODB_USERNAME: root
+      SPRING_MONGODB_PASSWORD: secret
+      SPRING_MONGODB_AUTHENTICATION_DATABASE: admin
     depends_on:
       mongo:
         condition: service_healthy
