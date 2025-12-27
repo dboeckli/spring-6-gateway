@@ -7,19 +7,17 @@ import org.junit.jupiter.api.ClassOrdererContext;
 import java.util.Comparator;
 
 public class TestClassOrderer implements ClassOrderer {
+    private static int getOrder(ClassDescriptor classDescriptor) {
+        String className = classDescriptor.getTestClass().getSimpleName();
+        return switch (className) {
+            case String name when name.endsWith("IT") -> 2;
+            case String name when name.endsWith("Test") || name.endsWith("Tests") -> 1;
+            default -> Integer.MAX_VALUE;
+        };
+    }
+
     @Override
     public void orderClasses(ClassOrdererContext classOrdererContext) {
         classOrdererContext.getClassDescriptors().sort(Comparator.comparingInt(TestClassOrderer::getOrder));
-    }
-
-    private static int getOrder(ClassDescriptor classDescriptor) {
-        String className = classDescriptor.getDisplayName();
-        if (className.endsWith("Test")) {
-            return 1;
-        } else if (className.endsWith("IT")) {
-            return 2;
-       } else {
-            throw new IllegalArgumentException("Test class " + className + " does not end with 'Test', 'IT'");
-        }
     }
 }

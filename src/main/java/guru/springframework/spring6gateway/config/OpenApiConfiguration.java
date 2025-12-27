@@ -29,6 +29,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -141,13 +142,14 @@ public class OpenApiConfiguration {
             .pathsToMatch("/api/v1" + apiDocsPath)
             .addOpenApiCustomizer(openApi -> {
                 try {
-                    URL restMvcOpenApiUrl = new URL(mvcUrl + apiDocsPath);
+                    URI restMvcOpenApiUri = URI.create(mvcUrl + apiDocsPath);
+                    URL restMvcOpenApiUrl = restMvcOpenApiUri.toURL();
                     StringBuilder content = readExternalOpenApiContent(restMvcOpenApiUrl);
                     setOpenApiServer(openApi, "Rest MVC", content);
                     correctActuatorPath(openApi, "/api");
                     setOauth2Url(openApi);
                 } catch (Exception ex) {
-                    throw new RuntimeException("Failed to load OpenAPI definition." ,ex);
+                    throw new RuntimeException("Failed to load OpenAPI definition.", ex);
                 }
             })
             .build();
@@ -162,13 +164,14 @@ public class OpenApiConfiguration {
             .pathsToMatch("/api/v2" + apiDocsPath)
             .addOpenApiCustomizer(openApi -> {
                 try {
-                    URL restMvcOpenApiUrl = new URL(reactiveUrl + apiDocsPath);
-                    StringBuilder content = readExternalOpenApiContent(restMvcOpenApiUrl);
+                    URI restReactiveOpenApiUri = URI.create(reactiveUrl + apiDocsPath);
+                    URL restReactiveOpenApiUrl = restReactiveOpenApiUri.toURL();
+                    StringBuilder content = readExternalOpenApiContent(restReactiveOpenApiUrl);
                     setOpenApiServer(openApi, "Rest Reactive", content);
                     correctActuatorPath(openApi, "/api");
                     setOauth2Url(openApi);
                 } catch (Exception ex) {
-                    throw new RuntimeException("Failed to load OpenAPI definition." ,ex);
+                    throw new RuntimeException("Failed to load OpenAPI definition.", ex);
                 }
             })
             .build();
@@ -183,13 +186,14 @@ public class OpenApiConfiguration {
             .pathsToMatch("/api/v3" + apiDocsPath)
             .addOpenApiCustomizer(openApi -> {
                 try {
-                    URL restMvcOpenApiUrl = new URL(reactiveMongoUrl + apiDocsPath);
-                    StringBuilder content = readExternalOpenApiContent(restMvcOpenApiUrl);
+                    URI restReactiveMongoOpenApiUri = URI.create(reactiveMongoUrl + apiDocsPath);
+                    URL restReactiveMongoOpenApiUrl = restReactiveMongoOpenApiUri.toURL();
+                    StringBuilder content = readExternalOpenApiContent(restReactiveMongoOpenApiUrl);
                     setOpenApiServer(openApi, "Rest Reactive Mongo", content);
                     correctActuatorPath(openApi, "/api");
                     setOauth2Url(openApi);
                 } catch (Exception ex) {
-                    throw new RuntimeException("Failed to load OpenAPI definition." ,ex);
+                    throw new RuntimeException("Failed to load OpenAPI definition.", ex);
                 }
             })
             .build();
@@ -204,13 +208,14 @@ public class OpenApiConfiguration {
             .pathsToMatch("/api/v4" + apiDocsPath)
             .addOpenApiCustomizer(openApi -> {
                 try {
-                    URL restMvcOpenApiUrl = new URL(dataRestUrl + apiDocsPath);
-                    StringBuilder content = readExternalOpenApiContent(restMvcOpenApiUrl);
+                    URI restDataRestOpenApiUri = URI.create(dataRestUrl + apiDocsPath);
+                    URL restDataRestOpenApiUrl = restDataRestOpenApiUri.toURL();
+                    StringBuilder content = readExternalOpenApiContent(restDataRestOpenApiUrl);
                     setOpenApiServer(openApi, "Rest Data-Rest", content);
                     correctActuatorPath(openApi, "/api");
                     setOauth2Url(openApi);
                 } catch (Exception ex) {
-                    throw new RuntimeException("Failed to load OpenAPI definition." ,ex);
+                    throw new RuntimeException("Failed to load OpenAPI definition.", ex);
                 }
             })
             .build();
@@ -226,7 +231,8 @@ public class OpenApiConfiguration {
             .pathsToMatch("/oauth2/v3" + apiDocsPath)
             .addOpenApiCustomizer(openApi -> {
                 try {
-                    URL restAuthOpenApiUrl = new URL(authServerUrl + apiDocsPath);
+                    URI restAuthOpenApiUri = URI.create(authServerUrl + apiDocsPath);
+                    URL restAuthOpenApiUrl = restAuthOpenApiUri.toURL();
                     StringBuilder content = readExternalOpenApiContent(restAuthOpenApiUrl);
                     setOpenApiServer(openApi, "Rest Auth Server", content);
                     correctActuatorPath(openApi, "/oauth2");
