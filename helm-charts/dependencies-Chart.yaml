@@ -11,10 +11,10 @@ dependencies:
     version: "v0.0.5-SNAPSHOT"
     repository: "oci://registry-1.docker.io/domboeckli"
   - name: spring-6-rest-mvc-mysql
-    version: v0.0.3-SNAPSHOT
+    version: v0.0.4-SNAPSHOT
     repository: "oci://registry-1.docker.io/domboeckli"
   - name: spring-6-rest-mvc
-    version: "v0.0.3-SNAPSHOT"
+    version: "v0.0.4-SNAPSHOT"
     repository: "oci://registry-1.docker.io/domboeckli"
   - name: spring-6-reactive-mongo-mongodb
     version: "v0.0.1-SNAPSHOT"
