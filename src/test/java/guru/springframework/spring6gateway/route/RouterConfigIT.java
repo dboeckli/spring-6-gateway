@@ -12,6 +12,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
@@ -35,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("with_docker_compose")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+@AutoConfigureWebTestClient
 @Slf4j
 class RouterConfigIT {
 
@@ -54,7 +56,7 @@ class RouterConfigIT {
         this.authToken = getAuthToken();
     }
 
-    @Test 
+    @Test
     void testV1RestMvcListBeers() {
         AtomicReference<Map<String, Object>> responseHolder = new AtomicReference<>();
 
@@ -73,8 +75,14 @@ class RouterConfigIT {
         Map<String, Object> storedResponse = responseHolder.get();
         log.info("V1 Full response:" + storedResponse);
 
-        Integer totalElements = (Integer) storedResponse.get("totalElements");
-        assertEquals(2413, totalElements);
+        @SuppressWarnings("unchecked")
+        Map<String, Object> page = (Map<String, Object>) storedResponse.get("page");
+        Number totalElements = (Number) page.get("totalElements");
+        log.info("page response:" + storedResponse);
+
+        Number totalPagesNum = (Number) page.get("totalPages");
+        assertEquals(21L, totalPagesNum.longValue());
+        assertEquals(503L, totalElements.longValue());
     }
 
     @Test
