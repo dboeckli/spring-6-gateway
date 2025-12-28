@@ -39,22 +39,150 @@ spec:
         - name: wait-for-reactive
           image: {{.Values.busyboxImage.repository }}:{{.Values.busyboxImage.tag }}
           imagePullPolicy: {{.Values.busyboxImage.pullPolicy }}
-          command: [ 'sh', '-c', 'until nc -z {{ default (printf "%s-spring-6-reactive.%s.svc.cluster.local" .Release.Name .Release.Namespace) .Values.reactive.serviceFQDN }} {{ .Values.reactive.port }}; do echo "[busybox: wait-for-reactive] waiting for reactive"; sleep 2; done; echo "[busybox: wait-for-reactive] reactive is available"' ]
+          command:
+            - sh
+            - -c
+            - >
+              HOST="{{ default (printf "%s-spring-6-reactive.%s.svc.cluster.local" .Release.Name .Release.Namespace) .Values.reactive.serviceFQDN }}";
+              URL="http://${HOST}:{{ .Values.reactive.port }}/actuator/health/readiness";
+              echo "[busybox: wait-for-reactive] waiting for ${URL}";
+              timeout 180 sh -c '
+                i=1;
+                while true; do
+                  rm -f /tmp/body /tmp/err;
+                  wget -O /tmp/body "$URL" 2>/tmp/err
+                  RC=$?
+
+                  BODY="$(cat /tmp/body 2>/dev/null || true)"
+                  ERR="$(cat /tmp/err 2>/dev/null || true)"
+
+                  if [ $RC -eq 0 ]; then
+                    STATUS="$(echo "$BODY" | sed -n '\''s/.*"status"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p'\'' | head -n 1)"
+                    if echo "$BODY" | grep -q "\"status\":\"UP\""; then
+                      echo "[busybox: wait-for-reactive] attempt ${i}: status=UP"
+                      exit 0
+                    fi
+                    echo "[busybox: wait-for-reactive] attempt ${i}: status=${STATUS:-unknown} body=${BODY}"
+                  else
+                    echo "[busybox: wait-for-reactive] attempt ${i}: wget failed rc=${RC} err=${ERR} body=${BODY}"
+                  fi
+
+                  i=$((i+1));
+                  sleep 2;
+                done
+              ';
+              echo "[busybox: wait-for-reactive] reactive readiness is UP"
 
         - name: wait-for-data-rest
           image: {{.Values.busyboxImage.repository }}:{{.Values.busyboxImage.tag }}
           imagePullPolicy: {{.Values.busyboxImage.pullPolicy }}
-          command: [ 'sh', '-c', 'until nc -z {{ default (printf "%s-spring-6-data-rest.%s.svc.cluster.local" .Release.Name .Release.Namespace) .Values.dataRest.serviceFQDN }} {{ .Values.dataRest.port }}; do echo "[busybox: wait-for-data-rest] waiting for data-rest"; sleep 2; done; echo "[busybox: wait-for-data-rest] data-rest is available"' ]
+          command:
+            - sh
+            - -c
+            - >
+              HOST="{{ default (printf "%s-spring-6-data-rest.%s.svc.cluster.local" .Release.Name .Release.Namespace) .Values.dataRest.serviceFQDN }}";
+              URL="http://${HOST}:{{ .Values.dataRest.port }}/actuator/health/readiness";
+              echo "[busybox: wait-for-dataRest] waiting for ${URL}";
+              timeout 180 sh -c '
+                i=1;
+                while true; do
+                  rm -f /tmp/body /tmp/err;
+                  wget -O /tmp/body "$URL" 2>/tmp/err
+                  RC=$?
+
+                  BODY="$(cat /tmp/body 2>/dev/null || true)"
+                  ERR="$(cat /tmp/err 2>/dev/null || true)"
+
+                  if [ $RC -eq 0 ]; then
+                    STATUS="$(echo "$BODY" | sed -n '\''s/.*"status"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p'\'' | head -n 1)"
+                    if echo "$BODY" | grep -q "\"status\":\"UP\""; then
+                      echo "[busybox: wait-for-dataRest] attempt ${i}: status=UP"
+                      exit 0
+                    fi
+                    echo "[busybox: wait-for-dataRest] attempt ${i}: status=${STATUS:-unknown} body=${BODY}"
+                  else
+                    echo "[busybox: wait-for-dataRest] attempt ${i}: wget failed rc=${RC} err=${ERR} body=${BODY}"
+                  fi
+
+                  i=$((i+1));
+                  sleep 2;
+                done
+              ';
+              echo "[busybox: wait-for-dataRest] reactive readiness is UP"
 
         - name: wait-for-reactive-mongo
           image: {{.Values.busyboxImage.repository }}:{{.Values.busyboxImage.tag }}
           imagePullPolicy: {{.Values.busyboxImage.pullPolicy }}
-          command: [ 'sh', '-c', 'until nc -z {{ default (printf "%s-spring-6-reactive-mongo.%s.svc.cluster.local" .Release.Name .Release.Namespace) .Values.reactiveMongo.serviceFQDN }} {{ .Values.reactiveMongo.port }}; do echo "[busybox: wait-for-reactive-mongo] waiting for reactive-mongo"; sleep 2; done; echo "[busybox: wait-for-reactive-mongo] reactive-mongo is available"' ]
+          command:
+            - sh
+            - -c
+            - >
+              HOST="{{ default (printf "%s-spring-6-reactive-mongo.%s.svc.cluster.local" .Release.Name .Release.Namespace) .Values.reactiveMongo.serviceFQDN }}";
+              URL="http://${HOST}:{{ .Values.reactiveMongo.port }}/actuator/health/readiness";
+              echo "[busybox: wait-for-reactiveMongo] waiting for ${URL}";
+              timeout 180 sh -c '
+                i=1;
+                while true; do
+                  rm -f /tmp/body /tmp/err;
+                  wget -O /tmp/body "$URL" 2>/tmp/err
+                  RC=$?
+
+                  BODY="$(cat /tmp/body 2>/dev/null || true)"
+                  ERR="$(cat /tmp/err 2>/dev/null || true)"
+
+                  if [ $RC -eq 0 ]; then
+                    STATUS="$(echo "$BODY" | sed -n '\''s/.*"status"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p'\'' | head -n 1)"
+                    if echo "$BODY" | grep -q "\"status\":\"UP\""; then
+                      echo "[busybox: wait-for-reactiveMongo] attempt ${i}: status=UP"
+                      exit 0
+                    fi
+                    echo "[busybox: wait-for-reactiveMongo] attempt ${i}: status=${STATUS:-unknown} body=${BODY}"
+                  else
+                    echo "[busybox: wait-for-reactiveMongo] attempt ${i}: wget failed rc=${RC} err=${ERR} body=${BODY}"
+                  fi
+
+                  i=$((i+1));
+                  sleep 2;
+                done
+              ';
+              echo "[busybox: wait-for-reactiveMongo] reactive readiness is UP"
 
         - name: wait-for-rest-mvc
           image: {{.Values.busyboxImage.repository }}:{{.Values.busyboxImage.tag }}
           imagePullPolicy: {{.Values.busyboxImage.pullPolicy }}
-          command: [ 'sh', '-c', 'until nc -z {{ default (printf "%s-spring-6-rest-mvc.%s.svc.cluster.local" .Release.Name .Release.Namespace) .Values.restMvc.serviceFQDN }} {{ .Values.restMvc.port }}; do echo "[busybox: wait-for-rest-mvc] waiting for rest-mvc"; sleep 2; done; echo "[busybox: wait-for-rest-mvc] rest-mvc is available"' ]
+          command:
+            - sh
+            - -c
+            - >
+              HOST="{{ default (printf "%s-spring-6-rest-mvc.%s.svc.cluster.local" .Release.Name .Release.Namespace) .Values.restMvc.serviceFQDN }}";
+              URL="http://${HOST}:{{ .Values.restMvc.port }}/actuator/health/readiness";
+              echo "[busybox: wait-for-restMvc] waiting for ${URL}";
+              timeout 180 sh -c '
+                i=1;
+                while true; do
+                  rm -f /tmp/body /tmp/err;
+                  wget -O /tmp/body "$URL" 2>/tmp/err
+                  RC=$?
+
+                  BODY="$(cat /tmp/body 2>/dev/null || true)"
+                  ERR="$(cat /tmp/err 2>/dev/null || true)"
+
+                  if [ $RC -eq 0 ]; then
+                    STATUS="$(echo "$BODY" | sed -n '\''s/.*"status"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p'\'' | head -n 1)"
+                    if echo "$BODY" | grep -q "\"status\":\"UP\""; then
+                      echo "[busybox: wait-for-restMvc] attempt ${i}: status=UP"
+                      exit 0
+                    fi
+                    echo "[busybox: wait-for-restMvc] attempt ${i}: status=${STATUS:-unknown} body=${BODY}"
+                  else
+                    echo "[busybox: wait-for-restMvc] attempt ${i}: wget failed rc=${RC} err=${ERR} body=${BODY}"
+                  fi
+
+                  i=$((i+1));
+                  sleep 2;
+                done
+              ';
+              echo "[busybox: wait-for-restMvc] reactive readiness is UP"
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.registry }}/@project.artifactId@:{{ .Chart.AppVersion }}"
