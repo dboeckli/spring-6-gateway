@@ -50,6 +50,10 @@ mysql:
 
   serviceFQDN:
 
+kafka:
+  port: 9092
+  serviceFQDN:
+
 mongodb:
   port: 27017
   targetPort: 27017

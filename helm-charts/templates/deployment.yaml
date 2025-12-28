@@ -16,6 +16,11 @@ spec:
         {{- include "application-template.selectorLabels" . | nindent 8 }}
     spec:
       initContainers:
+        - name: wait-for-kafka
+          image: {{.Values.busyboxImage.repository }}:{{.Values.busyboxImage.tag }}
+          imagePullPolicy: {{.Values.busyboxImage.pullPolicy }}
+          command: [ 'sh', '-c', 'until nc -z {{ default (printf "%s-spring-6-rest-mvc-kafka.%s.svc.cluster.local" .Release.Name .Release.Namespace) .Values.kafka.serviceFQDN }} {{ .Values.kafka.port }}; do echo "[busybox: wait-for-mysql] waiting for mysql"; sleep 2; done; echo "[busybox: wait-for-mysql] mysql is available"' ]
+
         - name: wait-for-mysql
           image: {{.Values.busyboxImage.repository }}:{{.Values.busyboxImage.tag }}
           imagePullPolicy: {{.Values.busyboxImage.pullPolicy }}
