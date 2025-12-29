@@ -16,6 +16,18 @@ spec:
         {{- include "application-template.selectorLabels" . | nindent 8 }}
     spec:
       initContainers:
+        - name: wait-for-kafka
+          image: {{.Values.kcatImage.repository }}:{{.Values.kcatImage.tag }}
+          imagePullPolicy: {{.Values.kcatImage.pullPolicy }}
+          command:
+            - /scripts/wait-for-kafka.sh
+          args:
+            - "{{ default (printf "%s-spring-6-rest-mvc-kafka.%s.svc.cluster.local" .Release.Name .Release.Namespace) .Values.kafka.serviceFQDN }}:{{ .Values.kafka.port }}"
+          volumeMounts:
+            - name: scripts
+              mountPath: /scripts
+              readOnly: true
+
         - name: wait-for-mysql
           image: {{.Values.busyboxImage.repository }}:{{.Values.busyboxImage.tag }}
           imagePullPolicy: {{.Values.busyboxImage.pullPolicy }}
@@ -29,27 +41,73 @@ spec:
         - name: wait-for-auth-server
           image: {{.Values.busyboxImage.repository }}:{{.Values.busyboxImage.tag }}
           imagePullPolicy: {{.Values.busyboxImage.pullPolicy }}
-          command: [ 'sh', '-c', 'until nc -z {{ default (printf "%s-spring-6-auth-server.%s.svc.cluster.local" .Release.Name .Release.Namespace) .Values.authServer.serviceFQDN }} {{ .Values.authServer.port }}; do echo "[busybox: wait-for-auth-server] waiting for auth-server"; sleep 2; done; echo "[busybox: wait-for-auth-server] auth-server is available"' ]
+          command:
+            - /scripts/wait-for-readiness.sh
+          args:
+            - authServer
+            - {{ default (printf "%s-spring-6-auth-server.%s.svc.cluster.local" .Release.Name .Release.Namespace) .Values.authServer.serviceFQDN | quote }}
+            - {{ .Values.authServer.port | quote }}
+          volumeMounts:
+            - name: scripts
+              mountPath: /scripts
+              readOnly: true
 
         - name: wait-for-reactive
           image: {{.Values.busyboxImage.repository }}:{{.Values.busyboxImage.tag }}
           imagePullPolicy: {{.Values.busyboxImage.pullPolicy }}
-          command: [ 'sh', '-c', 'until nc -z {{ default (printf "%s-spring-6-reactive.%s.svc.cluster.local" .Release.Name .Release.Namespace) .Values.reactive.serviceFQDN }} {{ .Values.reactive.port }}; do echo "[busybox: wait-for-reactive] waiting for reactive"; sleep 2; done; echo "[busybox: wait-for-reactive] reactive is available"' ]
+          command:
+            - /scripts/wait-for-readiness.sh
+          args:
+            - reactive
+            - {{ default (printf "%s-spring-6-reactive.%s.svc.cluster.local" .Release.Name .Release.Namespace) .Values.reactive.serviceFQDN | quote }}
+            - {{ .Values.reactive.port | quote }}
+          volumeMounts:
+            - name: scripts
+              mountPath: /scripts
+              readOnly: true
 
         - name: wait-for-data-rest
           image: {{.Values.busyboxImage.repository }}:{{.Values.busyboxImage.tag }}
           imagePullPolicy: {{.Values.busyboxImage.pullPolicy }}
-          command: [ 'sh', '-c', 'until nc -z {{ default (printf "%s-spring-6-data-rest.%s.svc.cluster.local" .Release.Name .Release.Namespace) .Values.dataRest.serviceFQDN }} {{ .Values.dataRest.port }}; do echo "[busybox: wait-for-data-rest] waiting for data-rest"; sleep 2; done; echo "[busybox: wait-for-data-rest] data-rest is available"' ]
+          command:
+            - /scripts/wait-for-readiness.sh
+          args:
+            - dataRest
+            - {{ default (printf "%s-spring-6-data-rest.%s.svc.cluster.local" .Release.Name .Release.Namespace) .Values.dataRest.serviceFQDN | quote }}
+            - {{ .Values.dataRest.port | quote }}
+          volumeMounts:
+            - name: scripts
+              mountPath: /scripts
+              readOnly: true
 
         - name: wait-for-reactive-mongo
           image: {{.Values.busyboxImage.repository }}:{{.Values.busyboxImage.tag }}
           imagePullPolicy: {{.Values.busyboxImage.pullPolicy }}
-          command: [ 'sh', '-c', 'until nc -z {{ default (printf "%s-spring-6-reactive-mongo.%s.svc.cluster.local" .Release.Name .Release.Namespace) .Values.reactiveMongo.serviceFQDN }} {{ .Values.reactiveMongo.port }}; do echo "[busybox: wait-for-reactive-mongo] waiting for reactive-mongo"; sleep 2; done; echo "[busybox: wait-for-reactive-mongo] reactive-mongo is available"' ]
+          command:
+            - /scripts/wait-for-readiness.sh
+          args:
+            - reactiveMongo
+            - {{ default (printf "%s-spring-6-reactive-mongo.%s.svc.cluster.local" .Release.Name .Release.Namespace) .Values.reactiveMongo.serviceFQDN | quote }}
+            - {{ .Values.reactiveMongo.port | quote }}
+          volumeMounts:
+            - name: scripts
+              mountPath: /scripts
+              readOnly: true
 
         - name: wait-for-rest-mvc
           image: {{.Values.busyboxImage.repository }}:{{.Values.busyboxImage.tag }}
           imagePullPolicy: {{.Values.busyboxImage.pullPolicy }}
-          command: [ 'sh', '-c', 'until nc -z {{ default (printf "%s-spring-6-rest-mvc.%s.svc.cluster.local" .Release.Name .Release.Namespace) .Values.restMvc.serviceFQDN }} {{ .Values.restMvc.port }}; do echo "[busybox: wait-for-rest-mvc] waiting for rest-mvc"; sleep 2; done; echo "[busybox: wait-for-rest-mvc] rest-mvc is available"' ]
+          command:
+            - /scripts/wait-for-readiness.sh
+          args:
+            - restMvc
+            - {{ default (printf "%s-spring-6-rest-mvc.%s.svc.cluster.local" .Release.Name .Release.Namespace) .Values.restMvc.serviceFQDN | quote }}
+            - {{ .Values.restMvc.port | quote }}
+          volumeMounts:
+            - name: scripts
+              mountPath: /scripts
+              readOnly: true
+
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.registry }}/@project.artifactId@:{{ .Chart.AppVersion }}"
@@ -275,3 +333,7 @@ spec:
           hostPath:
             path: {{ .Values.global.timezonePath }}
             type: ""
+        - name: scripts
+          configMap:
+            name: {{ include "application-template.fullname" . }}-scripts
+            defaultMode: 0555
