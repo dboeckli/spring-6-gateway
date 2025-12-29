@@ -3,3 +3,7 @@ busyboxImage:
   repository: busybox
   tag: "1.37.0"
   pullPolicy: IfNotPresent
+kcatImage:
+  repository: edenhill/kcat
+  tag: "1.7.1"
+  pullPolicy: IfNotPresent
