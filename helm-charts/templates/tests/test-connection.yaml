@@ -15,29 +15,51 @@ spec:
       command: [ '/bin/sh', '-c' ]
       args:
         - |
-          echo "::group::Application Deployment Status"
-          echo "Checking status of $APPLICATION_NAME (version $APP_VERSION) in namespace $NAMESPACE"
-          echo "Helm Release Details:"
-          helm status $APPLICATION_NAME --namespace ${NAMESPACE}
-          echo "::endgroup::"
+          BOOTSTRAP="{{ include "kafka.fullname" . }}:{{ .Values.kafka.service.port }}"
+          echo "### Test: Kafka connection using bootstrap-server: ${BOOTSTRAP}"
 
-          echo "::group::Helm Test Raw Output"
-          echo "Testing Application $APPLICATION_NAME: $APP_VERSION"
-          TEST_OUTPUT=$(helm test $APPLICATION_NAME --namespace ${NAMESPACE} --logs)
-          TEST_EXIT_CODE=$?
-          echo "Exit Code: $TEST_EXIT_CODE"
-          echo "$TEST_OUTPUT"
-          echo "::endgroup::"
+          echo "Waiting for Kafka to become reachable..."
+          REACHABLE=0
+          for i in $(seq 1 30); do
+            /opt/kafka/bin/kafka-topics.sh --bootstrap-server "${BOOTSTRAP}" --list >/tmp/topics.txt 2>/tmp/kafka_err.txt
+            rc=$?
+            if [ $rc -eq 0 ]; then
+              echo "Kafka reachable."
+              REACHABLE=1
+              break
+            fi
+            echo "Attempt ${i}/30 failed (rc=${rc}); retrying in 2s..."
+            sleep 2
+          done
 
-          # Check all test exit codes
-          if echo "$TEST_OUTPUT" | grep -q "Exit code: [^0]"; then
-            echo "::error::One or more Helm tests failed. See details above:"
-            exit 1
-          elif [ $TEST_EXIT_CODE -ne 0 ]; then
-            echo "::error::Helm test command failed with exit code $TEST_EXIT_CODE"
-            exit $TEST_EXIT_CODE
-          else
-            echo "All Helm tests passed successfully."
+          if [ $REACHABLE -ne 1 ]; then
+            echo "Kafka not reachable after retries."
+            ERROR_OCCURED=1
           fi
+
+          echo "### Topics (if any):"
+          if [ -f /tmp/topics.txt ]; then
+            cat /tmp/topics.txt
+          else
+            echo "(no topics list produced)"
+          fi
+
+          if [ $ERROR_OCCURED -ne 0 ]; then
+            echo "### kafka-topics stderr:"
+            if [ -f /tmp/kafka_err.txt ]; then
+              cat /tmp/kafka_err.txt
+            fi
+            echo "### DNS Configuration:"
+            cat /etc/resolv.conf || true
+
+            echo "### Testing DNS resolution:"
+            KAFKA_FQDN="{{ include "kafka.serviceFQDN" . }}"
+            echo "nslookup KAFKA_FQDN: ${KAFKA_FQDN}"
+            nslookup "${KAFKA_FQDN}" || true
+
+            exit 1
+          fi
+
+          exit 0
 
   restartPolicy: Never
