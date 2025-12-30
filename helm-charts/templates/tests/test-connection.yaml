@@ -15,47 +15,29 @@ spec:
       command: [ '/bin/sh', '-c' ]
       args:
         - |
-          ERROR_OCCURED=0
+          echo "::group::Application Deployment Status"
+          echo "Checking status of $APPLICATION_NAME (version $APP_VERSION) in namespace $NAMESPACE"
+          echo "Helm Release Details:"
+          helm status $APPLICATION_NAME --namespace ${NAMESPACE}
+          echo "::endgroup::"
 
-          echo "### Test 1: Checking health endpoint using service short name: {{ include "application-template.fullname" . }}"
-          wget -O- -q {{ include "application-template.fullname" . }}:{{ .Values.service.port }}/actuator/health
-          echo "Exit code: $?"
-          if [ $? -ne 0 ]; then
-            ERROR_OCCURED=1
-          fi
+          echo "::group::Helm Test Raw Output"
+          echo "Testing Application $APPLICATION_NAME: $APP_VERSION"
+          TEST_OUTPUT=$(helm test $APPLICATION_NAME --namespace ${NAMESPACE} --logs)
+          TEST_EXIT_CODE=$?
+          echo "Exit Code: $TEST_EXIT_CODE"
+          echo "$TEST_OUTPUT"
+          echo "::endgroup::"
 
-          echo "### Test 2: Checking health endpoint using fully qualified domain name (FQDN): {{ include "application-template.serviceFQDN" . }}"
-          wget -O- -q {{ include "application-template.serviceFQDN" . }}:{{ .Values.service.port }}/actuator/health
-
-          if [ $? -ne 0 ]; then
-            ERROR_OCCURED=1
-          fi
-          echo "Exit code: $?"
-
-          if [ $ERROR_OCCURED -ne 0 ]; then
-            # Print DNS configuration
-            echo "### DNS Configuration:"
-            cat /etc/resolv.conf
-
-            # Test DNS resolution
-            echo "### Testing DNS resolution:"
-            AP_FQDN="{{ include "application-template.serviceFQDN" . }}"
-            echo "nslookup AP_FQDN: $AP_FQDN"
-            nslookup $AP_FQDN
-
-            # More Checks
-            echo "More Checks"
-            echo "NAMESPACE=$NAMESPACE"
-            echo "SVC=$SVC"
-            echo "FQDN=$FQDN"
-            echo "PORT=$PORT"
-
-            nslookup "$SVC" || true
-            nslookup "$FQDN" || true
-
-            echo "### TCP connectivity (nc):"
-            nc -vz "$SVC" "$PORT" || true
-            nc -vz "$FQDN" "$PORT" || true
+          # Check all test exit codes
+          if echo "$TEST_OUTPUT" | grep -q "Exit code: [^0]"; then
+            echo "::error::One or more Helm tests failed. See details above:"
+            exit 1
+          elif [ $TEST_EXIT_CODE -ne 0 ]; then
+            echo "::error::Helm test command failed with exit code $TEST_EXIT_CODE"
+            exit $TEST_EXIT_CODE
+          else
+            echo "All Helm tests passed successfully."
           fi
 
   restartPolicy: Never
