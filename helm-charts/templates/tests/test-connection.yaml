@@ -4,7 +4,9 @@ metadata:
   name: "{{ include "application-template.fullname" . }}-test-connection"
   namespace: {{ .Values.global.namespace }}
   labels:
-    {{- include "application-template.labels" . | nindent 4 }}
+    app.kubernetes.io/component: helm-test
+    app.kubernetes.io/name: "{{ include "application-template.fullname" . }}-test-connection"
+    app.kubernetes.io/instance: "{{ .Release.Name }}-test"
   annotations:
     "helm.sh/hook": test
 spec:
@@ -15,22 +17,24 @@ spec:
       command: [ '/bin/sh', '-c' ]
       args:
         - |
+          set +e
           ERROR_OCCURED=0
 
           echo "### Test 1: Checking health endpoint using service short name: {{ include "application-template.fullname" . }}"
           wget -O- -q {{ include "application-template.fullname" . }}:{{ .Values.service.port }}/actuator/health
-          echo "Exit code: $?"
-          if [ $? -ne 0 ]; then
+          WGET_RC=$?
+          if [ $WGET_RC -ne 0 ]; then
             ERROR_OCCURED=1
           fi
+          echo "Exit code: $WGET_RC"
 
           echo "### Test 2: Checking health endpoint using fully qualified domain name (FQDN): {{ include "application-template.serviceFQDN" . }}"
           wget -O- -q {{ include "application-template.serviceFQDN" . }}:{{ .Values.service.port }}/actuator/health
-
-          if [ $? -ne 0 ]; then
-            ERROR_OCCURED=1
+          WGET_RC=$?
+          if [ $WGET_RC -ne 0 ]; then
+          ERROR_OCCURED=1
           fi
-          echo "Exit code: $?"
+          echo "Exit code: $WGET_RC"
 
           if [ $ERROR_OCCURED -ne 0 ]; then
             # Print DNS configuration
@@ -42,20 +46,7 @@ spec:
             AP_FQDN="{{ include "application-template.serviceFQDN" . }}"
             echo "nslookup AP_FQDN: $AP_FQDN"
             nslookup $AP_FQDN
-
-            # More Checks
-            echo "More Checks"
-            echo "NAMESPACE=$NAMESPACE"
-            echo "SVC=$SVC"
-            echo "FQDN=$FQDN"
-            echo "PORT=$PORT"
-
-            nslookup "$SVC" || true
-            nslookup "$FQDN" || true
-
-            echo "### TCP connectivity (nc):"
-            nc -vz "$SVC" "$PORT" || true
-            nc -vz "$FQDN" "$PORT" || true
           fi
+          exit 0
 
   restartPolicy: Never

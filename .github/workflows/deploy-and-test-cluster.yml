@@ -121,7 +121,7 @@ jobs:
             exit $TEST_EXIT_CODE
           else
             echo "All Helm tests passed successfully."
-          fi           
+          fi    
 
       - name: Set up Go for Terratest
         uses: actions/setup-go@v6
