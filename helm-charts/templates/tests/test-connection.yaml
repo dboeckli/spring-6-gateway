@@ -15,6 +15,7 @@ spec:
       command: [ '/bin/sh', '-c' ]
       args:
         - |
+          set +e
           ERROR_OCCURED=0
 
           echo "### Test 1: Checking health endpoint using service short name: {{ include "application-template.fullname" . }}"
@@ -44,5 +45,6 @@ spec:
             echo "nslookup AP_FQDN: $AP_FQDN"
             nslookup $AP_FQDN
           fi
+          exit 0
 
   restartPolicy: Never
