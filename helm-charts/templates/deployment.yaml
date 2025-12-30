@@ -306,6 +306,7 @@ spec:
             httpGet:
               path: /actuator/health
               port: http
+            initialDelaySeconds: 30
             failureThreshold: {{ .Values.probes.startup.failureThreshold }}
             periodSeconds: {{ .Values.probes.startup.periodSeconds }}
           readinessProbe:
