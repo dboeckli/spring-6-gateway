@@ -22,19 +22,19 @@ spec:
 
           echo "### Test 1: Checking health endpoint using service short name: {{ include "application-template.fullname" . }}"
           wget -O- -q {{ include "application-template.fullname" . }}:{{ .Values.service.port }}/actuator/health
-
-          if [ $? -ne 0 ]; then
+          WGET_RC=$?
+          if [ $WGET_RC -ne 0 ]; then
             ERROR_OCCURED=1
           fi
-          echo "Exit code: $?"
+          echo "Exit code: $WGET_RC"
 
           echo "### Test 2: Checking health endpoint using fully qualified domain name (FQDN): {{ include "application-template.serviceFQDN" . }}"
           wget -O- -q {{ include "application-template.serviceFQDN" . }}:{{ .Values.service.port }}/actuator/health
-
-          if [ $? -ne 0 ]; then
-            ERROR_OCCURED=1
+          WGET_RC=$?
+          if [ $WGET_RC -ne 0 ]; then
+          ERROR_OCCURED=1
           fi
-          echo "Exit code: $?"
+          echo "Exit code: $WGET_RC"
 
           if [ $ERROR_OCCURED -ne 0 ]; then
             # Print DNS configuration

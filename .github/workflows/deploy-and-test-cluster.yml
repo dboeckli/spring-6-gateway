@@ -122,12 +122,6 @@ jobs:
           else
             echo "All Helm tests passed successfully."
           fi    
-          
-          echo "::group::Kubernetes Debug (svc/endpoints/pods/events)"
-          kubectl -n spring-6-gateway describe svc spring-6-gateway
-          kubectl -n spring-6-gateway get endpoints spring-6-gateway -o yaml
-          kubectl -n spring-6-gateway get pods -o wide
-          echo "::endgroup::"
 
       - name: Set up Go for Terratest
         uses: actions/setup-go@v6
