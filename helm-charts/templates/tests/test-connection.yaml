@@ -15,51 +15,34 @@ spec:
       command: [ '/bin/sh', '-c' ]
       args:
         - |
-          BOOTSTRAP="{{ include "kafka.fullname" . }}:{{ .Values.kafka.service.port }}"
-          echo "### Test: Kafka connection using bootstrap-server: ${BOOTSTRAP}"
+          ERROR_OCCURED=0
 
-          echo "Waiting for Kafka to become reachable..."
-          REACHABLE=0
-          for i in $(seq 1 30); do
-            /opt/kafka/bin/kafka-topics.sh --bootstrap-server "${BOOTSTRAP}" --list >/tmp/topics.txt 2>/tmp/kafka_err.txt
-            rc=$?
-            if [ $rc -eq 0 ]; then
-              echo "Kafka reachable."
-              REACHABLE=1
-              break
-            fi
-            echo "Attempt ${i}/30 failed (rc=${rc}); retrying in 2s..."
-            sleep 2
-          done
+          echo "### Test 1: Checking health endpoint using service short name: {{ include "application-template.fullname" . }}"
+          wget -O- -q {{ include "application-template.fullname" . }}:{{ .Values.service.port }}/actuator/health
 
-          if [ $REACHABLE -ne 1 ]; then
-            echo "Kafka not reachable after retries."
+          if [ $? -ne 0 ]; then
             ERROR_OCCURED=1
           fi
+          echo "Exit code: $?"
 
-          echo "### Topics (if any):"
-          if [ -f /tmp/topics.txt ]; then
-            cat /tmp/topics.txt
-          else
-            echo "(no topics list produced)"
+          echo "### Test 2: Checking health endpoint using fully qualified domain name (FQDN): {{ include "application-template.serviceFQDN" . }}"
+          wget -O- -q {{ include "application-template.serviceFQDN" . }}:{{ .Values.service.port }}/actuator/health
+
+          if [ $? -ne 0 ]; then
+            ERROR_OCCURED=1
           fi
+          echo "Exit code: $?"
 
           if [ $ERROR_OCCURED -ne 0 ]; then
-            echo "### kafka-topics stderr:"
-            if [ -f /tmp/kafka_err.txt ]; then
-              cat /tmp/kafka_err.txt
-            fi
+            # Print DNS configuration
             echo "### DNS Configuration:"
-            cat /etc/resolv.conf || true
+            cat /etc/resolv.conf
 
+            # Test DNS resolution
             echo "### Testing DNS resolution:"
-            KAFKA_FQDN="{{ include "kafka.serviceFQDN" . }}"
-            echo "nslookup KAFKA_FQDN: ${KAFKA_FQDN}"
-            nslookup "${KAFKA_FQDN}" || true
-
-            exit 1
+            AP_FQDN="{{ include "application-template.serviceFQDN" . }}"
+            echo "nslookup AP_FQDN: $AP_FQDN"
+            nslookup $AP_FQDN
           fi
-
-          exit 0
 
   restartPolicy: Never
