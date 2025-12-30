@@ -2,7 +2,7 @@
 Examples of Reactive Programming with Spring Framework.
 
 ## Getting started
-Server runs on port 8080. Requires that other projects are up and running
+Server runs on port 8080. Requires that other projects are up and running.
 * spring-6-auth-server on port 9000
 * spring-6-rest-mvc on port 8081
 * spring-6-reactive on port 8082
