@@ -55,7 +55,7 @@
         <merge-yaml-plugin.version>1.4</merge-yaml-plugin.version>
 
         <!-- https://springdoc.org/#what-is-the-compatibility-matrix-of-springdoc-openapi-with-spring-boot -->
-        <springdoc.openapi.version>3.0.0</springdoc.openapi.version>
+        <springdoc.openapi.version>3.0.1</springdoc.openapi.version>
         <springdoc-openapi-maven-plugin.version>1.5</springdoc-openapi-maven-plugin.version>
 
         <wiremock.version>4.0.8</wiremock.version>
