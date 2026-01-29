@@ -42,7 +42,7 @@ services:
       
   mongo:
     container_name: mongo
-    image: mongo:8.2.3
+    image: mongo:8.2.4
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: secret
