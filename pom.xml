@@ -58,7 +58,7 @@
         <springdoc.openapi.version>3.0.1</springdoc.openapi.version>
         <springdoc-openapi-maven-plugin.version>1.5</springdoc-openapi-maven-plugin.version>
 
-        <wiremock.version>4.0.9</wiremock.version>
+        <wiremock.version>4.1.0</wiremock.version>
 
         <!-- Sonar -->
         <sonar-maven-plugin.version>5.5.0.6356</sonar-maven-plugin.version>
