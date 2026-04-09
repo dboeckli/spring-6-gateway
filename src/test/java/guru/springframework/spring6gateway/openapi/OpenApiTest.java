@@ -35,9 +35,11 @@ class OpenApiTest {
 
     @Test
     void openapiGetJsonTest() {
-        EntityExchangeResult<byte[]> result = webTestClient.get().uri("/v3/api-docs")
+        EntityExchangeResult<byte[]> result = webTestClient.get()
+            .uri("/v3/api-docs")
             .exchange()
-            .expectStatus().isOk()
+            .expectStatus()
+            .isOk()
             .expectBody()
             .returnResult();
 

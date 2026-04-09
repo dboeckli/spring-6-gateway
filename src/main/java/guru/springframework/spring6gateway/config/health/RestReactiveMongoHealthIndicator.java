@@ -14,10 +14,11 @@ import reactor.core.publisher.Mono;
 public class RestReactiveMongoHealthIndicator implements ReactiveHealthIndicator {
 
     private final WebClient webClient;
+
     private final String restReactiveMongoUrl;
 
     public RestReactiveMongoHealthIndicator(WebClient.Builder webClientBuilder,
-                                            @Value("${security.reactiveMongo-health-url}") String restReactiveMongoUrl) {
+            @Value("${security.reactiveMongo-health-url}") String restReactiveMongoUrl) {
         this.webClient = webClientBuilder.build();
         this.restReactiveMongoUrl = restReactiveMongoUrl;
     }
@@ -31,7 +32,8 @@ public class RestReactiveMongoHealthIndicator implements ReactiveHealthIndicator
             .map(response -> {
                 if (response.contains("\"status\":\"UP\"")) {
                     return Health.up().build();
-                } else {
+                }
+                else {
                     log.warn("Reactive Mongo server is not reporting UP status at {}", restReactiveMongoUrl);
                     return Health.down().build();
                 }
@@ -41,4 +43,5 @@ public class RestReactiveMongoHealthIndicator implements ReactiveHealthIndicator
                 return Mono.just(Health.down(e).build());
             });
     }
+
 }

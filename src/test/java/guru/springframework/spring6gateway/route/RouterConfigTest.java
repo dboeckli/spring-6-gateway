@@ -39,6 +39,7 @@ class RouterConfigTest {
 
     @TestConfiguration
     static class TestConfig {
+
         @Bean
         @Primary
         @Order(1)
@@ -47,71 +48,79 @@ class RouterConfigTest {
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .build();
         }
+
     }
 
     @Test
     void testSpring6RestMvcRoute() {
-        stubFor(get(urlEqualTo("/api/v1/rest-mvc/test"))
-            .willReturn(aResponse()
-                .withStatus(200)
-                .withHeader("Content-Type", "application/json")
-                .withBody("{\"message\":\"Hello from mocked REST MVC!\"}")));
+        stubFor(get(urlEqualTo("/api/v1/rest-mvc/test")).willReturn(aResponse().withStatus(200)
+            .withHeader("Content-Type", "application/json")
+            .withBody("{\"message\":\"Hello from mocked REST MVC!\"}")));
 
-        webTestClient.get().uri("/api/v1/rest-mvc/test")
+        webTestClient.get()
+            .uri("/api/v1/rest-mvc/test")
             .exchange()
-            .expectStatus().isOk()
-            .expectHeader().valueEquals("Content-Type", "application/json")
+            .expectStatus()
+            .isOk()
+            .expectHeader()
+            .valueEquals("Content-Type", "application/json")
             .expectBody()
-            .jsonPath("$.message").isEqualTo("Hello from mocked REST MVC!");
+            .jsonPath("$.message")
+            .isEqualTo("Hello from mocked REST MVC!");
     }
 
     @Test
     void testSpring6ReactiveRoute() {
-        stubFor(get(urlEqualTo("/api/v1/reactive/test"))
-            .willReturn(aResponse()
-                .withStatus(200)
-                .withHeader("Content-Type", "application/json")
-                .withBody("{\"message\":\"Hello from mocked Reactive!\"}")));
+        stubFor(get(urlEqualTo("/api/v1/reactive/test")).willReturn(aResponse().withStatus(200)
+            .withHeader("Content-Type", "application/json")
+            .withBody("{\"message\":\"Hello from mocked Reactive!\"}")));
 
-        webTestClient.get().uri("/api/v1/reactive/test")
+        webTestClient.get()
+            .uri("/api/v1/reactive/test")
             .exchange()
-            .expectStatus().isOk()
-            .expectHeader().valueEquals("Content-Type", "application/json")
+            .expectStatus()
+            .isOk()
+            .expectHeader()
+            .valueEquals("Content-Type", "application/json")
             .expectBody()
-            .jsonPath("$.message").isEqualTo("Hello from mocked Reactive!");
+            .jsonPath("$.message")
+            .isEqualTo("Hello from mocked Reactive!");
     }
 
     @Test
     void testSpring6ReactiveMongoRoute() {
-        stubFor(get(urlEqualTo("/api/v1/reactive-mongo/test"))
-            .willReturn(aResponse()
-                .withStatus(200)
-                .withHeader("Content-Type", "application/json")
-                .withBody("{\"message\":\"Hello from mocked Reactive Mongo!\"}")));
+        stubFor(get(urlEqualTo("/api/v1/reactive-mongo/test")).willReturn(aResponse().withStatus(200)
+            .withHeader("Content-Type", "application/json")
+            .withBody("{\"message\":\"Hello from mocked Reactive Mongo!\"}")));
 
-        webTestClient.get().uri("/api/v1/reactive-mongo/test")
+        webTestClient.get()
+            .uri("/api/v1/reactive-mongo/test")
             .exchange()
-            .expectStatus().isOk()
-            .expectHeader().valueEquals("Content-Type", "application/json")
+            .expectStatus()
+            .isOk()
+            .expectHeader()
+            .valueEquals("Content-Type", "application/json")
             .expectBody()
-            .jsonPath("$.message").isEqualTo("Hello from mocked Reactive Mongo!");
+            .jsonPath("$.message")
+            .isEqualTo("Hello from mocked Reactive Mongo!");
     }
 
     @Test
     void testSpring6DataRestRoute() {
-        stubFor(get(urlEqualTo("/api/v1/data-rest/test"))
-            .willReturn(aResponse()
-                .withStatus(200)
-                .withHeader("Content-Type", "application/json")
-                .withBody("{\"message\":\"Hello from mocked Data Rest!\"}")));
+        stubFor(get(urlEqualTo("/api/v1/data-rest/test")).willReturn(aResponse().withStatus(200)
+            .withHeader("Content-Type", "application/json")
+            .withBody("{\"message\":\"Hello from mocked Data Rest!\"}")));
 
-        webTestClient.get().uri("/api/v1/data-rest/test")
+        webTestClient.get()
+            .uri("/api/v1/data-rest/test")
             .exchange()
-            .expectStatus().isOk()
-            .expectHeader().valueEquals("Content-Type", "application/json")
+            .expectStatus()
+            .isOk()
+            .expectHeader()
+            .valueEquals("Content-Type", "application/json")
             .expectBody()
-            .jsonPath("$.message").isEqualTo("Hello from mocked Data Rest!");
+            .jsonPath("$.message")
+            .isEqualTo("Hello from mocked Data Rest!");
     }
 
-    
 }

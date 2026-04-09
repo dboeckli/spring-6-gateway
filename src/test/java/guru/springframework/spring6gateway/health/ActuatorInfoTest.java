@@ -31,42 +31,45 @@ class ActuatorInfoTest {
 
     @Test
     void actuatorInfoTest() {
-        webTestClient.get().uri("/actuator/info")
-            .exchange()
-            .expectStatus().isOk()
-            .expectBody()
-            .consumeWith(result -> {
-                String jsonResponse = new String(Objects.requireNonNull(result.getResponseBody()));
-                log.info("Response:\n{}", pretty(jsonResponse));
-            })
-            .jsonPath("$.git.commit.id.abbrev").isNotEmpty()
-            .jsonPath("$.build.artifact").isEqualTo(buildProperties.getArtifact())
-            .jsonPath("$.build.group").isEqualTo(buildProperties.getGroup())
+        webTestClient.get().uri("/actuator/info").exchange().expectStatus().isOk().expectBody().consumeWith(result -> {
+            String jsonResponse = new String(Objects.requireNonNull(result.getResponseBody()));
+            log.info("Response:\n{}", pretty(jsonResponse));
+        })
+            .jsonPath("$.git.commit.id.abbrev")
+            .isNotEmpty()
+            .jsonPath("$.build.artifact")
+            .isEqualTo(buildProperties.getArtifact())
+            .jsonPath("$.build.group")
+            .isEqualTo(buildProperties.getGroup())
             .consumeWith(result -> {
                 String jsonResponse = new String(Objects.requireNonNull(result.getResponseBody()));
                 log.info("Response:\n{}", pretty(jsonResponse));
             });
     }
 
-
     @Test
     void actuatorHealthTest() {
-        webTestClient.get().uri("/actuator/health/readiness")
+        webTestClient.get()
+            .uri("/actuator/health/readiness")
             .exchange()
-            .expectStatus().isOk()
+            .expectStatus()
+            .isOk()
             .expectBody()
             .consumeWith(result -> {
                 String jsonResponse = new String(Objects.requireNonNull(result.getResponseBody()));
                 log.info("Response:\n{}", pretty(jsonResponse));
             })
-            .jsonPath("$.status").isEqualTo("UP");
+            .jsonPath("$.status")
+            .isEqualTo("UP");
     }
 
     @Test
     void actuatorPrometheusTest() {
-        webTestClient.get().uri("/actuator/prometheus")
+        webTestClient.get()
+            .uri("/actuator/prometheus")
             .exchange()
-            .expectStatus().isOk()
+            .expectStatus()
+            .isOk()
             .expectBody()
             .consumeWith(result -> {
                 String jsonResponse = new String(Objects.requireNonNull(result.getResponseBody()));
@@ -78,7 +81,8 @@ class ActuatorInfoTest {
         try {
             Object json = objectMapper.readValue(jsonResponse, Object.class);
             return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(json);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             // Falls kein valides JSON: unverändert zurückgeben
             return jsonResponse;
         }

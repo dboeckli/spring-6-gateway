@@ -27,6 +27,7 @@ import java.util.List;
 public class SecurityConfig {
 
     private static final List<String> ALLOWED_HEADERS = List.of("*");
+
     private static final List<String> ALLOWED_METHODS = List.of("POST", "GET", "PUT", "OPTIONS", "DELETE", "PATCH");
 
     private final AllowedOriginConfig allowedOriginConfig;
@@ -46,60 +47,34 @@ public class SecurityConfig {
 
     @Bean
     @Order(2)
-    public SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http, CorsConfigurationSource corsConfigurationSource) {
+    public SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http,
+            CorsConfigurationSource corsConfigurationSource) {
 
         http.authorizeExchange(authorizeExchangeSpec -> authorizeExchangeSpec
-                .pathMatchers(
-                    "/oauth2/**", 
-                    "/oauth2/token",
-                    "/favicon.ico",
-                    
-                    "/v3/api-docs",
-                    "/v3/api-docs.yaml",
-                    "/v3/api-docs/**",
-                    "/swagger-ui/**",
-                    "/swagger-ui.html",
+            .pathMatchers("/oauth2/**", "/oauth2/token", "/favicon.ico",
+
+                    "/v3/api-docs", "/v3/api-docs.yaml", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html",
 
                     // spring-6-rest-mvc
-                    "/api/v1/actuator/**",
-                    "/api/v1/actuator",
-                    "/api/v1/v3/api-docs",
-                    "/api/v1/v3/api-docs.yaml",
-                    "/api/v1/v3/api-docs/**",
-                    "/api/v1/swagger-ui/**",
-                    "/api/v1/swagger-ui.html",
+                    "/api/v1/actuator/**", "/api/v1/actuator", "/api/v1/v3/api-docs", "/api/v1/v3/api-docs.yaml",
+                    "/api/v1/v3/api-docs/**", "/api/v1/swagger-ui/**", "/api/v1/swagger-ui.html",
 
                     // spring-6-reactive
-                    "/api/v2/actuator/**",
-                    "/api/v2/actuator",
-                    "/api/v2/v3/api-docs",
-                    "/api/v2/v3/api-docs.yaml",
-                    "/api/v2/v3/api-docs/**",
-                    "/api/v2/swagger-ui/**",
-                    "/api/v2/swagger-ui.html",
+                    "/api/v2/actuator/**", "/api/v2/actuator", "/api/v2/v3/api-docs", "/api/v2/v3/api-docs.yaml",
+                    "/api/v2/v3/api-docs/**", "/api/v2/swagger-ui/**", "/api/v2/swagger-ui.html",
 
                     // spring-6-reactive-mongo
-                    "/api/v3/actuator/**",
-                    "/api/v3/actuator",
-                    "/api/v3/v3/api-docs",
-                    "/api/v3/v3/api-docs.yaml",
-                    "/api/v3/v3/api-docs/**",
-                    "/api/v3/swagger-ui/**",
-                    "/api/v3/swagger-ui.html",
+                    "/api/v3/actuator/**", "/api/v3/actuator", "/api/v3/v3/api-docs", "/api/v3/v3/api-docs.yaml",
+                    "/api/v3/v3/api-docs/**", "/api/v3/swagger-ui/**", "/api/v3/swagger-ui.html",
 
                     // spring-6-data-rest
-                    "/api/v4/actuator/**",
-                    "/api/v4/actuator",
-                    "/api/v4/v3/api-docs",
-                    "/api/v4/v3/api-docs.yaml",
-                    "/api/v4/v3/api-docs/**",
-                    "/api/v4/swagger-ui/**",
-                    "/api/v4/swagger-ui.html")
-                      
-                .permitAll()
-                .anyExchange().permitAll())
-            .oauth2ResourceServer(oAuth2ResourceServerSpec -> oAuth2ResourceServerSpec
-                .jwt(Customizer.withDefaults()))
+                    "/api/v4/actuator/**", "/api/v4/actuator", "/api/v4/v3/api-docs", "/api/v4/v3/api-docs.yaml",
+                    "/api/v4/v3/api-docs/**", "/api/v4/swagger-ui/**", "/api/v4/swagger-ui.html")
+
+            .permitAll()
+            .anyExchange()
+            .permitAll())
+            .oauth2ResourceServer(oAuth2ResourceServerSpec -> oAuth2ResourceServerSpec.jwt(Customizer.withDefaults()))
             .csrf(ServerHttpSecurity.CsrfSpec::disable)
             .cors(cors -> cors.configurationSource(corsConfigurationSource));
 
@@ -125,6 +100,9 @@ public class SecurityConfig {
     @ConfigurationProperties(prefix = "security.cors")
     @Data
     public static class AllowedOriginConfig {
+
         private List<String> allowedOrigins;
+
     }
+
 }

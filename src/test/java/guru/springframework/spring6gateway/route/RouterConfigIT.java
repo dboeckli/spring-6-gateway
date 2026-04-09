@@ -44,6 +44,7 @@ class RouterConfigIT {
     private int port;
 
     private WebClient webClient;
+
     private String authToken;
 
     @BeforeEach
@@ -68,9 +69,7 @@ class RouterConfigIT {
             .bodyToMono(new ParameterizedTypeReference<>() {
             });
 
-        StepVerifier.create(response)
-            .consumeNextWith(responseHolder::set)
-            .verifyComplete();
+        StepVerifier.create(response).consumeNextWith(responseHolder::set).verifyComplete();
 
         Map<String, Object> storedResponse = responseHolder.get();
         log.info("V1 Full response:" + storedResponse);
@@ -97,9 +96,7 @@ class RouterConfigIT {
             .bodyToMono(new ParameterizedTypeReference<>() {
             });
 
-        StepVerifier.create(response)
-            .consumeNextWith(responseHolder::set)
-            .verifyComplete();
+        StepVerifier.create(response).consumeNextWith(responseHolder::set).verifyComplete();
 
         List<Map<String, Object>> storedResponse = responseHolder.get();
         log.info("V2 Full response: {}", storedResponse);
@@ -124,9 +121,7 @@ class RouterConfigIT {
             .bodyToMono(new ParameterizedTypeReference<>() {
             });
 
-        StepVerifier.create(response)
-            .consumeNextWith(responseHolder::set)
-            .verifyComplete();
+        StepVerifier.create(response).consumeNextWith(responseHolder::set).verifyComplete();
 
         List<Map<String, Object>> storedResponse = responseHolder.get();
         log.info("V3 Full response: {}", storedResponse);
@@ -151,9 +146,7 @@ class RouterConfigIT {
             .bodyToMono(new ParameterizedTypeReference<>() {
             });
 
-        StepVerifier.create(response)
-            .consumeNextWith(responseHolder::set)
-            .verifyComplete();
+        StepVerifier.create(response).consumeNextWith(responseHolder::set).verifyComplete();
 
         Map<String, Object> storedResponse = responseHolder.get();
         log.info("V4 Full response: {}", storedResponse);
@@ -174,7 +167,8 @@ class RouterConfigIT {
 
     @ParameterizedTest
     @MethodSource("actuatorTestArguments")
-    void testActuator(String apiVersion, String uri, String expectedArtifact, String expectedName, String expectedGroup) {
+    void testActuator(String apiVersion, String uri, String expectedArtifact, String expectedName,
+            String expectedGroup) {
         AtomicReference<Map<String, Object>> responseHolder = new AtomicReference<>();
 
         Mono<Map<String, Object>> response = webClient.get()
@@ -185,9 +179,7 @@ class RouterConfigIT {
             .bodyToMono(new ParameterizedTypeReference<>() {
             });
 
-        StepVerifier.create(response)
-            .consumeNextWith(responseHolder::set)
-            .verifyComplete();
+        StepVerifier.create(response).consumeNextWith(responseHolder::set).verifyComplete();
 
         Map<String, Object> storedResponse = responseHolder.get();
         log.info("{} Actuator Info response: {}", apiVersion, storedResponse);
@@ -204,12 +196,16 @@ class RouterConfigIT {
 
     private static Stream<Arguments> actuatorTestArguments() {
         return Stream.of(
-            Arguments.of("V1", "/api/v1/actuator/info", "spring-6-rest-mvc", "spring-6-rest-mvc", "ch.dboeckli.springframeworkguru.spring-rest-mvc"),
-            Arguments.of("V2", "/api/v2/actuator/info", "spring-6-reactive", "spring-6-reactive", "guru.springframework"),
-            Arguments.of("V3", "/api/v3/actuator/info", "spring-6-reactive-mongo", "spring-6-reactive-mongo", "guru.springframework"),
-            Arguments.of("V4", "/api/v4/actuator/info", "spring-6-data-rest", "spring-6-data-rest", "guru.springframework"),
-            Arguments.of("Auth", "/oauth2/actuator/info", "spring-6-auth-server", "spring-6-auth-server", "guru.springframework")
-        );
+                Arguments.of("V1", "/api/v1/actuator/info", "spring-6-rest-mvc", "spring-6-rest-mvc",
+                        "ch.dboeckli.springframeworkguru.spring-rest-mvc"),
+                Arguments.of("V2", "/api/v2/actuator/info", "spring-6-reactive", "spring-6-reactive",
+                        "guru.springframework"),
+                Arguments.of("V3", "/api/v3/actuator/info", "spring-6-reactive-mongo", "spring-6-reactive-mongo",
+                        "guru.springframework"),
+                Arguments.of("V4", "/api/v4/actuator/info", "spring-6-data-rest", "spring-6-data-rest",
+                        "guru.springframework"),
+                Arguments.of("Auth", "/oauth2/actuator/info", "spring-6-auth-server", "spring-6-auth-server",
+                        "guru.springframework"));
     }
 
     @ParameterizedTest
@@ -225,9 +221,7 @@ class RouterConfigIT {
             .bodyToMono(new ParameterizedTypeReference<>() {
             });
 
-        StepVerifier.create(response)
-            .consumeNextWith(responseHolder::set)
-            .verifyComplete();
+        StepVerifier.create(response).consumeNextWith(responseHolder::set).verifyComplete();
 
         Map<String, Object> storedResponse = responseHolder.get();
         log.info("{} OpenAPI Docs response: {}", apiVersion, storedResponse);
@@ -240,13 +234,11 @@ class RouterConfigIT {
     }
 
     private static Stream<Arguments> openApiDocsTestArguments() {
-        return Stream.of(
-            Arguments.of("V1", "/api/v1/v3/api-docs", "spring-6-rest-mvc"),
-            Arguments.of("V2", "/api/v2/v3/api-docs", "spring-6-reactive"),
-            Arguments.of("V3", "/api/v3/v3/api-docs", "spring-6-reactive-mongo"),
-            Arguments.of("V4", "/api/v4/v3/api-docs", "spring-6-data-rest"),
-            Arguments.of("Auth", "/oauth2/v3/api-docs", "spring-6-auth-server")
-        );
+        return Stream.of(Arguments.of("V1", "/api/v1/v3/api-docs", "spring-6-rest-mvc"),
+                Arguments.of("V2", "/api/v2/v3/api-docs", "spring-6-reactive"),
+                Arguments.of("V3", "/api/v3/v3/api-docs", "spring-6-reactive-mongo"),
+                Arguments.of("V4", "/api/v4/v3/api-docs", "spring-6-data-rest"),
+                Arguments.of("Auth", "/oauth2/v3/api-docs", "spring-6-auth-server"));
     }
 
     private String getAuthToken() {
@@ -276,34 +268,34 @@ class RouterConfigIT {
         WebClient webClientForActuator = WebClient.create(url);
         log.info("readyness check for {}", url);
 
-        Awaitility.await()
-            .atMost(90, TimeUnit.SECONDS)
-            .pollInterval(1, TimeUnit.SECONDS)
-            .until(() -> {
-                try {
-                    return webClientForActuator.get()
-                        .uri(url + "/actuator/health/readiness")
-                        .retrieve()
-                        .bodyToMono(String.class)
-                        .map(body -> {
-                            log.info("Readiness check response: {}", body);
-                            JsonNode jsonNode;
-                            try {
-                                jsonNode = new ObjectMapper().readTree(body);
-                            } catch (JsonProcessingException e) {
-                                throw new RuntimeException(e);
-                            }
-                            String status = jsonNode.path("status").asText();
-                            log.info("Application status: {}", status);
-                            return "UP".equals(status);
-                        })
-                        .onErrorReturn(false)
-                        .block(Duration.ofSeconds(5));
-                } catch (Exception e) {
-                    log.warn("Error checking MVC readiness: ", e);
-                    return false;
-                }
-            });
+        Awaitility.await().atMost(90, TimeUnit.SECONDS).pollInterval(1, TimeUnit.SECONDS).until(() -> {
+            try {
+                return webClientForActuator.get()
+                    .uri(url + "/actuator/health/readiness")
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .map(body -> {
+                        log.info("Readiness check response: {}", body);
+                        JsonNode jsonNode;
+                        try {
+                            jsonNode = new ObjectMapper().readTree(body);
+                        }
+                        catch (JsonProcessingException e) {
+                            throw new RuntimeException(e);
+                        }
+                        String status = jsonNode.path("status").asText();
+                        log.info("Application status: {}", status);
+                        return "UP".equals(status);
+                    })
+                    .onErrorReturn(false)
+                    .block(Duration.ofSeconds(5));
+            }
+            catch (Exception e) {
+                log.warn("Error checking MVC readiness: ", e);
+                return false;
+            }
+        });
         log.info("MVC application is ready.");
     }
+
 }
