@@ -14,31 +14,29 @@ import reactor.core.publisher.Mono;
 public class RestReactiveHealthIndicator implements ReactiveHealthIndicator {
 
     private final WebClient webClient;
+
     private final String restUrl;
 
     public RestReactiveHealthIndicator(WebClient.Builder webClientBuilder,
-                                       @Value("${security.reactive-health-url}") String restUrl) {
+            @Value("${security.reactive-health-url}") String restUrl) {
         this.webClient = webClientBuilder.build();
         this.restUrl = restUrl;
     }
 
     @Override
     public @NonNull Mono<Health> health() {
-        return webClient.get()
-            .uri(restUrl + "/actuator/health")
-            .retrieve()
-            .bodyToMono(String.class)
-            .map(response -> {
-                if (response.contains("\"status\":\"UP\"")) {
-                    return Health.up().build();
-                } else {
-                    log.warn("Reactive server is not reporting UP status at {}", restUrl);
-                    return Health.down().build();
-                }
-            })
-            .onErrorResume(e -> {
-                log.warn("Reactive server is not reachable at {}", restUrl, e);
-                return Mono.just(Health.down(e).build());
-            });
+        return webClient.get().uri(restUrl + "/actuator/health").retrieve().bodyToMono(String.class).map(response -> {
+            if (response.contains("\"status\":\"UP\"")) {
+                return Health.up().build();
+            }
+            else {
+                log.warn("Reactive server is not reporting UP status at {}", restUrl);
+                return Health.down().build();
+            }
+        }).onErrorResume(e -> {
+            log.warn("Reactive server is not reachable at {}", restUrl, e);
+            return Mono.just(Health.down(e).build());
+        });
     }
+
 }

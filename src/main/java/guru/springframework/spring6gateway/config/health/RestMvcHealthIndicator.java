@@ -14,10 +14,11 @@ import reactor.core.publisher.Mono;
 public class RestMvcHealthIndicator implements ReactiveHealthIndicator {
 
     private final WebClient webClient;
+
     private final String restMvcUrl;
 
     public RestMvcHealthIndicator(WebClient.Builder webClientBuilder,
-                                  @Value("${security.mvc-health-url}") String restMvcUrl) {
+            @Value("${security.mvc-health-url}") String restMvcUrl) {
         this.webClient = webClientBuilder.build();
         this.restMvcUrl = restMvcUrl;
     }
@@ -31,7 +32,8 @@ public class RestMvcHealthIndicator implements ReactiveHealthIndicator {
             .map(response -> {
                 if (response.contains("\"status\":\"UP\"")) {
                     return Health.up().build();
-                } else {
+                }
+                else {
                     log.warn("MVC server is not reporting UP status at {}", restMvcUrl);
                     return Health.down().build();
                 }
@@ -41,4 +43,5 @@ public class RestMvcHealthIndicator implements ReactiveHealthIndicator {
                 return Mono.just(Health.down(e).build());
             });
     }
+
 }
