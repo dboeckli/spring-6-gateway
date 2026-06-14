@@ -96,6 +96,8 @@ management:
       enabled: true
       include: request_headers, response_headers, session_id, time_taken
   observations:
+    annotations:
+      enabled: true
     http:
       server:
         requests:
