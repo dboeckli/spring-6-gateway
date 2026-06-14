@@ -1,13 +1,20 @@
 spring:
   application:
     name: spring-6-gateway
-    
+
+  reactor:
+    context-propagation: AUTO
+
+  threads:
+    virtual:
+      enabled: true
+
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:9000
-  
+
   cloud:
     gateway:
       server:
@@ -50,6 +57,7 @@ logging:
     org.springframework.web.reactive: INFO
     reactor.ipc.netty: INFO
     reactor.netty: INFO
+    guru.springframework.spring6gateway.log.RequestLoggingFilter: DEBUG
 
 management:
   health:
@@ -88,6 +96,8 @@ management:
       enabled: true
       include: request_headers, response_headers, session_id, time_taken
   observations:
+    annotations:
+      enabled: true
     http:
       server:
         requests:
@@ -149,5 +159,3 @@ security: # TODO: DO NOT USE HOST.DOCKER.INTERNAL. TAKE LOCALHOST
       - http://127.0.0.1:8080 # gateway project runs on port 8080
       - http://localhost:30080 # gateway project runs on port 30080
       - http://127.0.0.1:30080 # gateway project runs on port 30080
-
-
