@@ -1,23 +1,99 @@
 ### spring-6-rest-mvc
+< {%
+    function randomHex(length) {
+        let result = '';
+        const chars = '0123456789abcdef';
+        for (let i = 0; i < length; i++) {
+            result += chars[Math.floor(Math.random() * chars.length)];
+        }
+        return result;
+    }
+
+    const traceId = randomHex(32);
+    const spanId  = randomHex(16);
+
+    request.variables.set("traceId", traceId);
+    request.variables.set("spanId", spanId);
+%}
 GET http://localhost:{{gateway-port}}/api/v1/beer/listBeers
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
+# traceparent: {version}-{trace-id}-{span-id}-{trace-flags}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=hallo
 
 ### spring-6-reactive
+< {%
+    function randomHex(length) {
+        let result = '';
+        const chars = '0123456789abcdef';
+        for (let i = 0; i < length; i++) {
+            result += chars[Math.floor(Math.random() * chars.length)];
+        }
+        return result;
+    }
+
+    const traceId = randomHex(32);
+    const spanId  = randomHex(16);
+
+    request.variables.set("traceId", traceId);
+    request.variables.set("spanId", spanId);
+%}
 GET http://localhost:{{gateway-port}}/api/v2/beer
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
+# traceparent: {version}-{trace-id}-{span-id}-{trace-flags}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=hallo
 
 ### spring-6-reactive-mongo
+< {%
+    function randomHex(length) {
+        let result = '';
+        const chars = '0123456789abcdef';
+        for (let i = 0; i < length; i++) {
+            result += chars[Math.floor(Math.random() * chars.length)];
+        }
+        return result;
+    }
+
+    const traceId = randomHex(32);
+    const spanId  = randomHex(16);
+
+    request.variables.set("traceId", traceId);
+    request.variables.set("spanId", spanId);
+%}
 GET http://localhost:{{gateway-port}}/api/v3/beer
 Accept: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
+# traceparent: {version}-{trace-id}-{span-id}-{trace-flags}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=hallo
 
 ### spring-6-data-rest
+< {%
+    function randomHex(length) {
+        let result = '';
+        const chars = '0123456789abcdef';
+        for (let i = 0; i < length; i++) {
+            result += chars[Math.floor(Math.random() * chars.length)];
+        }
+        return result;
+    }
+
+    const traceId = randomHex(32);
+    const spanId  = randomHex(16);
+
+    request.variables.set("traceId", traceId);
+    request.variables.set("spanId", spanId);
+%}
 GET http://localhost:{{gateway-port}}/api/v4/beer
 Accept: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
+# traceparent: {version}-{trace-id}-{span-id}-{trace-flags}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=hallo
 
 
