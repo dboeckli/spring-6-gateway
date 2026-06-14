@@ -1,5 +1,6 @@
 package guru.springframework.spring6gateway.log;
 
+import io.micrometer.observation.annotation.Observed;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
@@ -21,6 +22,7 @@ public class ConfigChangeListener {
             "secret");
 
     @EventListener
+    @Observed(name = "config.change.listener", contextualName = "handle-context-refresh")
     public void handleContextRefresh(ContextRefreshedEvent event) {
         final Environment env = event.getApplicationContext().getEnvironment();
         log.info("Active profiles: {}", Arrays.toString(env.getActiveProfiles()));
