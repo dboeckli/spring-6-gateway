@@ -31,7 +31,8 @@
         "**/examples/**",
         "**/__tests__/**",
         "**/__fixtures__/**",
-        "docker-manual/**"
+        "docker-manual/**",
+        "k8s-manual/**"
     ],
     "maven-wrapper": {
         "managerFilePatterns": [
