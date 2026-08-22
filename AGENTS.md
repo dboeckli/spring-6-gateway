@@ -45,6 +45,9 @@ is needed here. On a normal host (Windows/CI) this does not apply either.
   release-independent. The Cloudsmith charts are private — CI logs in via
   `helm registry login docker.cloudsmith.io` (`CLOUDSMITH_USERNAME` var, `CLOUDSMITH_API_KEY` secret),
   locally you need a manual `helm registry login` before building.
+- Cloudsmith workaround: use the Docker-OCI URL `docker.cloudsmith.io`, not the native Helm endpoint
+  `helm.oci.cloudsmith.io` (Early Access, currently returns 500). Tracked in spring-6-rest-mvc #210 —
+  monitor stability before further Cloudsmith adoption.
 
 ## Test conventions
 
