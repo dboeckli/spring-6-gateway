@@ -72,6 +72,19 @@
             "ignoreUnstable": false
         },
         {
+            "matchDatasources": [
+                "helm"
+            ],
+            "matchPackageNames": [
+                "spring-6-rest-mvc-chart",
+                "spring-6-rest-mvc-mysql-chart",
+                "spring-6-rest-mvc-kafka-chart"
+            ],
+            "versioning": "maven",
+            "allowedVersions": "/^[0-9]+\\.[0-9]+\\.[0-9]+(-snapshot)?$/",
+            "ignoreUnstable": false
+        },
+        {
             "matchCategories": [
                 "docker"
             ],
@@ -143,6 +156,26 @@
                 "- name: (?<depName>spring-6-auth-server-chart)[\\s\\S]*?version: \"(?<currentValue>[^\"]+)\""
             ],
             "registryUrlTemplate": "https://repo.repsy.io/user08694146/helm-dboeckli"
+        },
+        {
+            "description": "Update spring-6-rest-mvc-chart versions in dependencies-Chart.yaml",
+            "customType": "regex",
+            "datasourceTemplate": "helm",
+            "managerFilePatterns": [
+                "/(^|\\/)dependencies-Chart\\.ya?ml$/"
+            ],
+            "matchStrings": [
+                "- name: (?<depName>spring-6-rest-mvc(-mysql|-kafka)?-chart)[\\s\\S]*?version: \"(?<currentValue>[^\"]+)\""
+            ],
+            "registryUrlTemplate": "oci://docker.cloudsmith.io/dboeckli/dboeckli-cloudsmith-repo"
+        }
+    ],
+    "hostRules": [
+        {
+            "matchHost": "docker.cloudsmith.io",
+            "hostType": "docker",
+            "username": "{{ lookupEnv 'CLOUDSMITH_USERNAME' }}",
+            "password": "{{ lookupEnv 'CLOUDSMITH_API_KEY' }}"
         }
     ],
     "platformAutomerge": false,

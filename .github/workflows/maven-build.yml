@@ -52,13 +52,15 @@ jobs:
           DOCKER_USER: ${{ vars.DOCKER_USER }}
           CI_USER: ${{ vars.CI_USER }}
           CI_USER_EMAIL: ${{ vars.CI_USER_EMAIL }}
+          CLOUDSMITH_USERNAME: ${{ vars.CLOUDSMITH_USERNAME }}
           DOCKER_ACCESS_TOKEN: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+          CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           TRIGGER_WORKFLOW_TOKEN: ${{ secrets.TRIGGER_WORKFLOW_TOKEN }}
           RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         run: |
-          required_vars=("DOCKER_USER" "CI_USER" "CI_USER_EMAIL")
-          required_secrets=("DOCKER_ACCESS_TOKEN" "SONAR_TOKEN" "TRIGGER_WORKFLOW_TOKEN" "RELEASE_TOKEN")
+          required_vars=("DOCKER_USER" "CI_USER" "CI_USER_EMAIL" "CLOUDSMITH_USERNAME")
+          required_secrets=("DOCKER_ACCESS_TOKEN" "CLOUDSMITH_API_KEY" "SONAR_TOKEN" "TRIGGER_WORKFLOW_TOKEN" "RELEASE_TOKEN")
           
           for param in "${required_vars[@]}"; do
             if [ -z "${!param}" ]; then
@@ -179,6 +181,15 @@ jobs:
           echo "### ALLMYVARS: $ALLMYVARS"
           echo "### ALLMYOUTPUT: $ALLMYOUTPUT"
 
+      - name: Helm registry login Cloudsmith
+        env:
+          CLOUDSMITH_USERNAME: ${{ vars.CLOUDSMITH_USERNAME }}
+          CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
+        run: |
+          helm registry login docker.cloudsmith.io \
+            --username "$CLOUDSMITH_USERNAME" \
+            --password "$CLOUDSMITH_API_KEY"
+
       - name: Run Maven Build
         env:
           GITHUB_ACTOR: ${{ github.actor }}
@@ -288,6 +299,15 @@ jobs:
 
       - name: Create k8s Kind Cluster
         uses: helm/kind-action@v1.14.0
+
+      - name: Helm registry login Cloudsmith
+        env:
+          CLOUDSMITH_USERNAME: ${{ vars.CLOUDSMITH_USERNAME }}
+          CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
+        run: |
+          helm registry login docker.cloudsmith.io \
+            --username "$CLOUDSMITH_USERNAME" \
+            --password "$CLOUDSMITH_API_KEY"
 
       - name: Run Maven Build
         env:

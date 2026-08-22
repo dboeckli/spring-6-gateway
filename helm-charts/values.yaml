@@ -110,7 +110,7 @@ spring-6-auth-server-chart:
     issuer:
       uri: "http://spring-6-auth-server.spring-6-gateway.svc.cluster.local:9000"
 
-spring-6-rest-mvc:
+spring-6-rest-mvc-chart:
   fullnameOverride: spring-6-rest-mvc
   authServer:
     enabled: false
@@ -122,13 +122,13 @@ spring-6-rest-mvc:
     enabled: false
     serviceFQDN: "spring-6-rest-mvc-kafka.spring-6-gateway.svc.cluster.local"
 
-spring-6-rest-mvc-mysql:
+spring-6-rest-mvc-mysql-chart:
   fullnameOverride: spring-6-rest-mvc-mysql
 
-spring-6-rest-mvc-kafka:
+spring-6-rest-mvc-kafka-chart:
   fullnameOverride: spring-6-rest-mvc-kafka
 
-spring-6-reactive-mongo:
+spring-6-reactive-mongo-chart:
   fullnameOverride: spring-6-reactive-mongo
   authServer:
     enabled: false
@@ -137,14 +137,14 @@ spring-6-reactive-mongo:
     enabled: false
     serviceFQDN: "spring-6-reactive-mongo-mongodb.spring-6-gateway.svc.cluster.local"
 
-spring-6-reactive-mongo-mongodb:
+spring-6-reactive-mongo-mongodb-chart:
   fullnameOverride: spring-6-reactive-mongo-mongodb
 
-spring-6-reactive:
+spring-6-reactive-chart:
   fullnameOverride: spring-6-reactive
   authServer:
     enabled: false
     serviceFQDN: "spring-6-auth-server.spring-6-gateway.svc.cluster.local"
 
-spring-6-data-rest:
+spring-6-data-rest-chart:
   fullnameOverride: spring-6-data-rest
