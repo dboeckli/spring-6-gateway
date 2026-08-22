@@ -109,7 +109,7 @@ spec:
               readOnly: true
 
       containers:
-        - name: {{ .Chart.Name }}
+        - name: @project.artifactId@
           image: "{{ .Values.image.registry }}/@project.artifactId@:{{ .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:

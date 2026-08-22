@@ -24,6 +24,14 @@
         "helmv3",
         "custom.regex"
     ],
+    "ignorePaths": [
+        "**/node_modules/**",
+        "**/bower_components/**",
+        "**/vendor/**",
+        "**/examples/**",
+        "**/__tests__/**",
+        "**/__fixtures__/**"
+    ],
     "maven-wrapper": {
         "managerFilePatterns": [
             "/(^|/)mvnw$/",
@@ -52,6 +60,17 @@
         ]
     },
     "packageRules": [
+        {
+            "matchDatasources": [
+                "helm"
+            ],
+            "matchPackageNames": [
+                "spring-6-auth-server-chart"
+            ],
+            "versioning": "maven",
+            "allowedVersions": "/^[0-9]+\\.[0-9]+\\.[0-9]+(-snapshot)?$/",
+            "ignoreUnstable": false
+        },
         {
             "matchCategories": [
                 "docker"
@@ -112,6 +131,18 @@
                 "  JAVA_VERSION:[\\t ]*(?<currentValue>\\d+)"
             ],
             "autoReplaceStringTemplate": "  JAVA_VERSION: {{{newValue}}}"
+        },
+        {
+            "description": "Update spring-6-auth-server-chart version in dependencies-Chart.yaml",
+            "customType": "regex",
+            "datasourceTemplate": "helm",
+            "managerFilePatterns": [
+                "/(^|\\/)dependencies-Chart\\.ya?ml$/"
+            ],
+            "matchStrings": [
+                "- name: (?<depName>spring-6-auth-server-chart)[\\s\\S]*?version: \"(?<currentValue>[^\"]+)\""
+            ],
+            "registryUrlTemplate": "https://repo.repsy.io/user08694146/helm-dboeckli"
         }
     ],
     "platformAutomerge": false,
