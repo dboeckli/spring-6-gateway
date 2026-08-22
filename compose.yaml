@@ -59,7 +59,7 @@ services:
       
   auth-server:
     container_name: auth-server
-    image: domboeckli/spring-6-auth-server:0.0.7-SNAPSHOT
+    image: domboeckli/spring-6-auth-server:0.0.11-snapshot
     ports:
       - "9000:9000"
     expose:
@@ -71,7 +71,7 @@ services:
   
   rest-mvc:
     container_name: rest-mvc
-    image: domboeckli/spring-6-rest-mvc:0.0.4-SNAPSHOT
+    image: domboeckli/spring-6-rest-mvc:0.0.4-snapshot
     ports:
       - "8081:8081"
     expose:
@@ -102,7 +102,7 @@ services:
       
   reactive-mongo:
     container_name: reactive-mongo
-    image: domboeckli/spring-6-reactive-mongo:0.0.1-SNAPSHOT
+    image: domboeckli/spring-6-reactive-mongo:0.0.1-snapshot
     ports:
       - "8083:8083"
     expose:
@@ -127,7 +127,7 @@ services:
 
   reactive:
     container_name: reactive
-    image: domboeckli/spring-6-reactive:0.0.1-SNAPSHOT
+    image: domboeckli/spring-6-reactive:0.0.1-snapshot
     ports:
       - "8082:8082"
     expose:
@@ -145,7 +145,7 @@ services:
       
   data-rest:
     container_name: data-rest
-    image: domboeckli/spring-6-data-rest:0.0.1-SNAPSHOT
+    image: domboeckli/spring-6-data-rest:0.0.1-snapshot
     ports:
       - "8084:8084"
     expose:

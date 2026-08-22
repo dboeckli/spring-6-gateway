@@ -36,7 +36,7 @@ jobs:
 
       - uses: mfinelli/setup-shfmt@v4
         with:
-          shfmt-version: 3.13.0
+          shfmt-version: 3.13.1
 
       - name: Set up java
         uses: actions/setup-java@v5.7.0
@@ -52,13 +52,15 @@ jobs:
           DOCKER_USER: ${{ vars.DOCKER_USER }}
           CI_USER: ${{ vars.CI_USER }}
           CI_USER_EMAIL: ${{ vars.CI_USER_EMAIL }}
+          CLOUDSMITH_USERNAME: ${{ vars.CLOUDSMITH_USERNAME }}
           DOCKER_ACCESS_TOKEN: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+          CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           TRIGGER_WORKFLOW_TOKEN: ${{ secrets.TRIGGER_WORKFLOW_TOKEN }}
           RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         run: |
-          required_vars=("DOCKER_USER" "CI_USER" "CI_USER_EMAIL")
-          required_secrets=("DOCKER_ACCESS_TOKEN" "SONAR_TOKEN" "TRIGGER_WORKFLOW_TOKEN" "RELEASE_TOKEN")
+          required_vars=("DOCKER_USER" "CI_USER" "CI_USER_EMAIL" "CLOUDSMITH_USERNAME")
+          required_secrets=("DOCKER_ACCESS_TOKEN" "CLOUDSMITH_API_KEY" "SONAR_TOKEN" "TRIGGER_WORKFLOW_TOKEN" "RELEASE_TOKEN")
           
           for param in "${required_vars[@]}"; do
             if [ -z "${!param}" ]; then
@@ -145,7 +147,7 @@ jobs:
 
       - uses: mfinelli/setup-shfmt@v4
         with:
-          shfmt-version: 3.13.0
+          shfmt-version: 3.13.1
 
       - name: Set up java
         uses: actions/setup-java@v5.7.0
@@ -167,45 +169,6 @@ jobs:
       - name: Create k8s Kind Cluster
         uses: helm/kind-action@v1.14.0
 
-      - name: Helm workaround
-        # This is a workaround because the helm push does not work the standard way. helm login file under ~/.config/helm/registry/config.json is ignored.
-        # Instead, we use the docker login file under ~/.docker/config.json
-        # see: https://github.com/helm/helm/issues/30929 and https://github.com/helm/helm/issues/30942
-        env:
-          DOCKER_USER: ${{ vars.DOCKER_USER }}
-          DOCKER_TOKEN: ${{ secrets.DOCKER_ACCESS_TOKEN }}
-        run: |
-          set -o pipefail
-          set -o nounset
-          set -o errexit
-
-          rm -f ~/.config/helm/registry/config.json
-
-          echo "Helm version:"
-          helm version --short
-
-          # Base64-Encode: username:token
-          AUTH=$(echo -n "$DOCKER_USER:$DOCKER_TOKEN" | base64)
-
-          # Zielverzeichnis anlegen
-          mkdir -p ~/.docker
-
-          # Docker config.json erzeugen
-          cat > ~/.docker/config.json <<EOF
-          {
-            "auths": {
-              "https://index.docker.io/v1/": {
-                "auth": "$AUTH"
-              },
-              "registry-1.docker.io": {
-                "auth": "$AUTH"
-              }
-            }
-          }
-          EOF
-
-          echo "✅ Docker config.json added to ~/.docker/config.json"      
-
       - name: show variables
         id: show_build_variables
         shell: bash
@@ -217,6 +180,15 @@ jobs:
           echo "### ALLMYSECRETS: $ALLMYSECRETS"
           echo "### ALLMYVARS: $ALLMYVARS"
           echo "### ALLMYOUTPUT: $ALLMYOUTPUT"
+
+      - name: Helm registry login Cloudsmith
+        env:
+          CLOUDSMITH_USERNAME: ${{ vars.CLOUDSMITH_USERNAME }}
+          CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
+        run: |
+          helm registry login docker.cloudsmith.io \
+            --username "$CLOUDSMITH_USERNAME" \
+            --password "$CLOUDSMITH_API_KEY"
 
       - name: Run Maven Build
         env:
@@ -270,7 +242,7 @@ jobs:
           echo "### helm chart version is: $HELM_CHART_VERSION"
           echo "HELM_CHART_VERSION=$HELM_CHART_VERSION" >> $GITHUB_OUTPUT
           
-          YAML_FILE="target/helm-templated/$ARTIFACT_ID/templates/deployment.yaml"
+          YAML_FILE="target/helm-templated/$ARTIFACT_ID-chart/templates/deployment.yaml"
           if [ -f "$YAML_FILE" ]; then
             NAMESPACE=$(grep '^\s*namespace:' "$YAML_FILE" | awk '{print $2}' | tr -d '"')
             if [ -z "$NAMESPACE" ]; then
@@ -306,7 +278,7 @@ jobs:
 
       - uses: mfinelli/setup-shfmt@v4
         with:
-          shfmt-version: 3.13.0
+          shfmt-version: 3.13.1
 
       - name: Set up java
         uses: actions/setup-java@v5.7.0
@@ -327,6 +299,15 @@ jobs:
 
       - name: Create k8s Kind Cluster
         uses: helm/kind-action@v1.14.0
+
+      - name: Helm registry login Cloudsmith
+        env:
+          CLOUDSMITH_USERNAME: ${{ vars.CLOUDSMITH_USERNAME }}
+          CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
+        run: |
+          helm registry login docker.cloudsmith.io \
+            --username "$CLOUDSMITH_USERNAME" \
+            --password "$CLOUDSMITH_API_KEY"
 
       - name: Run Maven Build
         env:

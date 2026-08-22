@@ -20,6 +20,10 @@ jobs:
         with:
           fetch-depth: 0
 
+      - uses: mfinelli/setup-shfmt@v4
+        with:
+          shfmt-version: 3.13.1
+
       - name: Check for main
         run: |
           BRANCH=$(git rev-parse --abbrev-ref HEAD)
@@ -44,7 +48,7 @@ jobs:
 
       - uses: mfinelli/setup-shfmt@v4
         with:
-          shfmt-version: 3.13.0
+          shfmt-version: 3.13.1
 
       - name: Check version
         run: |
@@ -72,7 +76,7 @@ jobs:
 
       - uses: mfinelli/setup-shfmt@v4
         with:
-          shfmt-version: 3.13.0
+          shfmt-version: 3.13.1
 
       - name: Set up java
         uses: actions/setup-java@v5.7.0
@@ -114,6 +118,15 @@ jobs:
           done
           git config --global user.email "${{ vars.CI_USER_EMAIL }}" 
           git config --global user.name "${{ vars.CI_USER }}"        
+
+      - name: Helm registry login Cloudsmith
+        env:
+          CLOUDSMITH_USERNAME: ${{ vars.CLOUDSMITH_USERNAME }}
+          CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
+        run: |
+          helm registry login docker.cloudsmith.io \
+            --username "$CLOUDSMITH_USERNAME" \
+            --password "$CLOUDSMITH_API_KEY"
 
       - name: Release
         env:

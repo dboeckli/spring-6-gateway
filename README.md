@@ -19,7 +19,51 @@ Example request you can find in the restRequest directory.
   * http://localhost:30080/swagger-ui/index.html
 * actuator: http://localhost:8080/api/v3/actuator/info
 
-![alt text](docs/guru.png "Overview")
+## Architecture Overview
+
+```mermaid
+graph LR
+    Client(["💻 Client"])
+
+    subgraph OAuth2 ["OAuth2"]
+        AuthServer["Spring Auth Server\n:9000"]
+    end
+
+    subgraph Gateway ["Gateway"]
+        GW["Spring Cloud Gateway\n:8080"]
+    end
+
+    subgraph Backends ["Backend Services"]
+        MVC["Spring MVC\n:8081"]
+        Reactive["Spring Reactive\n:8082"]
+        ReactiveMongo["Reactive Mongo\n:8083"]
+        DataRest["Spring Data REST\n:8084"]
+    end
+
+    subgraph Databases ["Databases"]
+        MySQL[("MySQL")]
+        H2[("H2\nIn-Memory")]
+        MongoDB[("MongoDB")]
+    end
+
+    subgraph Messaging ["Messaging"]
+        Kafka{{"Kafka"}}
+    end
+
+    AuthServer -->|"issues JWT"| Client
+    Client <-->|"HTTP (Bearer JWT)"| GW
+    GW -->|"routes /oauth2/**"| AuthServer
+    GW -->|"routes /api/v1/**"| MVC
+    GW -->|"routes /api/v2/**"| Reactive
+    GW -->|"routes /api/v3/**"| ReactiveMongo
+    GW -->|"routes /api/v4/**"| DataRest
+    GW -->|"validates JWT"| AuthServer
+    MVC <--> MySQL
+    MVC <-->|"events"| Kafka
+    Reactive <--> H2
+    DataRest <--> H2
+    ReactiveMongo <--> MongoDB
+```
 
 ## Docker
 
@@ -63,6 +107,41 @@ To run maven filtering for destination target/k8s and destination target/helm ru
 mvn clean install -DskipTests 
 ```
 
+## Sandbox (local dev environment)
+
+The sandbox consists of the gateway (Spring Boot, port 8080) plus the upstream projects
+(auth-server on port 9000, rest-mvc, reactive, reactive-mongo, data-rest) provided via `compose.yaml`
+and the IntelliJ run configurations.
+
+### Start the sandbox (opencode-sandbox-kit)
+
+The sandbox is provisioned by the opencode-sandbox-kit and runs as a Docker container. It mounts this
+repo, starts opencode, and connects the IntelliJ MCP server.
+
+Allow the kit source (GitHub without cloning):
+
+```powershell
+sbx settings set kit.allowedSources --% "[\"docker.io/\",\"github.com/dboeckli/\"]"
+```
+
+Start a new sandbox:
+
+```powershell
+sbx run opencode --name spring-6-gateway --kit "git+https://github.com/dboeckli/opencode-sandbox-kit.git#dir=opencode-agent" "C:\development\projects\spring-6-gateway"
+```
+
+Start the sandbox with Kubernetes support:
+
+```powershell
+sbx run opencode --name spring-6-gateway --kit "git+https://github.com/dboeckli/opencode-sandbox-kit.git#dir=opencode-agent" "C:\development\projects\spring-6-gateway" "$env:USERPROFILE\.kube:ro"
+```
+
+Apply the kit to an existing sandbox (restarts the sandbox, VM state is kept):
+
+```powershell
+sbx kit add spring-6-gateway "git+https://github.com/dboeckli/opencode-sandbox-kit.git#dir=opencode-agent"
+```
+
 ### Deployment with Kubernetes
 
 Deployment goes into the default namespace.
@@ -101,7 +180,7 @@ cd target/helm/repo
 unpack
 
 ```powershell
-$file = Get-ChildItem -Filter spring-6-gateway-v*.tgz | Select-Object -First 1
+$file = Get-ChildItem -Filter spring-6-gateway-chart-*.tgz | Select-Object -First 1
 tar -xvf $file.Name
 ```
 

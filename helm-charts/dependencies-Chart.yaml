@@ -7,27 +7,28 @@ version: 0.0.1
 appVersion: 0.0.1
 
 dependencies:
-  - name: spring-6-auth-server
-    version: "v0.0.7-SNAPSHOT"
+  - name: spring-6-auth-server-chart
+    version: "0.0.11-snapshot"
     repository: "oci://repo.repsy.io/user08694146/helm-dboeckli"
-  - name: spring-6-rest-mvc-mysql
-    version: v0.0.4-SNAPSHOT
+    condition: authServer.enabled
+  - name: spring-6-rest-mvc-mysql-chart
+    version: "0.0.4-snapshot"
+    repository: "oci://docker.cloudsmith.io/dboeckli/dboeckli-cloudsmith-repo"
+  - name: spring-6-rest-mvc-kafka-chart
+    version: "0.0.4-snapshot"
+    repository: "oci://docker.cloudsmith.io/dboeckli/dboeckli-cloudsmith-repo"
+  - name: spring-6-rest-mvc-chart
+    version: "0.0.4-snapshot"
+    repository: "oci://docker.cloudsmith.io/dboeckli/dboeckli-cloudsmith-repo"
+  - name: spring-6-reactive-mongo-mongodb-chart
+    version: "0.0.1-snapshot"
     repository: "oci://registry-1.docker.io/domboeckli"
-  - name: spring-6-rest-mvc-kafka
-    version: v0.0.4-SNAPSHOT
+  - name: spring-6-reactive-mongo-chart
+    version: "0.0.1-snapshot"
     repository: "oci://registry-1.docker.io/domboeckli"
-  - name: spring-6-rest-mvc
-    version: "v0.0.4-SNAPSHOT"
+  - name: spring-6-data-rest-chart
+    version: "0.0.1-snapshot"
     repository: "oci://registry-1.docker.io/domboeckli"
-  - name: spring-6-reactive-mongo-mongodb
-    version: "v0.0.1-SNAPSHOT"
-    repository: "oci://registry-1.docker.io/domboeckli"
-  - name: spring-6-reactive-mongo
-    version: "v0.0.1-SNAPSHOT"
-    repository: "oci://registry-1.docker.io/domboeckli"
-  - name: spring-6-data-rest
-    version: "v0.0.1-SNAPSHOT"
-    repository: "oci://registry-1.docker.io/domboeckli"
-  - name: spring-6-reactive
-    version: "v0.0.1-SNAPSHOT"
+  - name: spring-6-reactive-chart
+    version: "0.0.1-snapshot"
     repository: "oci://registry-1.docker.io/domboeckli"
