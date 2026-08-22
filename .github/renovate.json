@@ -30,7 +30,8 @@
         "**/vendor/**",
         "**/examples/**",
         "**/__tests__/**",
-        "**/__fixtures__/**"
+        "**/__fixtures__/**",
+        "docker-manual/**"
     ],
     "maven-wrapper": {
         "managerFilePatterns": [
