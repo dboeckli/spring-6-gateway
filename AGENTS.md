@@ -55,6 +55,13 @@ is needed here. On a normal host (Windows/CI) this does not apply either.
   not run during `verify`'s failsafe phase and vice versa.
 - Tests use WireMock (not Testcontainers) to simulate the upstream services — no Docker container
   dependency for the tests themselves.
+- The integration tests (`RouterConfigIT`) start the upstream services via `compose.yaml`
+  (`with_docker_compose` profile) and need `host.docker.internal` to resolve to `127.0.0.1` on
+  Windows (Docker Desktop writes it to the `hosts` file, often on the LAN IP where the mapped port
+  is unreachable → connection timeout). Fix: `C:\Windows\System32\drivers\etc\hosts` with
+  `127.0.0.1 host.docker.internal` + `ipconfig /flushdns`; disable "Add the *.docker.internal names
+  to the host's /etc/hosts file" in Docker Desktop Settings so it does not overwrite the entry.
+  See `README.md` (Sandbox section).
 
 ## Architecture
 

@@ -113,6 +113,33 @@ The sandbox consists of the gateway (Spring Boot, port 8080) plus the upstream p
 (auth-server on port 9000, rest-mvc, reactive, reactive-mongo, data-rest) provided via `compose.yaml`
 and the IntelliJ run configurations.
 
+> **Workaround (Windows): `host.docker.internal` must resolve to `127.0.0.1`.**
+> The gateway runs as a host JVM (unit/IT tests, `./mvnw spring-boot:run`), while the upstream
+> services run as Docker containers. Their OAuth2 JWT issuer is `http://host.docker.internal:9000`,
+> so the gateway must resolve that name too. Docker Desktop writes it to your `hosts` file — but
+> often on your LAN IP (e.g. `192.168.178.124`), where the mapped port is not reachable (timeout).
+> Fix: in `C:\Windows\System32\drivers\etc\hosts` (admin Notepad), make sure the Docker Desktop
+> section points to loopback:
+>
+> ```
+> # Added by Docker Desktop
+> 127.0.0.1 host.docker.internal
+> 127.0.0.1 gateway.docker.internal
+> ```
+>
+> Then flush the DNS cache:
+>
+> ```powershell
+> ipconfig /flushdns
+> ```
+>
+> In Docker Desktop Settings, disable
+> "Add the *.docker.internal names to the host's /etc/hosts file" so Docker does not overwrite
+> the entry again.
+>
+> **CI:** the build workflow (`maven-build.yml`) solves the same problem on Linux by appending
+> `127.0.0.1 host.docker.internal` to `/etc/hosts` in each job before running Maven.
+
 ### Start the sandbox (opencode-sandbox-kit)
 
 The sandbox is provisioned by the opencode-sandbox-kit and runs as a Docker container. It mounts this
