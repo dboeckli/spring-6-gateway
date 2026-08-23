@@ -7,3 +7,4 @@ helm uninstall $APPLICATION_NAME --namespace spring-6-gateway
 
 kubectl delete pod -n spring-6-gateway --field-selector=status.phase==Succeeded
 kubectl delete pod -n spring-6-gateway --field-selector=status.phase==Failed
+kubectl delete namespace spring-6-gateway
