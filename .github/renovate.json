@@ -17,6 +17,7 @@
         }
     },
     "enabledManagers": [
+        "maven",
         "maven-wrapper",
         "docker-compose",
         "kubernetes",
