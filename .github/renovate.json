@@ -64,6 +64,16 @@
     },
     "packageRules": [
         {
+            "description": "Ignore Maven APIs/SPIs",
+            "matchDatasources": [
+                "maven"
+            ],
+            "matchPackageNames": [
+                "org.apache.maven:*"
+            ],
+            "enabled": false
+        },
+        {
             "matchDatasources": [
                 "helm"
             ],
