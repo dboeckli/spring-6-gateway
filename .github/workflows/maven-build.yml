@@ -167,7 +167,7 @@ jobs:
           echo "------- "
 
       - name: Create k8s Kind Cluster
-        uses: helm/kind-action@v1.14.0
+        uses: helm/kind-action@v1.15.0
 
       - name: show variables
         id: show_build_variables
@@ -298,7 +298,7 @@ jobs:
           echo "------- "
 
       - name: Create k8s Kind Cluster
-        uses: helm/kind-action@v1.14.0
+        uses: helm/kind-action@v1.15.0
 
       - name: Helm registry login Cloudsmith
         env:
