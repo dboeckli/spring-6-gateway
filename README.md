@@ -50,6 +50,12 @@ graph LR
         Kafka{{"Kafka"}}
     end
 
+    subgraph Drinks ["Drink Microservices"]
+        Cold["spring-6-cold-micro-service\n(ColdListener)"]
+        Cool["spring-6-cool-micro-service\n(CoolListener)"]
+        IceCold["spring-6-icecold-micro-service\n(IceColdListener)"]
+    end
+
     AuthServer -->|"issues JWT"| Client
     Client <-->|"HTTP (Bearer JWT)"| GW
     GW -->|"routes /oauth2/**"| AuthServer
@@ -59,7 +65,17 @@ graph LR
     GW -->|"routes /api/v4/**"| DataRest
     GW -->|"validates JWT"| AuthServer
     MVC <--> MySQL
-    MVC <-->|"events"| Kafka
+    MVC <-->|"order.placed"| Kafka
+    MVC -->|"drink.request.cold\n(GOSE, WHEAT)"| Kafka
+    MVC -->|"drink.request.cool\n(STOUT, PORTER, ALE, IPA, PALE_ALE)"| Kafka
+    MVC -->|"drink.request.icecold\n(LAGER, SAISON)"| Kafka
+    Kafka -->|"drink.request.cold"| Cold
+    Kafka -->|"drink.request.cool"| Cool
+    Kafka -->|"drink.request.icecold"| IceCold
+    Cold -->|"drink.prepared"| Kafka
+    Cool -->|"drink.prepared"| Kafka
+    IceCold -->|"drink.prepared"| Kafka
+    Kafka -->|"drink.prepared"| MVC
     Reactive <--> H2
     DataRest <--> H2
     ReactiveMongo <--> MongoDB
@@ -118,13 +134,19 @@ and the IntelliJ run configurations.
 > services run as Docker containers. Their OAuth2 JWT issuer is `http://host.docker.internal:9000`,
 > so the gateway must resolve that name too. Docker Desktop writes it to your `hosts` file — but
 > often on your LAN IP (e.g. `192.168.178.124`), where the mapped port is not reachable (timeout).
-> Fix: in `C:\Windows\System32\drivers\etc\hosts` (admin Notepad), make sure the Docker Desktop
-> section points to loopback:
+> Fix: in `C:\Windows\System32\drivers\etc\hosts` (admin Notepad), map both names to loopback —
+> and place the entries **before** the `# Added by Docker Desktop` block (first match wins), so a
+> Docker-managed rewrite cannot override them:
 >
 > ```
-> # Added by Docker Desktop
 > 127.0.0.1 host.docker.internal
 > 127.0.0.1 gateway.docker.internal
+>
+> # Added by Docker Desktop
+> #192.168.178.124 host.docker.internal
+> #192.168.178.124 gateway.docker.internal
+> 127.0.0.1 kubernetes.docker.internal
+> # End of section
 > ```
 >
 > Then flush the DNS cache:
@@ -134,8 +156,8 @@ and the IntelliJ run configurations.
 > ```
 >
 > In Docker Desktop Settings, disable
-> "Add the *.docker.internal names to the host's /etc/hosts file" so Docker does not overwrite
-> the entry again.
+> "Add the *.docker.internal names to the host's /etc/hosts file" — note this does **not** remove
+> already written entries, so fix them as above.
 >
 > **CI:** the build workflow (`maven-build.yml`) solves the same problem on Linux by appending
 > `127.0.0.1 host.docker.internal` to `/etc/hosts` in each job before running Maven.
@@ -156,9 +178,9 @@ Start a new sandbox:
 ```powershell
 sbx run opencode `
     --kit "git+https://codeberg.org/dboeckli/opencode-sandbox-kit.git#dir=opencode-agent" `
-    --template docker.cloudsmith.io/dboeckli/sbx/sbx-opencode-tooling:latest `
+    --template docker.io/domboeckli/sbx-opencode-tooling:latest `
     --skills=off `
-    --static-mcp idea `
+    --static-mcp idea,k8s,docker `
     . `
     "C:\development\maven-repo:ro"
 ```
@@ -168,9 +190,9 @@ Start the sandbox with Kubernetes support:
 ```powershell
 sbx run opencode `
     --kit "git+https://codeberg.org/dboeckli/opencode-sandbox-kit.git#dir=opencode-agent" `
-    --template docker.cloudsmith.io/dboeckli/sbx/sbx-opencode-tooling:latest `
+    --template docker.io/domboeckli/sbx-opencode-tooling:latest `
     --skills=off `
-    --static-mcp idea `
+    --static-mcp idea,k8s,docker `
     . `
     "$env:USERPROFILE\.kube:ro" `
     "C:\development\maven-repo:ro"

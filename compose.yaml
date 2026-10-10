@@ -100,6 +100,48 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"    
       
+  # Drink-preparation saga participants.
+  # Each service overrides its Kafka bootstrap (default is [::1]:29092) to the in-network broker
+  # and disables Spring Boot Docker Compose (it must not spawn its own broker inside the container).
+  cold-micro-service:
+    container_name: cold-micro-service
+    image: ghcr.io/dboeckli/spring-6-cold-micro-service:0.0.1-snapshot
+    depends_on:
+      kafka:
+        condition: service_healthy
+        required: true
+    ports:
+      - "8091:8081"
+    environment:
+      SPRING_DOCKER_COMPOSE_ENABLED: "false"
+      SPRING_APPLICATION_JSON: '{"spring":{"kafka":{"bootstrap-servers":"kafka:9092","admin":{"properties":{"bootstrap-servers":"kafka:9092"}},"consumer":{"bootstrap-servers":"kafka:9092"},"producer":{"bootstrap-servers":"kafka:9092"}}}}'
+
+  cool-micro-service:
+    container_name: cool-micro-service
+    image: ghcr.io/dboeckli/spring-6-cool-micro-service:0.0.1-snapshot
+    depends_on:
+      kafka:
+        condition: service_healthy
+        required: true
+    ports:
+      - "8092:8082"
+    environment:
+      SPRING_DOCKER_COMPOSE_ENABLED: "false"
+      SPRING_APPLICATION_JSON: '{"spring":{"kafka":{"bootstrap-servers":"kafka:9092","admin":{"properties":{"bootstrap-servers":"kafka:9092"}},"consumer":{"bootstrap-servers":"kafka:9092"},"producer":{"bootstrap-servers":"kafka:9092"}}}}'
+
+  icecold-micro-service:
+    container_name: icecold-micro-service
+    image: ghcr.io/dboeckli/spring-6-icecold-micro-service:0.0.1-snapshot
+    depends_on:
+      kafka:
+        condition: service_healthy
+        required: true
+    ports:
+      - "8090:8080"
+    environment:
+      SPRING_DOCKER_COMPOSE_ENABLED: "false"
+      SPRING_APPLICATION_JSON: '{"spring":{"kafka":{"bootstrap-servers":"kafka:9092","admin":{"properties":{"bootstrap-servers":"kafka:9092"}},"consumer":{"bootstrap-servers":"kafka:9092"},"producer":{"bootstrap-servers":"kafka:9092"}}}}'
+
   reactive-mongo:
     container_name: reactive-mongo
     image: domboeckli/spring-6-reactive-mongo:0.0.1-snapshot
@@ -169,6 +211,15 @@ services:
       rest-mvc:
         condition: service_started
         required: true
+      cold-micro-service:
+        condition: service_started
+        required: true
+      cool-micro-service:
+        condition: service_started
+        required: true
+      icecold-micro-service:
+        condition: service_started
+        required: true
       reactive-mongo:
         condition: service_started
         required: true
@@ -184,6 +235,9 @@ services:
             test -f /bin/sh &&
             wget -qO- http://auth-server:9000/actuator/health/readiness | grep -q '\"status\":\"UP\"' &&
             wget -qO- http://rest-mvc:8081/actuator/health/readiness | grep -q '\"status\":\"UP\"' &&
+            wget -qO- http://cold-micro-service:8081/actuator/health/readiness | grep -q '\"status\":\"UP\"' &&
+            wget -qO- http://cool-micro-service:8082/actuator/health/readiness | grep -q '\"status\":\"UP\"' &&
+            wget -qO- http://icecold-micro-service:8080/actuator/health/readiness | grep -q '\"status\":\"UP\"' &&
             wget -qO- http://reactive-mongo:8083/actuator/health/readiness | grep -q '\"status\":\"UP\"' &&
             wget -qO- http://reactive:8082/actuator/health/readiness | grep -q '\"status\":\"UP\"' &&
             wget -qO- http://data-rest:8084/actuator/health/readiness | grep -q '\"status\":\"UP\"'
@@ -196,6 +250,9 @@ services:
       while true; do
         auth_health=$$(wget -q -O - http://auth-server:9000/actuator/health/readiness 2>/dev/null)
         mvc_health=$$(wget -q -O - http://rest-mvc:8081/actuator/health/readiness 2>/dev/null)
+        cold_health=$$(wget -q -O - http://cold-micro-service:8081/actuator/health/readiness 2>/dev/null)
+        cool_health=$$(wget -q -O - http://cool-micro-service:8082/actuator/health/readiness 2>/dev/null)
+        icecold_health=$$(wget -q -O - http://icecold-micro-service:8080/actuator/health/readiness 2>/dev/null)
         reactive_mongo_health=$$(wget -q -O - http://reactive-mongo:8083/actuator/health/readiness 2>/dev/null)
         reactive_health=$$(wget -q -O - http://reactive:8082/actuator/health/readiness 2>/dev/null)
         data_rest_health=$$(wget -q -O - http://data-rest:8084/actuator/health/readiness 2>/dev/null)
@@ -205,6 +262,9 @@ services:
           \"services\": {
             \"auth-server\": $$auth_health,
             \"rest-mvc\": $$mvc_health,
+            \"cold-micro-service\": $$cold_health,
+            \"cool-micro-service\": $$cool_health,
+            \"icecold-micro-service\": $$icecold_health,
             \"reactive-mongo\": $$reactive_mongo_health,
             \"reactive\": $$reactive_health,
             \"data-rest\": $$data_rest_health
