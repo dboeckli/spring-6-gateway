@@ -99,6 +99,51 @@ reactiveMongo:
 
   serviceFQDN: "spring-6-reactive-mongo.spring-6-gateway.svc.cluster.local"
 
+# Microservices are declared as direct dependencies (see dependencies-Chart.yaml)
+# so they are deployed by this chart and not pulled in transitively via spring-6-rest-mvc-chart.
+# The alias (coldMicroService/coolMicroService/icecoldMicroService) is the values key used for overrides.
+coldMicroService:
+  enabled: true
+
+  fullnameOverride: spring-6-cold-micro-service
+
+  service:
+    nodePort: 30085
+
+  kafka:
+    enabled: false
+    serviceFQDN: "spring-6-rest-mvc-kafka.spring-6-gateway.svc.cluster.local"
+    port: 9092
+    clientPort: 9092
+
+coolMicroService:
+  enabled: true
+
+  fullnameOverride: spring-6-cool-micro-service
+
+  service:
+    nodePort: 30086
+
+  kafka:
+    enabled: false
+    serviceFQDN: "spring-6-rest-mvc-kafka.spring-6-gateway.svc.cluster.local"
+    port: 9092
+    clientPort: 9092
+
+icecoldMicroService:
+  enabled: true
+
+  fullnameOverride: spring-6-icecold-micro-service
+
+  service:
+    nodePort: 30087
+
+  kafka:
+    enabled: false
+    serviceFQDN: "spring-6-rest-mvc-kafka.spring-6-gateway.svc.cluster.local"
+    port: 9092
+    clientPort: 9092
+
 ingress:
   enabled: false
 
@@ -121,6 +166,12 @@ spring-6-rest-mvc-chart:
   kafka:
     enabled: false
     serviceFQDN: "spring-6-rest-mvc-kafka.spring-6-gateway.svc.cluster.local"
+  coldMicroService:
+    enabled: false
+  coolMicroService:
+    enabled: false
+  icecoldMicroService:
+    enabled: false
 
 spring-6-rest-mvc-mysql-chart:
   fullnameOverride: spring-6-rest-mvc-mysql

@@ -38,11 +38,12 @@ is needed here. On a normal host (Windows/CI) this does not apply either.
 - The auth-server (`spring-6-auth-server`) is resolved from the auth-server project's GitHub Packages
   (`maven.pkg.github.com`) / Helm repo (`repo.repsy.io/user08694146/helm-dboeckli`). Without a PAT in
   `~/.m2/settings.xml` (server id `github`) the build cannot resolve the snapshot dependency.
-- The Helm chart depends on **8 remote subcharts** (auth-server from Repsy, all others — including
-  `spring-6-rest-mvc` + its `-mysql`/`-kafka` charts — from Docker Hub
-  `oci://registry-1.docker.io/domboeckli`). `helm dependency build` pulls them during the build; all
-  subcharts get a `fullnameOverride` so their service names are release-independent. The Docker Hub
-  charts are public (OSS), so pulling needs no login.
+- The Helm chart depends on **11 remote subcharts** (auth-server from Repsy, all others from Docker
+  Hub `oci://registry-1.docker.io/domboeckli`): `spring-6-rest-mvc` ± its `-mysql`/`-kafka` charts,
+  the three drink micro-services (`cold`/`cool`/`icecold`, declared with `alias` + `condition` and
+  `fullnameOverride` values), plus the reactive/data-rest charts. `helm dependency build` pulls them
+  during the build; all subcharts get a `fullnameOverride` so their service names are
+  release-independent. The Docker Hub charts are public (OSS), so pulling needs no login.
 
 ## Test conventions
 
@@ -54,8 +55,11 @@ is needed here. On a normal host (Windows/CI) this does not apply either.
   (`with_docker_compose` profile) and need `host.docker.internal` to resolve to `127.0.0.1` on
   Windows (Docker Desktop writes it to the `hosts` file, often on the LAN IP where the mapped port
   is unreachable → connection timeout). Fix: `C:\Windows\System32\drivers\etc\hosts` with
-  `127.0.0.1 host.docker.internal` + `ipconfig /flushdns`; disable "Add the *.docker.internal names
-  to the host's /etc/hosts file" in Docker Desktop Settings so it does not overwrite the entry.
+  `127.0.0.1 host.docker.internal` + `ipconfig /flushdns`, placed **before** the
+  `# Added by Docker Desktop` block (first match wins); also disable "Add the *.docker.internal names
+  to the host's /etc/hosts file" in Docker Desktop Settings — note that does not remove already
+  written entries, so fix them manually. `RouterConfigIT` logs a `WebClientResponseException` 500
+  from the gateway's `/oauth2/token` when this mapping is wrong.
   See `README.md` (Sandbox section).
 
 ## Architecture

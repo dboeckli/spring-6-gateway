@@ -134,13 +134,19 @@ and the IntelliJ run configurations.
 > services run as Docker containers. Their OAuth2 JWT issuer is `http://host.docker.internal:9000`,
 > so the gateway must resolve that name too. Docker Desktop writes it to your `hosts` file — but
 > often on your LAN IP (e.g. `192.168.178.124`), where the mapped port is not reachable (timeout).
-> Fix: in `C:\Windows\System32\drivers\etc\hosts` (admin Notepad), make sure the Docker Desktop
-> section points to loopback:
+> Fix: in `C:\Windows\System32\drivers\etc\hosts` (admin Notepad), map both names to loopback —
+> and place the entries **before** the `# Added by Docker Desktop` block (first match wins), so a
+> Docker-managed rewrite cannot override them:
 >
 > ```
-> # Added by Docker Desktop
 > 127.0.0.1 host.docker.internal
 > 127.0.0.1 gateway.docker.internal
+>
+> # Added by Docker Desktop
+> #192.168.178.124 host.docker.internal
+> #192.168.178.124 gateway.docker.internal
+> 127.0.0.1 kubernetes.docker.internal
+> # End of section
 > ```
 >
 > Then flush the DNS cache:
@@ -150,8 +156,8 @@ and the IntelliJ run configurations.
 > ```
 >
 > In Docker Desktop Settings, disable
-> "Add the *.docker.internal names to the host's /etc/hosts file" so Docker does not overwrite
-> the entry again.
+> "Add the *.docker.internal names to the host's /etc/hosts file" — note this does **not** remove
+> already written entries, so fix them as above.
 >
 > **CI:** the build workflow (`maven-build.yml`) solves the same problem on Linux by appending
 > `127.0.0.1 host.docker.internal` to `/etc/hosts` in each job before running Maven.

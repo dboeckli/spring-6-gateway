@@ -20,6 +20,11 @@ spring:
       enabled: true
       stop:
         command: down
+      readiness:
+        wait: always
+        timeout: 4m
+        tcp:
+          connect-timeout: 2000ms
       skip:
         in-tests: false
 
