@@ -96,7 +96,7 @@ jobs:
           echo "------- " 
 
       - name: Create k8s Kind Cluster
-        uses: helm/kind-action@v1.15.0
+        uses: helm/kind-action@v1.15.1
 
       - name: View settings.xml
         run: | 
@@ -119,14 +119,14 @@ jobs:
           git config --global user.email "${{ vars.CI_USER_EMAIL }}" 
           git config --global user.name "${{ vars.CI_USER }}"        
 
-      - name: Helm registry login Cloudsmith
+      - name: Helm registry login Docker Hub
         env:
-          CLOUDSMITH_USERNAME: ${{ vars.CLOUDSMITH_USERNAME }}
-          CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
+          DOCKER_USER: ${{ vars.DOCKER_USER }}
+          DOCKER_TOKEN: ${{ secrets.DOCKER_ACCESS_TOKEN }}
         run: |
-          helm registry login docker.cloudsmith.io \
-            --username "$CLOUDSMITH_USERNAME" \
-            --password "$CLOUDSMITH_API_KEY"
+          helm registry login registry-1.docker.io \
+            --username "$DOCKER_USER" \
+            --password "$DOCKER_TOKEN"
 
       - name: Release
         env:
