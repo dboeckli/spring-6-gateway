@@ -85,19 +85,6 @@
             "ignoreUnstable": false
         },
         {
-            "matchDatasources": [
-                "docker"
-            ],
-            "matchPackageNames": [
-                "docker.cloudsmith.io/dboeckli/helm-repo/spring-6-rest-mvc-chart",
-                "docker.cloudsmith.io/dboeckli/helm-repo/spring-6-rest-mvc-mysql-chart",
-                "docker.cloudsmith.io/dboeckli/helm-repo/spring-6-rest-mvc-kafka-chart"
-            ],
-            "versioning": "maven",
-            "allowedVersions": "/^[0-9]+\\.[0-9]+\\.[0-9]+(-snapshot)?$/",
-            "ignoreUnstable": false
-        },
-        {
             "matchCategories": [
                 "docker"
             ],
@@ -118,6 +105,23 @@
             "automerge": false,
             "automergeType": "pr",
             "ignoreTests": true
+        },
+        {
+            "description": "spring-6-rest-mvc and micro-service Helm charts on Docker Hub (non-hash snapshot tags)",
+            "matchDatasources": [
+                "docker"
+            ],
+            "matchPackageNames": [
+                "domboeckli/spring-6-rest-mvc-chart",
+                "domboeckli/spring-6-rest-mvc-mysql-chart",
+                "domboeckli/spring-6-rest-mvc-kafka-chart",
+                "domboeckli/spring-6-cold-micro-service-chart",
+                "domboeckli/spring-6-cool-micro-service-chart",
+                "domboeckli/spring-6-icecold-micro-service-chart"
+            ],
+            "versioning": "maven",
+            "allowedVersions": "/^[0-9]+\\.[0-9]+\\.[0-9]+(-snapshot)?$/",
+            "ignoreUnstable": false
         },
         {
             "matchDatasources": [
@@ -171,16 +175,16 @@
             "registryUrlTemplate": "https://repo.repsy.io/user08694146/helm-dboeckli"
         },
         {
-            "description": "Update spring-6-rest-mvc-chart versions in dependencies-Chart.yaml",
+            "description": "Update spring-6-rest-mvc and micro-service chart versions in dependencies-Chart.yaml (Docker Hub)",
             "customType": "regex",
             "datasourceTemplate": "docker",
             "managerFilePatterns": [
                 "/(^|\\/)dependencies-Chart\\.ya?ml$/"
             ],
             "matchStrings": [
-                "- name: (?<depName>spring-6-rest-mvc(-mysql|-kafka)?-chart)[\\s\\S]*?version: \"(?<currentValue>[^\"]+)\""
+                "- name: (?<depName>spring-6-rest-mvc(-mysql|-kafka)?-chart|spring-6-(cold|cool|icecold)-micro-service-chart)[\\s\\S]*?version: \"(?<currentValue>[^\"]+)\""
             ],
-            "packageNameTemplate": "docker.cloudsmith.io/dboeckli/helm-repo/{{{depName}}}"
+            "packageNameTemplate": "domboeckli/{{{depName}}}"
         },
         {
             "description": "Update shfmt version pinned in pom.xml (spotless shfmt formatter) and GitHub workflows (mfinelli/setup-shfmt)",
