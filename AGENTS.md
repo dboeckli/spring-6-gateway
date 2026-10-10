@@ -38,16 +38,11 @@ is needed here. On a normal host (Windows/CI) this does not apply either.
 - The auth-server (`spring-6-auth-server`) is resolved from the auth-server project's GitHub Packages
   (`maven.pkg.github.com`) / Helm repo (`repo.repsy.io/user08694146/helm-dboeckli`). Without a PAT in
   `~/.m2/settings.xml` (server id `github`) the build cannot resolve the snapshot dependency.
-- The Helm chart depends on **8 aliased subcharts** (auth-server from Repsy, `spring-6-rest-mvc` +
-  its `-mysql`/`-kafka` charts from Cloudsmith `oci://docker.cloudsmith.io/dboeckli/helm-repo`,
-  the remaining projects from Docker Hub `oci://registry-1.docker.io/domboeckli`). `helm dependency build`
-  pulls them during the build; all subcharts get a `fullnameOverride` so their service names are
-  release-independent. The Cloudsmith charts are public (OSS), so pulling needs no login; CI's
-  `helm registry login docker.cloudsmith.io` (`CLOUDSMITH_USERNAME` var, `CLOUDSMITH_API_KEY` secret)
-  stays harmless/optional.
-- Cloudsmith workaround: use the Docker-OCI URL `docker.cloudsmith.io`, not the native Helm endpoint
-  `helm.oci.cloudsmith.io` (Early Access, currently returns 500). Tracked in spring-6-rest-mvc #210 —
-  monitor stability before further Cloudsmith adoption.
+- The Helm chart depends on **8 remote subcharts** (auth-server from Repsy, all others — including
+  `spring-6-rest-mvc` + its `-mysql`/`-kafka` charts — from Docker Hub
+  `oci://registry-1.docker.io/domboeckli`). `helm dependency build` pulls them during the build; all
+  subcharts get a `fullnameOverride` so their service names are release-independent. The Docker Hub
+  charts are public (OSS), so pulling needs no login.
 
 ## Test conventions
 
