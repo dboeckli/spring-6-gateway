@@ -9,6 +9,13 @@ x-otel-env: &otel-env
   MANAGEMENT_OPENTELEMETRY_TRACING_EXPORT_OTLP_ENDPOINT: http://otel-collector:4318/v1/traces
   MANAGEMENT_TRACING_SAMPLING_PROBABILITY: "1.0"
 
+# Marks a service's container logs for collection by Filebeat (observability
+# profile). decode_log_event_to_json_object parses the JSON logged by the
+# logstash-logback-encoder appender.
+x-filebeat-labels: &filebeat-labels
+  collect_logs_with_filebeat: "true"
+  decode_log_event_to_json_object: "true"
+
 services:
   mysql:
     container_name: mysql
@@ -78,6 +85,8 @@ services:
     environment:
       <<: *otel-env
       SPRING_SECURITY_OAUTH2_AUTHORIZATION_SERVER_ISSUER: "http://host.docker.internal:9000"
+    labels:
+      <<: *filebeat-labels
     depends_on:
       otel-collector:
         condition: service_started
@@ -104,6 +113,8 @@ services:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       SPRING_KAFKA_CONSUMER_BOOTSTRAP_SERVERS: kafka:9092
       SPRING_KAFKA_ADMIN_PROPERTIES_BOOTSTRAP_SERVERS: kafka:9092
+    labels:
+      <<: *filebeat-labels
     depends_on:
       mysql:
         condition: service_healthy
@@ -139,6 +150,8 @@ services:
       <<: *otel-env
       SPRING_DOCKER_COMPOSE_ENABLED: "false"
       SPRING_APPLICATION_JSON: '{"spring":{"kafka":{"bootstrap-servers":"kafka:9092","admin":{"properties":{"bootstrap-servers":"kafka:9092"}},"consumer":{"bootstrap-servers":"kafka:9092"},"producer":{"bootstrap-servers":"kafka:9092"}}}}'
+    labels:
+      <<: *filebeat-labels
 
   cool-micro-service:
     container_name: cool-micro-service
@@ -156,6 +169,8 @@ services:
       <<: *otel-env
       SPRING_DOCKER_COMPOSE_ENABLED: "false"
       SPRING_APPLICATION_JSON: '{"spring":{"kafka":{"bootstrap-servers":"kafka:9092","admin":{"properties":{"bootstrap-servers":"kafka:9092"}},"consumer":{"bootstrap-servers":"kafka:9092"},"producer":{"bootstrap-servers":"kafka:9092"}}}}'
+    labels:
+      <<: *filebeat-labels
 
   icecold-micro-service:
     container_name: icecold-micro-service
@@ -173,6 +188,8 @@ services:
       <<: *otel-env
       SPRING_DOCKER_COMPOSE_ENABLED: "false"
       SPRING_APPLICATION_JSON: '{"spring":{"kafka":{"bootstrap-servers":"kafka:9092","admin":{"properties":{"bootstrap-servers":"kafka:9092"}},"consumer":{"bootstrap-servers":"kafka:9092"},"producer":{"bootstrap-servers":"kafka:9092"}}}}'
+    labels:
+      <<: *filebeat-labels
 
   reactive-mongo:
     container_name: reactive-mongo
@@ -190,6 +207,8 @@ services:
       SPRING_MONGODB_USERNAME: root
       SPRING_MONGODB_PASSWORD: secret
       SPRING_MONGODB_AUTHENTICATION_DATABASE: admin
+    labels:
+      <<: *filebeat-labels
     depends_on:
       mongo:
         condition: service_healthy
@@ -215,6 +234,8 @@ services:
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://host.docker.internal:9000
       SECURITY_AUTH_SERVER_HEALTH_URL: http://auth-server:9000
       SERVER_PORT: 8082
+    labels:
+      <<: *filebeat-labels
     depends_on:
       auth-server:
         condition: service_started
@@ -235,6 +256,8 @@ services:
     environment:
       <<: *otel-env
       SERVER_PORT: 8084
+    labels:
+      <<: *filebeat-labels
     depends_on:
       auth-server:
         condition: service_started
@@ -392,6 +415,29 @@ services:
       - "8200:8200"
     depends_on:
       - elasticsearch
+    restart: unless-stopped
+
+  # Ships container stdout logs of the labelled app services to Elasticsearch
+  # (Kibana -> Discover). Collects via the Docker socket + container log files.
+  filebeat:
+    container_name: filebeat
+    image: docker.elastic.co/beats/filebeat:9.5.4
+    profiles:
+      - observability
+    volumes:
+      - ./monitoring/filebeat.docker.yml:/usr/share/filebeat/filebeat.yml
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command: >
+      /bin/bash -c "
+      chmod 644 /usr/share/filebeat/filebeat.yml &&
+      chown root:root /usr/share/filebeat/filebeat.yml &&
+      filebeat -e --strict.perms=false
+      "
+    user: root
+    depends_on:
+      - elasticsearch
+      - kibana
     restart: unless-stopped
 
 volumes:
