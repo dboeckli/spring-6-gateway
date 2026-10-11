@@ -15,7 +15,15 @@ management:
     export:
       otlp:
         enabled: true
+  logging:
+    export:
+      otlp:
+        enabled: true
   opentelemetry:
+    logging:
+      export:
+        otlp:
+          endpoint: http://localhost:4318/v1/logs
     tracing:
       export:
         otlp:
