@@ -1,3 +1,14 @@
+# Shared OTLP export config for the application services. Always active; the
+# otel-collector only runs with the "observability" profile, so without it the
+# services log export warnings but keep working. Logging is not wired yet (the
+# images lack the OpenTelemetry Logback appender).
+x-otel-env: &otel-env
+  MANAGEMENT_OTLP_METRICS_EXPORT_ENABLED: "true"
+  MANAGEMENT_OTLP_METRICS_EXPORT_URL: http://otel-collector:4318/v1/metrics
+  MANAGEMENT_TRACING_EXPORT_OTLP_ENABLED: "true"
+  MANAGEMENT_OPENTELEMETRY_TRACING_EXPORT_OTLP_ENDPOINT: http://otel-collector:4318/v1/traces
+  MANAGEMENT_TRACING_SAMPLING_PROBABILITY: "1.0"
+
 services:
   mysql:
     container_name: mysql
@@ -65,7 +76,12 @@ services:
     expose:
       - 9000
     environment:
+      <<: *otel-env
       SPRING_SECURITY_OAUTH2_AUTHORIZATION_SERVER_ISSUER: "http://host.docker.internal:9000"
+    depends_on:
+      otel-collector:
+        condition: service_started
+        required: false
     extra_hosts:
       - "host.docker.internal:host-gateway"
   
@@ -77,6 +93,7 @@ services:
     expose:
       - 8081
     environment:
+      <<: *otel-env
       SPRING_PROFILES_ACTIVE: mysql
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://host.docker.internal:9000
       SECURITY_AUTH_SERVER_HEALTH_URL: http://auth-server:9000
@@ -97,6 +114,9 @@ services:
       auth-server:
         condition: service_started
         required: true
+      otel-collector:
+        condition: service_started
+        required: false
     extra_hosts:
       - "host.docker.internal:host-gateway"    
       
@@ -110,9 +130,13 @@ services:
       kafka:
         condition: service_healthy
         required: true
+      otel-collector:
+        condition: service_started
+        required: false
     ports:
       - "8091:8081"
     environment:
+      <<: *otel-env
       SPRING_DOCKER_COMPOSE_ENABLED: "false"
       SPRING_APPLICATION_JSON: '{"spring":{"kafka":{"bootstrap-servers":"kafka:9092","admin":{"properties":{"bootstrap-servers":"kafka:9092"}},"consumer":{"bootstrap-servers":"kafka:9092"},"producer":{"bootstrap-servers":"kafka:9092"}}}}'
 
@@ -123,9 +147,13 @@ services:
       kafka:
         condition: service_healthy
         required: true
+      otel-collector:
+        condition: service_started
+        required: false
     ports:
       - "8092:8082"
     environment:
+      <<: *otel-env
       SPRING_DOCKER_COMPOSE_ENABLED: "false"
       SPRING_APPLICATION_JSON: '{"spring":{"kafka":{"bootstrap-servers":"kafka:9092","admin":{"properties":{"bootstrap-servers":"kafka:9092"}},"consumer":{"bootstrap-servers":"kafka:9092"},"producer":{"bootstrap-servers":"kafka:9092"}}}}'
 
@@ -136,9 +164,13 @@ services:
       kafka:
         condition: service_healthy
         required: true
+      otel-collector:
+        condition: service_started
+        required: false
     ports:
       - "8090:8080"
     environment:
+      <<: *otel-env
       SPRING_DOCKER_COMPOSE_ENABLED: "false"
       SPRING_APPLICATION_JSON: '{"spring":{"kafka":{"bootstrap-servers":"kafka:9092","admin":{"properties":{"bootstrap-servers":"kafka:9092"}},"consumer":{"bootstrap-servers":"kafka:9092"},"producer":{"bootstrap-servers":"kafka:9092"}}}}'
 
@@ -150,6 +182,7 @@ services:
     expose:
       - 8083
     environment:
+      <<: *otel-env
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://host.docker.internal:9000
       SECURITY_AUTH_SERVER_HEALTH_URL: http://auth-server:9000
       SERVER_PORT: 8083
@@ -164,6 +197,9 @@ services:
       auth-server:
         condition: service_started
         required: true
+      otel-collector:
+        condition: service_started
+        required: false
     extra_hosts:
       - "host.docker.internal:host-gateway"      
 
@@ -175,6 +211,7 @@ services:
     expose:
       - 8082
     environment:
+      <<: *otel-env
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://host.docker.internal:9000
       SECURITY_AUTH_SERVER_HEALTH_URL: http://auth-server:9000
       SERVER_PORT: 8082
@@ -182,6 +219,9 @@ services:
       auth-server:
         condition: service_started
         required: true
+      otel-collector:
+        condition: service_started
+        required: false
     extra_hosts:
       - "host.docker.internal:host-gateway" 
       
@@ -193,11 +233,15 @@ services:
     expose:
       - 8084
     environment:
+      <<: *otel-env
       SERVER_PORT: 8084
     depends_on:
       auth-server:
         condition: service_started
         required: true
+      otel-collector:
+        condition: service_started
+        required: false
     extra_hosts:
       - "host.docker.internal:host-gateway"
   
