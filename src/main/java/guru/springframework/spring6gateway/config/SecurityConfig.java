@@ -15,6 +15,7 @@ import org.springframework.security.config.annotation.web.reactive.EnableWebFlux
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
+import org.springframework.security.oauth2.jwt.SupplierReactiveJwtDecoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.stereotype.Component;
 import org.springframework.web.cors.CorsConfiguration;
@@ -103,7 +104,9 @@ public class SecurityConfig {
     @Bean
     ReactiveJwtDecoder jwtDecoder(WebClient.Builder webClientBuilder,
             @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}") String issuerUri) {
-        return NimbusReactiveJwtDecoder.withIssuerLocation(issuerUri).webClient(webClientBuilder.build()).build();
+        return new SupplierReactiveJwtDecoder(() -> NimbusReactiveJwtDecoder.withIssuerLocation(issuerUri)
+            .webClient(webClientBuilder.build())
+            .build());
     }
 
     @Component
