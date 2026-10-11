@@ -103,6 +103,8 @@ services:
       - 8081
     environment:
       <<: *otel-env
+      MANAGEMENT_LOGGING_EXPORT_OTLP_ENABLED: "true"
+      MANAGEMENT_OPENTELEMETRY_LOGGING_EXPORT_OTLP_ENDPOINT: http://otel-collector:4318/v1/logs
       SPRING_PROFILES_ACTIVE: mysql
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://host.docker.internal:9000
       SECURITY_AUTH_SERVER_HEALTH_URL: http://auth-server:9000
@@ -113,8 +115,6 @@ services:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       SPRING_KAFKA_CONSUMER_BOOTSTRAP_SERVERS: kafka:9092
       SPRING_KAFKA_ADMIN_PROPERTIES_BOOTSTRAP_SERVERS: kafka:9092
-    labels:
-      <<: *filebeat-labels
     depends_on:
       mysql:
         condition: service_healthy
