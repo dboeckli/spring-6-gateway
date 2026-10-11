@@ -1,0 +1,25 @@
+spring:
+  docker:
+    compose:
+      profiles:
+        active: observability
+
+management:
+  otlp:
+    metrics:
+      export:
+        enabled: true
+        url: http://localhost:4318/v1/metrics
+        step: 10s
+  tracing:
+    export:
+      otlp:
+        enabled: true
+  opentelemetry:
+    tracing:
+      export:
+        otlp:
+          endpoint: http://localhost:4318/v1/traces
+    resource-attributes:
+      service.namespace: spring-6-gateway
+      deployment.environment: local

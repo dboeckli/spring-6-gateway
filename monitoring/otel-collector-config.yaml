@@ -1,0 +1,55 @@
+---
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: "0.0.0.0:4317"
+      http:
+        endpoint: "0.0.0.0:4318"
+
+processors:
+  memory_limiter:
+    check_interval: "1s"
+    limit_mib: 4000
+    spike_limit_mib: 800
+  batch:
+    timeout: "5s"
+    send_batch_size: 1000
+
+exporters:
+  debug:
+    verbosity: "detailed"
+  # traces + metrics -> Elastic APM Server (OTLP HTTP)
+  otlp_http/elastic-apm:
+    endpoint: "http://apm-server:8200"
+  # logs -> Elasticsearch
+  elasticsearch:
+    endpoints:
+      - "http://elasticsearch:9200"
+
+service:
+  pipelines:
+    traces:
+      receivers:
+        - "otlp"
+      processors:
+        - "memory_limiter"
+        - "batch"
+      exporters:
+        - "otlp_http/elastic-apm"
+    metrics:
+      receivers:
+        - "otlp"
+      processors:
+        - "memory_limiter"
+        - "batch"
+      exporters:
+        - "otlp_http/elastic-apm"
+    logs:
+      receivers:
+        - "otlp"
+      processors:
+        - "memory_limiter"
+        - "batch"
+      exporters:
+        - "elasticsearch"

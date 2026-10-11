@@ -273,3 +273,82 @@ services:
         sleep 15
       done
       '            
+
+  # ---------------------------------------------------------------------------
+  # Observability stack (ELK) - opt-in via compose profile "observability".
+  # Not started by default, so spring-boot:run without the profile and the
+  # integration tests (RouterConfigIT) are unaffected.
+  #
+  # Activate:  docker compose --profile observability up -d
+  #        or  SPRING_PROFILES_ACTIVE=with_docker_compose,observability (see .run config)
+  # UIs: Kibana http://localhost:5601 (APM + Discover), Elasticsearch http://localhost:9200
+  # OTLP intake (from the host, e.g. the gateway): grpc :4317, http :4318
+  # ---------------------------------------------------------------------------
+  otel-collector:
+    container_name: otel-collector
+    image: otel/opentelemetry-collector-contrib:0.161.0
+    profiles:
+      - observability
+    command:
+      - --config=/etc/otel-collector-config.yaml
+    volumes:
+      - ./monitoring/otel-collector-config.yaml:/etc/otel-collector-config.yaml:ro
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+    depends_on:
+      - apm-server
+      - elasticsearch
+    restart: unless-stopped
+
+  elasticsearch:
+    container_name: elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.5.4
+    profiles:
+      - observability
+    environment:
+      discovery.type: single-node
+      ES_JAVA_OPTS: -Xms512m -Xmx512m
+      xpack.security.enabled: "false"
+      xpack.security.http.ssl.enabled: "false"
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    restart: unless-stopped
+
+  kibana:
+    container_name: kibana
+    image: docker.elastic.co/kibana/kibana:9.5.4
+    profiles:
+      - observability
+    environment:
+      I18N_DEFAULTLOCALE: en
+      I18N_DETECTBROWSERLOCALE: "false"
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    restart: unless-stopped
+
+  apm-server:
+    container_name: apm-server
+    image: docker.elastic.co/apm/apm-server:9.5.4
+    profiles:
+      - observability
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+      output.elasticsearch.hosts: '["http://elasticsearch:9200"]'
+      apm-server.kibana.enabled: "true"
+      apm-server.kibana.host: kibana:5601
+      apm-server.otlp.enabled: "true"
+      apm-server.otlp.http.enabled: "true"
+      apm-server.otlp.http.host: 0.0.0.0:8200
+    ports:
+      - "8200:8200"
+    depends_on:
+      - elasticsearch
+    restart: unless-stopped
+
+volumes:
+  elasticsearch-data:
