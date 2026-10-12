@@ -151,10 +151,10 @@ services:
       - "8091:8081"
     environment:
       <<: *otel-env
+      MANAGEMENT_LOGGING_EXPORT_OTLP_ENABLED: "true"
+      MANAGEMENT_OPENTELEMETRY_LOGGING_EXPORT_OTLP_ENDPOINT: http://otel-collector:4318/v1/logs
       SPRING_DOCKER_COMPOSE_ENABLED: "false"
       SPRING_APPLICATION_JSON: '{"spring":{"kafka":{"bootstrap-servers":"kafka:9092","admin":{"properties":{"bootstrap-servers":"kafka:9092"}},"consumer":{"bootstrap-servers":"kafka:9092"},"producer":{"bootstrap-servers":"kafka:9092"}}}}'
-    labels:
-      <<: *filebeat-labels
 
   cool-micro-service:
     container_name: cool-micro-service
@@ -170,10 +170,10 @@ services:
       - "8092:8082"
     environment:
       <<: *otel-env
+      MANAGEMENT_LOGGING_EXPORT_OTLP_ENABLED: "true"
+      MANAGEMENT_OPENTELEMETRY_LOGGING_EXPORT_OTLP_ENDPOINT: http://otel-collector:4318/v1/logs
       SPRING_DOCKER_COMPOSE_ENABLED: "false"
       SPRING_APPLICATION_JSON: '{"spring":{"kafka":{"bootstrap-servers":"kafka:9092","admin":{"properties":{"bootstrap-servers":"kafka:9092"}},"consumer":{"bootstrap-servers":"kafka:9092"},"producer":{"bootstrap-servers":"kafka:9092"}}}}'
-    labels:
-      <<: *filebeat-labels
 
   icecold-micro-service:
     container_name: icecold-micro-service
@@ -189,10 +189,10 @@ services:
       - "8090:8080"
     environment:
       <<: *otel-env
+      MANAGEMENT_LOGGING_EXPORT_OTLP_ENABLED: "true"
+      MANAGEMENT_OPENTELEMETRY_LOGGING_EXPORT_OTLP_ENDPOINT: http://otel-collector:4318/v1/logs
       SPRING_DOCKER_COMPOSE_ENABLED: "false"
       SPRING_APPLICATION_JSON: '{"spring":{"kafka":{"bootstrap-servers":"kafka:9092","admin":{"properties":{"bootstrap-servers":"kafka:9092"}},"consumer":{"bootstrap-servers":"kafka:9092"},"producer":{"bootstrap-servers":"kafka:9092"}}}}'
-    labels:
-      <<: *filebeat-labels
 
   reactive-mongo:
     container_name: reactive-mongo
