@@ -1,0 +1,71 @@
+# Flow: listBeerOrders -> getBeerOrderyById -> deleteBeerOrder — see restRequests/beerOrder-flow-list-get-delete/beerOrder-flow-list-get-delete.md
+
+### 1) list beer orders — pick the first order that HAS a line (sets {{beerOrderId}} + {{beerOrderLineId}})
+< ../scripts/traceparent.js
+GET http://localhost:{{gateway-port}}/api/v1/beerOrder/listBeerOrders
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-rest-mvc
+
+> {%
+    const orderWithLine = response.body.content.find(order => order.beerOrderLines && order.beerOrderLines.length > 0);
+    if (orderWithLine) {
+        client.global.set("beerOrderId", orderWithLine.id);
+        client.global.set("beerOrderLineId", orderWithLine.beerOrderLines[0].id);
+        client.log("listBeerOrders -> saved beerOrderId=" + orderWithLine.id + " (line=" + orderWithLine.beerOrderLines[0].id + ")");
+    } else {
+        client.log("listBeerOrders -> no beer order with a line found");
+    }
+%}
+
+### 2) get beer order by id (logs and checks {{beerOrderId}} before sending)
+< {%
+    function randomHex(length) {
+        let result = '';
+        const chars = '0123456789abcdef';
+        for (let i = 0; i < length; i++) {
+            result += chars[Math.floor(Math.random() * chars.length)];
+        }
+        return result;
+    }
+    request.variables.set("traceId", randomHex(32));
+    request.variables.set("spanId", randomHex(16));
+
+    const beerOrderId = client.global.get("beerOrderId");
+    client.log("getBeerOrderyById -> beerOrderId=" + beerOrderId);
+    if (!beerOrderId) {
+        throw new Error("beerOrderId is not set - run 'list beer orders' first");
+    }
+%}
+GET http://localhost:{{gateway-port}}/api/v1/beerOrder/getBeerOrderyById/{{beerOrderId}}
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-rest-mvc
+
+> {%
+    client.test("getBeerOrderyById returns 200", function () {
+        client.assert(response.status === 200, "expected 200 but got " + response.status);
+    });
+    client.test("returned beer order id matches", function () {
+        client.assert(response.body.id === client.global.get("beerOrderId"), "beerOrderId mismatch");
+    });
+%}
+
+### 3) delete the beer order by id
+< ../scripts/traceparent.js
+DELETE http://localhost:{{gateway-port}}/api/v1/beerOrder/deleteBeerOrder/{{beerOrderId}}
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-rest-mvc
+
+> {%
+    client.test("deleteBeerOrder returns 204", function () {
+        client.assert(response.status === 204, "expected 204 but got " + response.status);
+    });
+%}

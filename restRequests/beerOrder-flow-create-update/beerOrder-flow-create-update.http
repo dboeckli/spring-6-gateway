@@ -1,5 +1,7 @@
-### list customer (get first from list which provides a valid customerId for the beer order below)
-< scripts/traceparent.js
+# Flow: createBeerOrder -> updateBeerOrder — see restRequests/beerOrder-flow-create-update/beerOrder-flow-create-update.md
+
+### 1a) list customer (sets {{customerId}})
+< ../scripts/traceparent.js
 GET http://localhost:{{gateway-port}}/api/v1/customer/listCustomer
 Accept: application/json
 Content-Type: application/json
@@ -15,8 +17,8 @@ baggage: testBaggage=spring-6-rest-mvc
     }
 %}
 
-### create a customer (provides a valid customerId for the beer order below)
-< scripts/traceparent.js
+### 1b) create a customer (alternative to 1a — provides a fresh {{customerId}})
+< ../scripts/traceparent.js
 POST http://localhost:{{gateway-port}}/api/v1/customer/createCustomer
 Accept: application/json
 Content-Type: application/json
@@ -34,8 +36,25 @@ baggage: testBaggage=spring-6-rest-mvc
     client.log("Created customer id: " + response.body.id);
 %}
 
-### create a beer order. Stores the returned id in {{beerOrderId}} for the following requests
-< scripts/traceparent.js
+### 2) list beers (sets {{beerId}})
+< ../scripts/traceparent.js
+GET http://localhost:{{gateway-port}}/api/v1/beer/listBeers
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-rest-mvc
+
+> {%
+    if (response.body.content.length > 0) {
+        const first = response.body.content[0];
+        client.global.set("beerId", first.id);
+        client.log("listBeers -> saved beerId=" + first.id);
+    }
+%}
+
+### 3) create a beer order with a line (sets {{beerOrderId}} and {{beerOrderLineId}})
+< ../scripts/traceparent.js
 POST http://localhost:{{gateway-port}}/api/v1/beerOrder/createBeerOrder
 Accept: application/json
 Content-Type: application/json
@@ -48,7 +67,7 @@ baggage: testBaggage=spring-6-rest-mvc
   "customerRef": "bootstrap1",
   "beerOrderLines": [
     {
-      "beerId": "f33929b7-a065-48f3-a1b0-fc8b307fb613",
+      "beerId": "{{beerId}}",
       "orderQuantity": 5
     }
   ]
@@ -61,37 +80,18 @@ baggage: testBaggage=spring-6-rest-mvc
         client.global.set("beerOrderLineId", response.body.beerOrderLines[0].id);
         client.log("Created beer order line id: " + response.body.beerOrderLines[0].id);
     }
+
+    client.test("createBeerOrder returns 201", function () {
+        client.assert(response.status === 201, "expected 201 but got " + response.status);
+    });
+    client.test("createBeerOrder returns id and one line", function () {
+        client.assert(!!response.body.id, "beerOrderId missing");
+        client.assert(response.body.beerOrderLines && response.body.beerOrderLines.length === 1, "expected exactly 1 beer order line");
+    });
 %}
 
-### get beer order by id (uses the id created above)
-< scripts/traceparent.js
-GET http://localhost:{{gateway-port}}/api/v1/beerOrder/getBeerOrderyById/{{beerOrderId}}
-Accept: application/json
-Content-Type: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
-traceparent: 00-{{traceId}}-{{spanId}}-03
-baggage: testBaggage=spring-6-rest-mvc
-
-### list beer order
-< scripts/traceparent.js
-GET http://localhost:{{gateway-port}}/api/v1/beerOrder/listBeerOrders
-Accept: application/json
-Content-Type: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
-traceparent: 00-{{traceId}}-{{spanId}}-03
-baggage: testBaggage=spring-6-rest-mvc
-
-> {%
-    if (response.body.content.length > 0) {
-        const first = response.body.content[0];
-        client.global.set("beerOrderId", first.id);
-        client.log("listBeerOrders -> saved beerOrderId=" + first.id);
-    }
-%}
-
-### update a order. CREATE a new order if the id does not exist. UPDATE an existing order if the id exists.
-# TODO: Implement the update functionality and check if kafka trace id is forwarded
-< scripts/traceparent.js
+### 4) update the created beer order (uses {{beerOrderId}} + {{beerOrderLineId}})
+< ../scripts/traceparent.js
 PUT http://localhost:{{gateway-port}}/api/v1/beerOrder/updateBeerOrder/{{beerOrderId}}
 Accept: application/json
 Content-Type: application/json
@@ -105,7 +105,7 @@ baggage: testBaggage=spring-6-rest-mvc
     "beerOrderLines": [
         {
             "id": "{{beerOrderLineId}}",
-            "beerId": "f33929b7-a065-48f3-a1b0-fc8b307fb613",
+            "beerId": "{{beerId}}",
             "orderQuantity": 5,
             "quantityAllocated": 0
         }
@@ -113,11 +113,11 @@ baggage: testBaggage=spring-6-rest-mvc
     "paymentAmount": 99.99
 }
 
-### delete a order by id
-< scripts/traceparent.js
-DELETE http://localhost:{{application-port}}/api/v1/beerOrder/deleteBeerOrder/{{beerOrderId}}
-Accept: application/json
-Content-Type: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
-traceparent: 00-{{traceId}}-{{spanId}}-03
-baggage: testBaggage=spring-6-rest-mvc
+> {%
+    client.test("updateBeerOrder returns 200", function () {
+        client.assert(response.status === 200, "expected 200 but got " + response.status);
+    });
+    client.test("updated beer order id matches", function () {
+        client.assert(response.body.id === client.global.get("beerOrderId"), "beerOrderId mismatch");
+    });
+%}
