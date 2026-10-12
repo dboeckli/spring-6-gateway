@@ -1,0 +1,123 @@
+### list customer (get first from list which provides a valid customerId for the beer order below)
+< scripts/traceparent.js
+GET http://localhost:{{gateway-port}}/api/v1/customer/listCustomer
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-rest-mvc
+
+> {%
+    if (response.body.length > 0) {
+        const first = response.body[0];
+        client.global.set("customerId", first.id);
+        client.log("listCustomer -> saved customerId=" + first.id + " (" + first.name + ")");
+    }
+%}
+
+### create a customer (provides a valid customerId for the beer order below)
+< scripts/traceparent.js
+POST http://localhost:{{gateway-port}}/api/v1/customer/createCustomer
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-rest-mvc
+
+{
+  "name": "beer-order-customer",
+  "version": "0"
+}
+
+> {%
+    client.global.set("customerId", response.body.id);
+    client.log("Created customer id: " + response.body.id);
+%}
+
+### create a beer order. Stores the returned id in {{beerOrderId}} for the following requests
+< scripts/traceparent.js
+POST http://localhost:{{gateway-port}}/api/v1/beerOrder/createBeerOrder
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-rest-mvc
+
+{
+  "customerId": "{{customerId}}",
+  "customerRef": "bootstrap1",
+  "beerOrderLines": [
+    {
+      "beerId": "f33929b7-a065-48f3-a1b0-fc8b307fb613",
+      "orderQuantity": 5
+    }
+  ]
+}
+
+> {%
+    client.global.set("beerOrderId", response.body.id);
+    client.log("Created beer order id: " + response.body.id);
+    if (response.body.beerOrderLines && response.body.beerOrderLines.length > 0) {
+        client.global.set("beerOrderLineId", response.body.beerOrderLines[0].id);
+        client.log("Created beer order line id: " + response.body.beerOrderLines[0].id);
+    }
+%}
+
+### get beer order by id (uses the id created above)
+< scripts/traceparent.js
+GET http://localhost:{{gateway-port}}/api/v1/beerOrder/getBeerOrderyById/{{beerOrderId}}
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-rest-mvc
+
+### list beer order
+< scripts/traceparent.js
+GET http://localhost:{{gateway-port}}/api/v1/beerOrder/listBeerOrders
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-rest-mvc
+
+> {%
+    if (response.body.content.length > 0) {
+        const first = response.body.content[0];
+        client.global.set("beerOrderId", first.id);
+        client.log("listBeerOrders -> saved beerOrderId=" + first.id);
+    }
+%}
+
+### update a order. CREATE a new order if the id does not exist. UPDATE an existing order if the id exists.
+# TODO: Implement the update functionality and check if kafka trace id is forwarded
+< scripts/traceparent.js
+PUT http://localhost:{{gateway-port}}/api/v1/beerOrder/updateBeerOrder/{{beerOrderId}}
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-rest-mvc
+
+{
+    "customerId": "{{customerId}}",
+    "customerRef": "bootstrap1",
+    "beerOrderLines": [
+        {
+            "id": "{{beerOrderLineId}}",
+            "beerId": "f33929b7-a065-48f3-a1b0-fc8b307fb613",
+            "orderQuantity": 5,
+            "quantityAllocated": 0
+        }
+    ],
+    "paymentAmount": 99.99
+}
+
+### delete a order by id
+< scripts/traceparent.js
+DELETE http://localhost:{{application-port}}/api/v1/beerOrder/deleteBeerOrder/{{beerOrderId}}
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-rest-mvc
