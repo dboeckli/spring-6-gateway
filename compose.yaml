@@ -16,6 +16,13 @@ x-filebeat-labels: &filebeat-labels
   collect_logs_with_filebeat: "true"
   decode_log_event_to_json_object: "true"
 
+# Quiets Spring's per-request DEBUG logging (CommonsRequestLoggingFilter), which
+# floods the logs. A class-level logger cannot be addressed with a
+# LOGGING_LEVEL_* env var (relaxed binding always lowercases the name), so
+# SPRING_APPLICATION_JSON is used; services that already set it merge this block.
+x-commons-logging-env: &commons-logging-env
+  SPRING_APPLICATION_JSON: '{"logging":{"level":{"org.springframework.web.filter.CommonsRequestLoggingFilter":"WARN"}}}'
+
 services:
   mysql:
     container_name: mysql
@@ -86,7 +93,7 @@ services:
     expose:
       - 9000
     environment:
-      <<: *otel-env
+      <<: [*otel-env, *commons-logging-env]
       MANAGEMENT_LOGGING_EXPORT_OTLP_ENABLED: "true"
       MANAGEMENT_OPENTELEMETRY_LOGGING_EXPORT_OTLP_ENDPOINT: http://otel-collector:4318/v1/logs
       SPRING_SECURITY_OAUTH2_AUTHORIZATION_SERVER_ISSUER: "http://host.docker.internal:9000"
@@ -105,7 +112,7 @@ services:
     expose:
       - 8081
     environment:
-      <<: *otel-env
+      <<: [*otel-env, *commons-logging-env]
       MANAGEMENT_LOGGING_EXPORT_OTLP_ENABLED: "true"
       MANAGEMENT_OPENTELEMETRY_LOGGING_EXPORT_OTLP_ENDPOINT: http://otel-collector:4318/v1/logs
       SPRING_PROFILES_ACTIVE: mysql
@@ -154,7 +161,7 @@ services:
       MANAGEMENT_LOGGING_EXPORT_OTLP_ENABLED: "true"
       MANAGEMENT_OPENTELEMETRY_LOGGING_EXPORT_OTLP_ENDPOINT: http://otel-collector:4318/v1/logs
       SPRING_DOCKER_COMPOSE_ENABLED: "false"
-      SPRING_APPLICATION_JSON: '{"spring":{"kafka":{"bootstrap-servers":"kafka:9092","admin":{"properties":{"bootstrap-servers":"kafka:9092"}},"consumer":{"bootstrap-servers":"kafka:9092"},"producer":{"bootstrap-servers":"kafka:9092"}}}}'
+      SPRING_APPLICATION_JSON: '{"spring":{"kafka":{"bootstrap-servers":"kafka:9092","admin":{"properties":{"bootstrap-servers":"kafka:9092"}},"consumer":{"bootstrap-servers":"kafka:9092"},"producer":{"bootstrap-servers":"kafka:9092"}}},"logging":{"level":{"org.springframework.web.filter.CommonsRequestLoggingFilter":"WARN"}}}'
 
   cool-micro-service:
     container_name: cool-micro-service
@@ -173,7 +180,7 @@ services:
       MANAGEMENT_LOGGING_EXPORT_OTLP_ENABLED: "true"
       MANAGEMENT_OPENTELEMETRY_LOGGING_EXPORT_OTLP_ENDPOINT: http://otel-collector:4318/v1/logs
       SPRING_DOCKER_COMPOSE_ENABLED: "false"
-      SPRING_APPLICATION_JSON: '{"spring":{"kafka":{"bootstrap-servers":"kafka:9092","admin":{"properties":{"bootstrap-servers":"kafka:9092"}},"consumer":{"bootstrap-servers":"kafka:9092"},"producer":{"bootstrap-servers":"kafka:9092"}}}}'
+      SPRING_APPLICATION_JSON: '{"spring":{"kafka":{"bootstrap-servers":"kafka:9092","admin":{"properties":{"bootstrap-servers":"kafka:9092"}},"consumer":{"bootstrap-servers":"kafka:9092"},"producer":{"bootstrap-servers":"kafka:9092"}}},"logging":{"level":{"org.springframework.web.filter.CommonsRequestLoggingFilter":"WARN"}}}'
 
   icecold-micro-service:
     container_name: icecold-micro-service
@@ -192,7 +199,7 @@ services:
       MANAGEMENT_LOGGING_EXPORT_OTLP_ENABLED: "true"
       MANAGEMENT_OPENTELEMETRY_LOGGING_EXPORT_OTLP_ENDPOINT: http://otel-collector:4318/v1/logs
       SPRING_DOCKER_COMPOSE_ENABLED: "false"
-      SPRING_APPLICATION_JSON: '{"spring":{"kafka":{"bootstrap-servers":"kafka:9092","admin":{"properties":{"bootstrap-servers":"kafka:9092"}},"consumer":{"bootstrap-servers":"kafka:9092"},"producer":{"bootstrap-servers":"kafka:9092"}}}}'
+      SPRING_APPLICATION_JSON: '{"spring":{"kafka":{"bootstrap-servers":"kafka:9092","admin":{"properties":{"bootstrap-servers":"kafka:9092"}},"consumer":{"bootstrap-servers":"kafka:9092"},"producer":{"bootstrap-servers":"kafka:9092"}}},"logging":{"level":{"org.springframework.web.filter.CommonsRequestLoggingFilter":"WARN"}}}'
 
   reactive-mongo:
     container_name: reactive-mongo
@@ -257,7 +264,7 @@ services:
     expose:
       - 8084
     environment:
-      <<: *otel-env
+      <<: [*otel-env, *commons-logging-env]
       SERVER_PORT: 8084
     labels:
       <<: *filebeat-labels
