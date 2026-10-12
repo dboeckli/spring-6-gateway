@@ -1,14 +1,20 @@
 filebeat.autodiscover:
   providers:
     - type: docker
-      hints.enabled: true
+      hints.enabled: false
       templates:
         - condition:
             contains:
               container.labels.collect_logs_with_filebeat: "true"
           config:
-            - type: container
-              format: docker
+            - type: filestream
+              id: container-${data.docker.container.id}
+              prospector.scanner.symlinks: true
+              close.on_state_change.removed: false
+              parsers:
+                - container:
+                    stream: all
+                    format: docker
               paths:
                 - "/var/lib/docker/containers/${data.docker.container.id}/*.log"
               processors:
