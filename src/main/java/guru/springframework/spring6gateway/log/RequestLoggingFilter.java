@@ -1,22 +1,33 @@
 package guru.springframework.spring6gateway.log;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
+import org.springframework.web.server.WebFilterChain;
+import reactor.core.publisher.Mono;
 
-@Configuration
+import java.util.List;
+
+@RequiredArgsConstructor
 @Slf4j
-public class RequestLoggingFilter {
+public class RequestLoggingFilter implements WebFilter {
 
-    @Bean
-    public WebFilter logFilter() {
-        return (exchange, chain) -> {
+    private final List<String> excludePaths;
+
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+        String path = exchange.getRequest().getPath().value();
+        if (!isExcluded(path)) {
             var request = exchange.getRequest();
             log.debug("REQUEST DATA: method={}, uri={}, headers={}", request.getMethod(), request.getURI(),
                     request.getHeaders());
-            return chain.filter(exchange);
-        };
+        }
+        return chain.filter(exchange);
+    }
+
+    boolean isExcluded(String path) {
+        return excludePaths.stream().anyMatch(path::startsWith);
     }
 
 }
