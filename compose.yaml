@@ -87,9 +87,9 @@ services:
       - 9000
     environment:
       <<: *otel-env
+      MANAGEMENT_LOGGING_EXPORT_OTLP_ENABLED: "true"
+      MANAGEMENT_OPENTELEMETRY_LOGGING_EXPORT_OTLP_ENDPOINT: http://otel-collector:4318/v1/logs
       SPRING_SECURITY_OAUTH2_AUTHORIZATION_SERVER_ISSUER: "http://host.docker.internal:9000"
-    labels:
-      <<: *filebeat-labels
     depends_on:
       otel-collector:
         condition: service_started
