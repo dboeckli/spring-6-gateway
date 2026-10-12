@@ -184,9 +184,6 @@ management:
       server:
         requests:
           name: http.server.requests
-      client:
-        requests:
-          name: http-client-requests
   otlp:
     metrics:
       export:
