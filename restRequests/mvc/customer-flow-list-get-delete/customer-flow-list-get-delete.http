@@ -2,7 +2,7 @@
 
 ### 1) list customers (sets {{customerId}})
 < ../../scripts/traceparent.js
-GET http://localhost:{{application-port}}/api/v1/customer/listCustomer
+GET http://localhost:{{gateway-port}}/api/v1/customer/listCustomer
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
@@ -41,7 +41,7 @@ baggage: testBaggage=spring-6-rest-mvc
         throw new Error("customerId is not set - run 'list customers' first");
     }
 %}
-GET http://localhost:{{application-port}}/api/v1/customer/getCustomerById/{{customerId}}
+GET http://localhost:{{gateway-port}}/api/v1/customer/getCustomerById/{{customerId}}
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
@@ -59,7 +59,7 @@ baggage: testBaggage=spring-6-rest-mvc
 
 ### 3) delete the customer by id
 < ../../scripts/traceparent.js
-DELETE http://localhost:{{application-port}}/api/v1/customer/deleteCustomer/{{customerId}}
+DELETE http://localhost:{{gateway-port}}/api/v1/customer/deleteCustomer/{{customerId}}
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}

@@ -51,7 +51,7 @@ sequenceDiagram
 
 ## Hinweise
 
-- Basis-URL ist `{{application-port}}` (Profil `local` = 8081, `k8s` = 30081).
+- Basis-URL ist `{{gateway-port}}` (Profil `local` = 8081, `k8s` = 30081).
 - `listCustomer` liefert eine **List** (kein Page-Wrapper); das erste Element liegt unter `response.body[0]`.
 - Ohne vorheriges `listCustomer` ist `customerId` leer → das `getCustomerById`-Pre-Request wirft einen Fehler.
 - `getCustomerById` liefert `404 Not Found`, wenn der Kunde nicht existiert.

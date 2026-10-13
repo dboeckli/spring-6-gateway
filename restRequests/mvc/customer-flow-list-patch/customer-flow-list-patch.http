@@ -2,7 +2,7 @@
 
 ### 1) list customers (sets {{customerId}})
 < ../../scripts/traceparent.js
-GET http://localhost:{{application-port}}/api/v1/customer/listCustomer
+GET http://localhost:{{gateway-port}}/api/v1/customer/listCustomer
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
@@ -41,7 +41,7 @@ baggage: testBaggage=spring-6-rest-mvc
         throw new Error("customerId is not set - run 'list customers' first");
     }
 %}
-PATCH http://localhost:{{application-port}}/api/v1/customer/patchCustomer/{{customerId}}
+PATCH http://localhost:{{gateway-port}}/api/v1/customer/patchCustomer/{{customerId}}
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}

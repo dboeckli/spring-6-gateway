@@ -43,7 +43,7 @@ sequenceDiagram
 
 ## Hinweise
 
-- Basis-URL ist `{{application-port}}` (Profil `local` = 8081, `k8s` = 30081).
+- Basis-URL ist `{{gateway-port}}` (Profil `local` = 8081, `k8s` = 30081).
 - `patchCustomer` ist eine **`PATCH`**-Operation (`@PatchMapping`), nicht `PUT` (das alte Monolith-File nutzte hier fälschlich `PUT`).
 - Nur die im Body gesetzten Felder werden übernommen (partielle Änderung).
 - Ohne vorheriges `listCustomer` ist `customerId` leer → das `patchCustomer`-Pre-Request wirft einen Fehler.

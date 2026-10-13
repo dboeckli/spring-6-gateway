@@ -45,7 +45,7 @@ sequenceDiagram
 
 ## Hinweise
 
-- Basis-URL ist `{{application-port}}` (Profil `local` = 8081, `k8s` = 30081).
+- Basis-URL ist `{{gateway-port}}` (Profil `local` = 8081, `k8s` = 30081).
 - `CustomerDTO` hat das Feld **`name`** (nicht `customerName`) und `version` als **String**.
 - Die `customerVersion` wird aus der Create-Antwort übernommen, damit das optimistische Locking (`@Version`) beim Update passt.
 - Der Name im Edit-Body ist bewusst gesetzt; `editCustomer` prüft nur, ob die Line existiert.

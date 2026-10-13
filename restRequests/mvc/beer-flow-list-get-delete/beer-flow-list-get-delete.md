@@ -51,7 +51,7 @@ sequenceDiagram
 
 ## Hinweise
 
-- Basis-URL ist `{{application-port}}` (Profil `local` = 8081, `k8s` = 30081).
+- Basis-URL ist `{{gateway-port}}` (Profil `local` = 8081, `k8s` = 30081).
 - `listBeers` liefert eine `Page`; das erste Element liegt unter `response.body.content[0]`.
 - Ohne vorheriges `listBeers` ist `beerId` leer → das `getBeerById`-Pre-Request wirft einen Fehler.
 - `getBeerById` liefert `404 Not Found`, wenn das Bier nicht existiert.

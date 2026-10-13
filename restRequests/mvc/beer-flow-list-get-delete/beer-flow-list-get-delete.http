@@ -2,7 +2,7 @@
 
 ### 1) list beers (sets {{beerId}})
 < ../../scripts/traceparent.js
-GET http://localhost:{{application-port}}/api/v1/beer/listBeers
+GET http://localhost:{{gateway-port}}/api/v1/beer/listBeers
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
@@ -41,7 +41,7 @@ baggage: testBaggage=spring-6-rest-mvc
         throw new Error("beerId is not set - run 'list beers' first");
     }
 %}
-GET http://localhost:{{application-port}}/api/v1/beer/getBeerById/{{beerId}}
+GET http://localhost:{{gateway-port}}/api/v1/beer/getBeerById/{{beerId}}
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
@@ -59,7 +59,7 @@ baggage: testBaggage=spring-6-rest-mvc
 
 ### 3) delete the beer by id
 < ../../scripts/traceparent.js
-DELETE http://localhost:{{application-port}}/api/v1/beer/deleteBeer/{{beerId}}
+DELETE http://localhost:{{gateway-port}}/api/v1/beer/deleteBeer/{{beerId}}
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}

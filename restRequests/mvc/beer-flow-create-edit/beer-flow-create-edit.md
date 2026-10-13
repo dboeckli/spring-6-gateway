@@ -45,7 +45,7 @@ sequenceDiagram
 
 ## Hinweise
 
-- Basis-URL ist `{{application-port}}` (Profil `local` = 8081, `k8s` = 30081).
+- Basis-URL ist `{{gateway-port}}` (Profil `local` = 8081, `k8s` = 30081).
 - `createBeer`/`editBeer` sind `@Validated`: `beerName`, `beerStyle`, `upc` und `price` müssen gesetzt (nicht leer) sein,
   sonst `400`. Deshalb hat der `editBeer`-Body eine gültige (`nicht-leere`) `upc`.
 - Die `beerVersion` wird aus der Create-Antwort übernommen, damit das optimistische Locking (`@Version`) beim Update passt.

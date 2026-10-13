@@ -2,7 +2,7 @@
 
 ### 1) create a beer (sets {{beerId}} and {{beerVersion}})
 < ../../scripts/traceparent.js
-POST http://localhost:{{application-port}}/api/v1/beer/createBeer
+POST http://localhost:{{gateway-port}}/api/v1/beer/createBeer
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
@@ -34,7 +34,7 @@ baggage: testBaggage=spring-6-rest-mvc
 
 ### 2) edit the created beer (uses {{beerId}} + {{beerVersion}})
 < ../../scripts/traceparent.js
-PUT http://localhost:{{application-port}}/api/v1/beer/editBeer/{{beerId}}
+PUT http://localhost:{{gateway-port}}/api/v1/beer/editBeer/{{beerId}}
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}

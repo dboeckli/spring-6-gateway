@@ -2,7 +2,7 @@
 
 ### 1) create a customer (sets {{customerId}} and {{customerVersion}})
 < ../../scripts/traceparent.js
-POST http://localhost:{{application-port}}/api/v1/customer/createCustomer
+POST http://localhost:{{gateway-port}}/api/v1/customer/createCustomer
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
@@ -30,7 +30,7 @@ baggage: testBaggage=spring-6-rest-mvc
 
 ### 2) edit the created customer (PUT, uses {{customerId}} + {{customerVersion}})
 < ../../scripts/traceparent.js
-PUT http://localhost:{{application-port}}/api/v1/customer/editCustomer/{{customerId}}
+PUT http://localhost:{{gateway-port}}/api/v1/customer/editCustomer/{{customerId}}
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}

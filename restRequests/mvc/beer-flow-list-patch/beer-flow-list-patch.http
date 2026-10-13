@@ -2,7 +2,7 @@
 
 ### 1) list beers (sets {{beerId}})
 < ../../scripts/traceparent.js
-GET http://localhost:{{application-port}}/api/v1/beer/listBeers
+GET http://localhost:{{gateway-port}}/api/v1/beer/listBeers
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
@@ -41,7 +41,7 @@ baggage: testBaggage=spring-6-rest-mvc
         throw new Error("beerId is not set - run 'list beers' first");
     }
 %}
-PATCH http://localhost:{{application-port}}/api/v1/beer/patchBeer/{{beerId}}
+PATCH http://localhost:{{gateway-port}}/api/v1/beer/patchBeer/{{beerId}}
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}

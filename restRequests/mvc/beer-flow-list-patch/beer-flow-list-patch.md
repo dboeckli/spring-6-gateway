@@ -43,7 +43,7 @@ sequenceDiagram
 
 ## Hinweise
 
-- Basis-URL ist `{{application-port}}` (Profil `local` = 8081, `k8s` = 30081).
+- Basis-URL ist `{{gateway-port}}` (Profil `local` = 8081, `k8s` = 30081).
 - `patchBeer` ist **nicht** `@Validated` – nur die im Body gesetzten Felder werden übernommen (partielle Änderung).
 - Ohne vorheriges `listBeers` ist `beerId` leer → das `patchBeer`-Pre-Request wirft einen Fehler.
 - PATCH löst ein `BeerPatchEvent` aus → `BeerCreatedListener` schreibt einen `BeerAudit`-Eintrag.
