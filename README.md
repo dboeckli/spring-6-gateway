@@ -106,13 +106,7 @@ or just run
 
 Do this for all above projects to get the images into the local docker registry
 
-## Docker
-
-[Docker Documentation](docker-manual/DockerCommands.md)
-
 ## Kubernetes
-
-[Kubernetes Documentation Manual](k8s-manual/KubeCommands.md)
 
 The approach having all kubernetes files of the other projects here should be reworked. the kubernetes files should go into the
 appropriate projects, templating with helm and deployment into a kubernetes environment should be considered.
@@ -203,6 +197,22 @@ Apply the kit to an existing sandbox (restarts the sandbox, VM state is kept):
 ```powershell
 sbx kit add opencode-spring-6-gateway "git+https://codeberg.org/dboeckli/opencode-sandbox-kit.git#dir=opencode-agent"
 ```
+
+### Observability (ELK)
+
+The gateway and the upstream services export telemetry (traces, metrics, logs) to the ELK stack over
+OTLP via the OpenTelemetry collector. Start the opt-in `observability` compose profile:
+
+```bash
+docker compose --profile observability up -d
+```
+
+GUIs / endpoints (from the host):
+
+- **Kibana UI:** <http://localhost:5601> (APM traces, Discover, logs)
+- Elasticsearch: <http://localhost:9200>
+- APM Server (OTLP HTTP intake): <http://localhost:8200>
+- OTel Collector OTLP intake: gRPC `:4317`, HTTP `:4318`
 
 ### Deployment with Kubernetes
 

@@ -1,0 +1,60 @@
+# Flow: createBeer -> editBeer — see restRequest/beer-flow-create-edit/beer-flow-create-edit.md
+
+### 1) create a beer (sets {{beerId}} and {{beerVersion}})
+< ../../scripts/traceparent.js
+POST http://localhost:{{gateway-port}}/api/v1/beer/createBeer
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-rest-mvc
+
+{
+  "version": 0,
+  "beerName": "presidente",
+  "beerStyle": "LAGER",
+  "upc": "xx",
+  "quantityOnHand": 5,
+  "price": 27.16
+}
+
+> {%
+    client.global.set("beerId", response.body.id);
+    client.global.set("beerVersion", response.body.version);
+    client.log("Created beer id: " + response.body.id + " (version=" + response.body.version + ")");
+
+    client.test("createBeer returns 201", function () {
+        client.assert(response.status === 201, "expected 201 but got " + response.status);
+    });
+    client.test("createBeer returns id and name", function () {
+        client.assert(!!response.body.id, "beerId missing");
+        client.assert(response.body.beerName === "presidente", "unexpected beerName");
+    });
+%}
+
+### 2) edit the created beer (uses {{beerId}} + {{beerVersion}})
+< ../../scripts/traceparent.js
+PUT http://localhost:{{gateway-port}}/api/v1/beer/editBeer/{{beerId}}
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-rest-mvc
+
+{
+  "version": {{beerVersion}},
+  "beerName": "presidente-edited",
+  "beerStyle": "PALE_ALE",
+  "upc": "xx-edited",
+  "quantityOnHand": 7,
+  "price": 28.50
+}
+
+> {%
+    client.test("editBeer returns 200", function () {
+        client.assert(response.status === 200, "expected 200 but got " + response.status);
+    });
+    client.test("edited beer name matches", function () {
+        client.assert(response.body.beerName === "presidente-edited", "beerName mismatch");
+    });
+%}

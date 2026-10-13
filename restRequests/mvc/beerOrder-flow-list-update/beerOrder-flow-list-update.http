@@ -1,0 +1,87 @@
+# Flow: listBeerOrders -> updateBeerOrder — see restRequests/mvc/beerOrder-flow-list-update/beerOrder-flow-list-update.md
+
+### 1) list customer (sets {{customerId}}) — or use createCustomer for a fresh customer
+< ../../scripts/traceparent.js
+GET http://localhost:{{gateway-port}}/api/v1/customer/listCustomer
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-rest-mvc
+
+> {%
+    if (response.body.length > 0) {
+        const first = response.body[0];
+        client.global.set("customerId", first.id);
+        client.log("listCustomer -> saved customerId=" + first.id + " (" + first.name + ")");
+    }
+%}
+
+### 2) list beers (sets {{beerId}})
+< ../../scripts/traceparent.js
+GET http://localhost:{{gateway-port}}/api/v1/beer/listBeers
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-rest-mvc
+
+> {%
+    if (response.body.content.length > 0) {
+        const first = response.body.content[0];
+        client.global.set("beerId", first.id);
+        client.log("listBeers -> saved beerId=" + first.id);
+    }
+%}
+
+### 3) list beer orders — pick the first order that HAS a line (sets {{beerOrderId}} + {{beerOrderLineId}})
+< ../../scripts/traceparent.js
+GET http://localhost:{{gateway-port}}/api/v1/beerOrder/listBeerOrders
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-rest-mvc
+
+> {%
+    const orderWithLine = response.body.content.find(order => order.beerOrderLines && order.beerOrderLines.length > 0);
+    if (orderWithLine) {
+        client.global.set("beerOrderId", orderWithLine.id);
+        client.global.set("beerOrderLineId", orderWithLine.beerOrderLines[0].id);
+        client.log("listBeerOrders -> saved beerOrderId=" + orderWithLine.id + " (line=" + orderWithLine.beerOrderLines[0].id + ")");
+    } else {
+        client.log("listBeerOrders -> no beer order with a line found");
+    }
+%}
+
+### 4) update the listed beer order (uses {{beerOrderId}} + {{beerOrderLineId}})
+< ../../scripts/traceparent.js
+PUT http://localhost:{{gateway-port}}/api/v1/beerOrder/updateBeerOrder/{{beerOrderId}}
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-rest-mvc
+
+{
+    "customerId": "{{customerId}}",
+    "customerRef": "bootstrap1",
+    "beerOrderLines": [
+        {
+            "id": "{{beerOrderLineId}}",
+            "beerId": "{{beerId}}",
+            "orderQuantity": 5,
+            "quantityAllocated": 0
+        }
+    ],
+    "paymentAmount": 99.99
+}
+
+> {%
+    client.test("updateBeerOrder returns 200", function () {
+        client.assert(response.status === 200, "expected 200 but got " + response.status);
+    });
+    client.test("updated beer order id matches", function () {
+        client.assert(response.body.id === client.global.get("beerOrderId"), "beerOrderId mismatch");
+    });
+%}

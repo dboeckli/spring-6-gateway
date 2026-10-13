@@ -1,0 +1,82 @@
+---
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: "0.0.0.0:4317"
+      http:
+        endpoint: "0.0.0.0:4318"
+
+processors:
+  memory_limiter:
+    check_interval: "1s"
+    limit_mib: 4000
+    spike_limit_mib: 800
+  batch:
+    timeout: "5s"
+    send_batch_size: 1000
+  # Drop whole traces of health/readiness/liveness probes so they do not
+  # pollute the trace view. The conditions match the http.server span on any of
+  # the usual path attributes (uri is the Micrometer route label) and drop every
+  # span of that trace (the child spans carry no path). The drop decision wins
+  # over the keep-all policy below; without keep-all every other trace would
+  # fall through to the default "not sampled" decision and be dropped.
+  tail_sampling/drop-health:
+    decision_wait: "10s"
+    num_traces: 50000
+    expected_new_traces_per_sec: 100
+    policies:
+      - name: drop-health
+        type: drop
+        drop:
+          drop_sub_policy:
+            - name: health-endpoints
+              type: ottl_condition
+              ottl_condition:
+                error_mode: ignore
+                span:
+                  - 'IsMatch(attributes["uri"], "^/actuator/health")'
+                  - 'IsMatch(attributes["url.path"], "^/actuator/health")'
+                  - 'IsMatch(attributes["http.target"], "^/actuator/health")'
+                  - 'IsMatch(attributes["http.route"], "^/actuator/health")'
+      - name: keep-all
+        type: always_sample
+
+exporters:
+  debug:
+    verbosity: "detailed"
+  # traces + metrics -> Elastic APM Server (OTLP HTTP)
+  otlp_http/elastic-apm:
+    endpoint: "http://apm-server:8200"
+  # logs -> Elasticsearch
+  elasticsearch:
+    endpoints:
+      - "http://elasticsearch:9200"
+
+service:
+  pipelines:
+    traces:
+      receivers:
+        - "otlp"
+      processors:
+        - "memory_limiter"
+        - "tail_sampling/drop-health"
+        - "batch"
+      exporters:
+        - "otlp_http/elastic-apm"
+    metrics:
+      receivers:
+        - "otlp"
+      processors:
+        - "memory_limiter"
+        - "batch"
+      exporters:
+        - "otlp_http/elastic-apm"
+    logs:
+      receivers:
+        - "otlp"
+      processors:
+        - "memory_limiter"
+        - "batch"
+      exporters:
+        - "elasticsearch"

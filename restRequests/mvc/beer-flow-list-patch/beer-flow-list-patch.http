@@ -1,0 +1,62 @@
+# Flow: listBeers -> patchBeer — see restRequest/beer-flow-list-patch/beer-flow-list-patch.md
+
+### 1) list beers (sets {{beerId}})
+< ../../scripts/traceparent.js
+GET http://localhost:{{gateway-port}}/api/v1/beer/listBeers
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-rest-mvc
+
+> {%
+    if (response.body.content.length > 0) {
+        const first = response.body.content[0];
+        client.global.set("beerId", first.id);
+        client.log("listBeers -> saved beerId=" + first.id + " (" + first.beerName + ")");
+    } else {
+        client.log("listBeers -> no beer found");
+    }
+    client.test("listBeers returns 200", function () {
+        client.assert(response.status === 200, "expected 200 but got " + response.status);
+    });
+%}
+
+### 2) patch beer by id (uses {{beerId}})
+< {%
+    function randomHex(length) {
+        let result = '';
+        const chars = '0123456789abcdef';
+        for (let i = 0; i < length; i++) {
+            result += chars[Math.floor(Math.random() * chars.length)];
+        }
+        return result;
+    }
+    request.variables.set("traceId", randomHex(32));
+    request.variables.set("spanId", randomHex(16));
+
+    const beerId = client.global.get("beerId");
+    client.log("patchBeer -> beerId=" + beerId);
+    if (!beerId) {
+        throw new Error("beerId is not set - run 'list beers' first");
+    }
+%}
+PATCH http://localhost:{{gateway-port}}/api/v1/beer/patchBeer/{{beerId}}
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-rest-mvc
+
+{
+  "beerName": "patched-beername"
+}
+
+> {%
+    client.test("patchBeer returns 200", function () {
+        client.assert(response.status === 200, "expected 200 but got " + response.status);
+    });
+    client.test("patched beer name matches", function () {
+        client.assert(response.body.beerName === "patched-beername", "beerName mismatch");
+    });
+%}

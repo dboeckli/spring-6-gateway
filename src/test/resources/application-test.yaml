@@ -59,6 +59,14 @@ logging:
     reactor.netty: INFO
     guru.springframework.spring6gateway.log.RequestLoggingFilter: DEBUG
 
+appconfig:
+  request-logging:
+    # set to false to remove the request logging filter from the web filter chain
+    enabled: true
+    # request URI prefixes that are not logged
+    exclude-paths:
+      - /actuator/health
+
 management:
   health:
     readinessstate:
@@ -102,9 +110,6 @@ management:
       server:
         requests:
           name: http.server.requests
-      client:
-        requests:
-          name: http-client-requests
   otlp:
     metrics:
       export:

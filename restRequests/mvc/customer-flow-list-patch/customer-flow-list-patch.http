@@ -1,0 +1,62 @@
+# Flow: listCustomer -> patchCustomer — see restRequest/customer-flow-list-patch/customer-flow-list-patch.md
+
+### 1) list customers (sets {{customerId}})
+< ../../scripts/traceparent.js
+GET http://localhost:{{gateway-port}}/api/v1/customer/listCustomer
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-rest-mvc
+
+> {%
+    if (response.body.length > 0) {
+        const first = response.body[0];
+        client.global.set("customerId", first.id);
+        client.log("listCustomer -> saved customerId=" + first.id + " (" + first.name + ")");
+    } else {
+        client.log("listCustomer -> no customer found");
+    }
+    client.test("listCustomer returns 200", function () {
+        client.assert(response.status === 200, "expected 200 but got " + response.status);
+    });
+%}
+
+### 2) patch customer by id (PATCH, uses {{customerId}})
+< {%
+    function randomHex(length) {
+        let result = '';
+        const chars = '0123456789abcdef';
+        for (let i = 0; i < length; i++) {
+            result += chars[Math.floor(Math.random() * chars.length)];
+        }
+        return result;
+    }
+    request.variables.set("traceId", randomHex(32));
+    request.variables.set("spanId", randomHex(16));
+
+    const customerId = client.global.get("customerId");
+    client.log("patchCustomer -> customerId=" + customerId);
+    if (!customerId) {
+        throw new Error("customerId is not set - run 'list customers' first");
+    }
+%}
+PATCH http://localhost:{{gateway-port}}/api/v1/customer/patchCustomer/{{customerId}}
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-rest-mvc
+
+{
+  "name": "customer-flow-patched"
+}
+
+> {%
+    client.test("patchCustomer returns 200", function () {
+        client.assert(response.status === 200, "expected 200 but got " + response.status);
+    });
+    client.test("patched customer name matches", function () {
+        client.assert(response.body.name === "customer-flow-patched", "name mismatch");
+    });
+%}

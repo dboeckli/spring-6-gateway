@@ -1,3 +1,14 @@
+# Shared OTLP export config for the application services. Always active; the
+# otel-collector only runs with the "observability" profile, so without it the
+# services log export warnings but keep working. Logging is not wired yet (the
+# images lack the OpenTelemetry Logback appender).
+x-otel-env: &otel-env
+  MANAGEMENT_OTLP_METRICS_EXPORT_ENABLED: "true"
+  MANAGEMENT_OTLP_METRICS_EXPORT_URL: http://otel-collector:4318/v1/metrics
+  MANAGEMENT_TRACING_EXPORT_OTLP_ENABLED: "true"
+  MANAGEMENT_OPENTELEMETRY_TRACING_EXPORT_OTLP_ENDPOINT: http://otel-collector:4318/v1/traces
+  MANAGEMENT_TRACING_SAMPLING_PROBABILITY: "1.0"
+
 services:
   mysql:
     container_name: mysql
@@ -31,6 +42,9 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT"
       KAFKA_LOG_DIRS: "/var/lib/kafka/data"
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
     ports:
       - "9092:9092"
     healthcheck:
@@ -65,7 +79,14 @@ services:
     expose:
       - 9000
     environment:
+      <<: *otel-env
+      MANAGEMENT_LOGGING_EXPORT_OTLP_ENABLED: "true"
+      MANAGEMENT_OPENTELEMETRY_LOGGING_EXPORT_OTLP_ENDPOINT: http://otel-collector:4318/v1/logs
       SPRING_SECURITY_OAUTH2_AUTHORIZATION_SERVER_ISSUER: "http://host.docker.internal:9000"
+    depends_on:
+      otel-collector:
+        condition: service_started
+        required: false
     extra_hosts:
       - "host.docker.internal:host-gateway"
   
@@ -77,6 +98,9 @@ services:
     expose:
       - 8081
     environment:
+      <<: *otel-env
+      MANAGEMENT_LOGGING_EXPORT_OTLP_ENABLED: "true"
+      MANAGEMENT_OPENTELEMETRY_LOGGING_EXPORT_OTLP_ENDPOINT: http://otel-collector:4318/v1/logs
       SPRING_PROFILES_ACTIVE: mysql
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://host.docker.internal:9000
       SECURITY_AUTH_SERVER_HEALTH_URL: http://auth-server:9000
@@ -97,6 +121,9 @@ services:
       auth-server:
         condition: service_started
         required: true
+      otel-collector:
+        condition: service_started
+        required: false
     extra_hosts:
       - "host.docker.internal:host-gateway"    
       
@@ -105,40 +132,58 @@ services:
   # and disables Spring Boot Docker Compose (it must not spawn its own broker inside the container).
   cold-micro-service:
     container_name: cold-micro-service
-    image: ghcr.io/dboeckli/spring-6-cold-micro-service:0.0.1-snapshot
+    image: domboeckli/spring-6-cold-micro-service:0.0.1-snapshot
     depends_on:
       kafka:
         condition: service_healthy
         required: true
+      otel-collector:
+        condition: service_started
+        required: false
     ports:
       - "8091:8081"
     environment:
+      <<: *otel-env
+      MANAGEMENT_LOGGING_EXPORT_OTLP_ENABLED: "true"
+      MANAGEMENT_OPENTELEMETRY_LOGGING_EXPORT_OTLP_ENDPOINT: http://otel-collector:4318/v1/logs
       SPRING_DOCKER_COMPOSE_ENABLED: "false"
       SPRING_APPLICATION_JSON: '{"spring":{"kafka":{"bootstrap-servers":"kafka:9092","admin":{"properties":{"bootstrap-servers":"kafka:9092"}},"consumer":{"bootstrap-servers":"kafka:9092"},"producer":{"bootstrap-servers":"kafka:9092"}}}}'
 
   cool-micro-service:
     container_name: cool-micro-service
-    image: ghcr.io/dboeckli/spring-6-cool-micro-service:0.0.1-snapshot
+    image: domboeckli/spring-6-cool-micro-service:0.0.1-snapshot
     depends_on:
       kafka:
         condition: service_healthy
         required: true
+      otel-collector:
+        condition: service_started
+        required: false
     ports:
       - "8092:8082"
     environment:
+      <<: *otel-env
+      MANAGEMENT_LOGGING_EXPORT_OTLP_ENABLED: "true"
+      MANAGEMENT_OPENTELEMETRY_LOGGING_EXPORT_OTLP_ENDPOINT: http://otel-collector:4318/v1/logs
       SPRING_DOCKER_COMPOSE_ENABLED: "false"
       SPRING_APPLICATION_JSON: '{"spring":{"kafka":{"bootstrap-servers":"kafka:9092","admin":{"properties":{"bootstrap-servers":"kafka:9092"}},"consumer":{"bootstrap-servers":"kafka:9092"},"producer":{"bootstrap-servers":"kafka:9092"}}}}'
 
   icecold-micro-service:
     container_name: icecold-micro-service
-    image: ghcr.io/dboeckli/spring-6-icecold-micro-service:0.0.1-snapshot
+    image: domboeckli/spring-6-icecold-micro-service:0.0.1-snapshot
     depends_on:
       kafka:
         condition: service_healthy
         required: true
+      otel-collector:
+        condition: service_started
+        required: false
     ports:
       - "8090:8080"
     environment:
+      <<: *otel-env
+      MANAGEMENT_LOGGING_EXPORT_OTLP_ENABLED: "true"
+      MANAGEMENT_OPENTELEMETRY_LOGGING_EXPORT_OTLP_ENDPOINT: http://otel-collector:4318/v1/logs
       SPRING_DOCKER_COMPOSE_ENABLED: "false"
       SPRING_APPLICATION_JSON: '{"spring":{"kafka":{"bootstrap-servers":"kafka:9092","admin":{"properties":{"bootstrap-servers":"kafka:9092"}},"consumer":{"bootstrap-servers":"kafka:9092"},"producer":{"bootstrap-servers":"kafka:9092"}}}}'
 
@@ -150,6 +195,9 @@ services:
     expose:
       - 8083
     environment:
+      <<: *otel-env
+      MANAGEMENT_LOGGING_EXPORT_OTLP_ENABLED: "true"
+      MANAGEMENT_OPENTELEMETRY_LOGGING_EXPORT_OTLP_ENDPOINT: http://otel-collector:4318/v1/logs
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://host.docker.internal:9000
       SECURITY_AUTH_SERVER_HEALTH_URL: http://auth-server:9000
       SERVER_PORT: 8083
@@ -164,6 +212,9 @@ services:
       auth-server:
         condition: service_started
         required: true
+      otel-collector:
+        condition: service_started
+        required: false
     extra_hosts:
       - "host.docker.internal:host-gateway"      
 
@@ -175,6 +226,9 @@ services:
     expose:
       - 8082
     environment:
+      <<: *otel-env
+      MANAGEMENT_LOGGING_EXPORT_OTLP_ENABLED: "true"
+      MANAGEMENT_OPENTELEMETRY_LOGGING_EXPORT_OTLP_ENDPOINT: http://otel-collector:4318/v1/logs
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://host.docker.internal:9000
       SECURITY_AUTH_SERVER_HEALTH_URL: http://auth-server:9000
       SERVER_PORT: 8082
@@ -182,6 +236,9 @@ services:
       auth-server:
         condition: service_started
         required: true
+      otel-collector:
+        condition: service_started
+        required: false
     extra_hosts:
       - "host.docker.internal:host-gateway" 
       
@@ -193,11 +250,17 @@ services:
     expose:
       - 8084
     environment:
+      <<: *otel-env
+      MANAGEMENT_LOGGING_EXPORT_OTLP_ENABLED: "true"
+      MANAGEMENT_OPENTELEMETRY_LOGGING_EXPORT_OTLP_ENDPOINT: http://otel-collector:4318/v1/logs
       SERVER_PORT: 8084
     depends_on:
       auth-server:
         condition: service_started
         required: true
+      otel-collector:
+        condition: service_started
+        required: false
     extra_hosts:
       - "host.docker.internal:host-gateway"
   
@@ -273,3 +336,83 @@ services:
         sleep 15
       done
       '            
+
+  # ---------------------------------------------------------------------------
+  # Observability stack (ELK) - opt-in via compose profile "observability".
+  # Not started by default, so spring-boot:run without the profile and the
+  # integration tests (RouterConfigIT) are unaffected.
+  #
+  # Activate:  docker compose --profile observability up -d
+  #        or  SPRING_PROFILES_ACTIVE=with_docker_compose,observability (see .run config)
+  # UIs: Kibana http://localhost:5601 (APM + Discover), Elasticsearch http://localhost:9200
+  # OTLP intake (from the host, e.g. the gateway): grpc :4317, http :4318
+  # ---------------------------------------------------------------------------
+  otel-collector:
+    container_name: otel-collector
+    image: otel/opentelemetry-collector-contrib:0.161.0
+    profiles:
+      - observability
+    command:
+      - --config=/etc/otel-collector-config.yaml
+    volumes:
+      - ./monitoring/otel-collector-config.yaml:/etc/otel-collector-config.yaml:ro
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+    depends_on:
+      - apm-server
+      - elasticsearch
+    restart: unless-stopped
+
+  elasticsearch:
+    container_name: elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.5.4
+    profiles:
+      - observability
+    environment:
+      discovery.type: single-node
+      ES_JAVA_OPTS: -Xms512m -Xmx512m
+      xpack.security.enabled: "false"
+      xpack.security.http.ssl.enabled: "false"
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    restart: unless-stopped
+
+  kibana:
+    container_name: kibana
+    image: docker.elastic.co/kibana/kibana:9.5.4
+    profiles:
+      - observability
+    environment:
+      I18N_LOCALES: '["en"]'
+      I18N_DEFAULTLOCALE: en
+      I18N_DETECTBROWSERLOCALE: "false"
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    restart: unless-stopped
+
+  apm-server:
+    container_name: apm-server
+    image: docker.elastic.co/apm/apm-server:9.5.4
+    profiles:
+      - observability
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+      output.elasticsearch.hosts: '["http://elasticsearch:9200"]'
+      apm-server.kibana.enabled: "true"
+      apm-server.kibana.host: kibana:5601
+      apm-server.otlp.enabled: "true"
+      apm-server.otlp.http.enabled: "true"
+      apm-server.otlp.http.host: 0.0.0.0:8200
+    ports:
+      - "8200:8200"
+    depends_on:
+      - elasticsearch
+    restart: unless-stopped
+
+volumes:
+  elasticsearch-data:
