@@ -61,7 +61,7 @@ logging:
 
 appconfig:
   request-logging:
-    # set to false to remove the request logging filter from the chain entirely
+    # set to false to remove the request logging filter from the web filter chain
     enabled: true
     # request URI prefixes that are not logged
     exclude-paths:

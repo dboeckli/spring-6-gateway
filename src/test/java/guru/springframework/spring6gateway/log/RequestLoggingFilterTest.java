@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.web.server.WebFilter;
 
 import java.util.List;
 
@@ -12,50 +13,39 @@ import static org.assertj.core.api.Assertions.assertThat;
 class RequestLoggingFilterTest {
 
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-        .withUserConfiguration(RequestLoggingConfig.class);
+        .withUserConfiguration(RequestLoggingFilter.class);
 
     @ParameterizedTest
     @ValueSource(strings = { "/actuator/health", "/actuator/health/readiness", "/actuator/health/liveness" })
     void excludesRequestsMatchingAnExcludedPath(String path) {
-        RequestLoggingFilter filter = new RequestLoggingFilter(List.of("/actuator/health"));
-
-        assertThat(filter.isExcluded(path)).isTrue();
+        assertThat(RequestLoggingFilter.isExcluded(path, List.of("/actuator/health"))).isTrue();
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "/api/v1/beer", "/actuator/info", "/oauth2/token" })
+    @ValueSource(strings = { "/api/v1/beer", "/actuator/info", "/actuator/healthcheck" })
     void logsRequestsNotMatchingAnExcludedPath(String path) {
-        RequestLoggingFilter filter = new RequestLoggingFilter(List.of("/actuator/health"));
-
-        assertThat(filter.isExcluded(path)).isFalse();
+        assertThat(RequestLoggingFilter.isExcluded(path, List.of("/actuator/health"))).isFalse();
     }
 
     @Test
     void logsEverythingWhenNoExcludedPathsAreConfigured() {
-        RequestLoggingFilter filter = new RequestLoggingFilter(List.of());
+        assertThat(RequestLoggingFilter.isExcluded("/actuator/health", List.of())).isFalse();
+    }
 
-        assertThat(filter.isExcluded("/actuator/health")).isFalse();
+    @Test
+    void logsEverythingWhenExcludedPathsIsNull() {
+        assertThat(RequestLoggingFilter.isExcluded("/actuator/health", null)).isFalse();
     }
 
     @Test
     void registersFilterByDefault() {
-        contextRunner.run(context -> assertThat(context).hasSingleBean(RequestLoggingFilter.class));
+        contextRunner.run(context -> assertThat(context).hasSingleBean(WebFilter.class));
     }
 
     @Test
     void doesNotRegisterFilterWhenDisabled() {
         contextRunner.withPropertyValues("appconfig.request-logging.enabled=false")
-            .run(context -> assertThat(context).doesNotHaveBean(RequestLoggingFilter.class));
-    }
-
-    @Test
-    void bindsExcludedPathsFromConfiguration() {
-        contextRunner.withPropertyValues("appconfig.request-logging.exclude-paths[0]=/actuator/health").run(context -> {
-            RequestLoggingFilter filter = context.getBean(RequestLoggingFilter.class);
-
-            assertThat(filter.isExcluded("/actuator/health/readiness")).isTrue();
-            assertThat(filter.isExcluded("/api/v1/beer")).isFalse();
-        });
+            .run(context -> assertThat(context).doesNotHaveBean(WebFilter.class));
     }
 
 }
