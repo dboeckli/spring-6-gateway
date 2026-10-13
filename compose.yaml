@@ -9,13 +9,6 @@ x-otel-env: &otel-env
   MANAGEMENT_OPENTELEMETRY_TRACING_EXPORT_OTLP_ENDPOINT: http://otel-collector:4318/v1/traces
   MANAGEMENT_TRACING_SAMPLING_PROBABILITY: "1.0"
 
-# Marks a service's container logs for collection by Filebeat (observability
-# profile). decode_log_event_to_json_object parses the JSON logged by the
-# logstash-logback-encoder appender.
-x-filebeat-labels: &filebeat-labels
-  collect_logs_with_filebeat: "true"
-  decode_log_event_to_json_object: "true"
-
 services:
   mysql:
     container_name: mysql
@@ -419,29 +412,6 @@ services:
       - "8200:8200"
     depends_on:
       - elasticsearch
-    restart: unless-stopped
-
-  # Ships container stdout logs of the labelled app services to Elasticsearch
-  # (Kibana -> Discover). Collects via the Docker socket + container log files.
-  filebeat:
-    container_name: filebeat
-    image: docker.elastic.co/beats/filebeat:9.5.4
-    profiles:
-      - observability
-    volumes:
-      - ./monitoring/filebeat.docker.yml:/usr/share/filebeat/filebeat.yml
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    command: >
-      /bin/bash -c "
-      chmod 644 /usr/share/filebeat/filebeat.yml &&
-      chown root:root /usr/share/filebeat/filebeat.yml &&
-      filebeat -e --strict.perms=false
-      "
-    user: root
-    depends_on:
-      - elasticsearch
-      - kibana
     restart: unless-stopped
 
 volumes:
