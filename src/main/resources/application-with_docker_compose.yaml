@@ -244,3 +244,11 @@ security:
       - http://host.docker.internal:8083
       - http://host.docker.internal:8084
       - http://host.docker.internal:9000
+
+appconfig:
+  request-logging:
+    # set to false to remove the request logging filter from the web filter chain
+    enabled: true
+    # request URI prefixes that are not logged
+    exclude-paths:
+      - /actuator/health
