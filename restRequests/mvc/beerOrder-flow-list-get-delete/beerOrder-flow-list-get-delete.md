@@ -1,6 +1,6 @@
 # beerOrder Flow: listBeerOrders → getBeerOrderyById → deleteBeerOrder
 
-Datei: `restRequests/beerOrder-flow-list-get-delete/beerOrder-flow-list-get-delete.http`
+Datei: `restRequests/mvc/beerOrder-flow-list-get-delete/beerOrder-flow-list-get-delete.http`
 
 ## Ziel
 
@@ -41,11 +41,11 @@ sequenceDiagram
 
 ## Benötigte Globals
 
-|       Global        |         gesetzt von         |              genutzt von               |
-|---------------------|-----------------------------|----------------------------------------|
-| `beerOrderId`       | `listBeerOrders`            | `getBeerOrderyById`, `deleteBeerOrder` |
-| `beerOrderLineId`   | `listBeerOrders`            | (nur informativ)                       |
-| `traceId`, `spanId` | `../scripts/traceparent.js` | alle Requests (Trace-Korrelation)      |
+|       Global        |          gesetzt von           |              genutzt von               |
+|---------------------|--------------------------------|----------------------------------------|
+| `beerOrderId`       | `listBeerOrders`               | `getBeerOrderyById`, `deleteBeerOrder` |
+| `beerOrderLineId`   | `listBeerOrders`               | (nur informativ)                       |
+| `traceId`, `spanId` | `../../scripts/traceparent.js` | alle Requests (Trace-Korrelation)      |
 
 ## Asserts
 

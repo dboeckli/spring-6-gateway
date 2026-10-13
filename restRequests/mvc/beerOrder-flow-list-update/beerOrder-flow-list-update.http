@@ -1,7 +1,7 @@
-# Flow: listBeerOrders -> updateBeerOrder — see restRequests/beerOrder-flow-list-update/beerOrder-flow-list-update.md
+# Flow: listBeerOrders -> updateBeerOrder — see restRequests/mvc/beerOrder-flow-list-update/beerOrder-flow-list-update.md
 
 ### 1) list customer (sets {{customerId}}) — or use createCustomer for a fresh customer
-< ../scripts/traceparent.js
+< ../../scripts/traceparent.js
 GET http://localhost:{{gateway-port}}/api/v1/customer/listCustomer
 Accept: application/json
 Content-Type: application/json
@@ -18,7 +18,7 @@ baggage: testBaggage=spring-6-rest-mvc
 %}
 
 ### 2) list beers (sets {{beerId}})
-< ../scripts/traceparent.js
+< ../../scripts/traceparent.js
 GET http://localhost:{{gateway-port}}/api/v1/beer/listBeers
 Accept: application/json
 Content-Type: application/json
@@ -35,7 +35,7 @@ baggage: testBaggage=spring-6-rest-mvc
 %}
 
 ### 3) list beer orders — pick the first order that HAS a line (sets {{beerOrderId}} + {{beerOrderLineId}})
-< ../scripts/traceparent.js
+< ../../scripts/traceparent.js
 GET http://localhost:{{gateway-port}}/api/v1/beerOrder/listBeerOrders
 Accept: application/json
 Content-Type: application/json
@@ -55,7 +55,7 @@ baggage: testBaggage=spring-6-rest-mvc
 %}
 
 ### 4) update the listed beer order (uses {{beerOrderId}} + {{beerOrderLineId}})
-< ../scripts/traceparent.js
+< ../../scripts/traceparent.js
 PUT http://localhost:{{gateway-port}}/api/v1/beerOrder/updateBeerOrder/{{beerOrderId}}
 Accept: application/json
 Content-Type: application/json

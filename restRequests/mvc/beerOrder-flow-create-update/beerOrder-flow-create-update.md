@@ -1,6 +1,6 @@
 # beerOrder Flow: createBeerOrder → updateBeerOrder
 
-Datei: `restRequests/beerOrder-flow-create-update/beerOrder-flow-create-update.http`
+Datei: `restRequests/mvc/beerOrder-flow-create-update/beerOrder-flow-create-update.http`
 
 ## Ziel
 
@@ -59,7 +59,7 @@ sequenceDiagram
 | `beerId`            | `listBeers`                       | `createBeerOrder`, `updateBeerOrder` |
 | `beerOrderId`       | `createBeerOrder`                 | `updateBeerOrder`                    |
 | `beerOrderLineId`   | `createBeerOrder`                 | `updateBeerOrder`                    |
-| `traceId`, `spanId` | `../scripts/traceparent.js`       | alle Requests (Trace-Korrelation)    |
+| `traceId`, `spanId` | `../../scripts/traceparent.js`    | alle Requests (Trace-Korrelation)    |
 
 ## Asserts
 

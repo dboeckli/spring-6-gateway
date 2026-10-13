@@ -1,0 +1,52 @@
+# Flow: createCustomer -> editCustomer — see restRequest/customer-flow-create-edit/customer-flow-create-edit.md
+
+### 1) create a customer (sets {{customerId}} and {{customerVersion}})
+< ../../scripts/traceparent.js
+POST http://localhost:{{application-port}}/api/v1/customer/createCustomer
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-rest-mvc
+
+{
+  "name": "customer-flow",
+  "version": "0"
+}
+
+> {%
+    client.global.set("customerId", response.body.id);
+    client.global.set("customerVersion", response.body.version);
+    client.log("Created customer id: " + response.body.id + " (version=" + response.body.version + ")");
+
+    client.test("createCustomer returns 201", function () {
+        client.assert(response.status === 201, "expected 201 but got " + response.status);
+    });
+    client.test("createCustomer returns id and name", function () {
+        client.assert(!!response.body.id, "customerId missing");
+        client.assert(response.body.name === "customer-flow", "unexpected name");
+    });
+%}
+
+### 2) edit the created customer (PUT, uses {{customerId}} + {{customerVersion}})
+< ../../scripts/traceparent.js
+PUT http://localhost:{{application-port}}/api/v1/customer/editCustomer/{{customerId}}
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-rest-mvc
+
+{
+  "name": "customer-flow-edited",
+  "version": "{{customerVersion}}"
+}
+
+> {%
+    client.test("editCustomer returns 200", function () {
+        client.assert(response.status === 200, "expected 200 but got " + response.status);
+    });
+    client.test("edited customer name matches", function () {
+        client.assert(response.body.name === "customer-flow-edited", "name mismatch");
+    });
+%}

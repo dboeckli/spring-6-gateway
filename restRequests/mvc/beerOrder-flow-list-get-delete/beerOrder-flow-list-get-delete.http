@@ -1,7 +1,7 @@
-# Flow: listBeerOrders -> getBeerOrderyById -> deleteBeerOrder — see restRequests/beerOrder-flow-list-get-delete/beerOrder-flow-list-get-delete.md
+# Flow: listBeerOrders -> getBeerOrderyById -> deleteBeerOrder — see restRequests/mvc/beerOrder-flow-list-get-delete/beerOrder-flow-list-get-delete.md
 
 ### 1) list beer orders — pick the first order that HAS a line (sets {{beerOrderId}} + {{beerOrderLineId}})
-< ../scripts/traceparent.js
+< ../../scripts/traceparent.js
 GET http://localhost:{{gateway-port}}/api/v1/beerOrder/listBeerOrders
 Accept: application/json
 Content-Type: application/json
@@ -56,7 +56,7 @@ baggage: testBaggage=spring-6-rest-mvc
 %}
 
 ### 3) delete the beer order by id
-< ../scripts/traceparent.js
+< ../../scripts/traceparent.js
 DELETE http://localhost:{{gateway-port}}/api/v1/beerOrder/deleteBeerOrder/{{beerOrderId}}
 Accept: application/json
 Content-Type: application/json
