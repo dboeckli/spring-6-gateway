@@ -1,0 +1,50 @@
+### Profile
+GET http://localhost:{{gateway-port}}/api/v4/profile/beer
+Accept: application/json
+Content-Type: application/json
+
+### Get all beers
+GET http://localhost:{{gateway-port}}/api/v4/beer
+Accept: application/json
+Content-Type: application/json
+
+### Create new Beer
+POST http://localhost:{{gateway-port}}/api/v4/beer
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+
+{
+    "beerName": "Mango Bobs New",
+    "beerStyle": "ALE",
+    "upc": "0631234200036",
+    "quantityOnHand": 310,
+    "price": 28.00
+}
+
+### Change an existing beer. do a get first to retrieve the correct id
+PUT http://localhost:{{gateway-port}}/api/v4/beer/2edca6a7-5b39-481b-9a27-cb83fda82b91
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+
+{
+    "beerName": "Blessed Changed",
+    "beerStyle": "STOUT",
+    "upc": "4666337557578",
+    "quantityOnHand": 2877,
+    "price": 51.10
+}
+
+### DELETE existing beer. do a get first to retrieve the correct id
+DELETE http://localhost:{{gateway-port}}/api/v4/beer/2edca6a7-5b39-481b-9a27-cb83fda82b91
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+
+### Find by UPC. Check method in BeerRepository: findByUpc. do a get first to retrieve an existing upc
+GET http://localhost:{{gateway-port}}/api/v4/beer/search/findByUpc?upc=2380867498485
+Accept: application/json
+Content-Type: application/json
+
+### Find by Beerstyle. Check method in BeerRepository: findAllByBeerStyle. do a get first to retrieve an existing beerstyle
+GET http://localhost:{{gateway-port}}/api/v4/beer/search/findAllByBeerStyle?beerStyle=ALE
+Accept: application/json
+Content-Type: application/json
