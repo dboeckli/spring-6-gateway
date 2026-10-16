@@ -1,6 +1,7 @@
 # spring-6-gateway
 
-Examples of Reactive Programming with Spring Framework.
+Spring Cloud Gateway (WebFlux) that routes requests to the sibling Spring 6 services
+(auth-server, rest-mvc, reactive, reactive-mongo, data-rest) and validates JWT bearer tokens.
 
 ## Getting started
 
@@ -10,14 +11,15 @@ Server runs on port 8080. Requires that other projects are up and running.
 * spring-6-reactive on port 8082
 * spring-6-reactive-mongo on port 8083
 * spring-6-data-rest on port 8084
-Example request you can find in the restRequest directory.
+Example requests can be found in the `restRequests/` directory, grouped per upstream service
+(`mvc/`, `reactive/`, `reactive-mongo/`, `data-rest/`).
 
 ## Urls
 
 * openapi:
   * http://localhost:8080/swagger-ui/index.html
   * http://localhost:30080/swagger-ui/index.html
-* actuator: http://localhost:8080/api/v3/actuator/info
+* actuator: http://localhost:8080/actuator/info
 
 ## Architecture Overview
 
@@ -79,42 +81,6 @@ graph LR
     Reactive <--> H2
     DataRest <--> H2
     ReactiveMongo <--> MongoDB
-```
-
-## Docker
-
-### Images
-
-* spring-6-gateway:0.0.1-SNAPSHOT
-* spring-6-auth-server:0.0.1-SNAPSHOT
-* spring-6-rest-mvc:0.0.1-SNAPSHOT
-* spring-6-reactive:0.0.1-SNAPSHOT
-* spring-6-reactive-mongo:0.0.1-SNAPSHOT
-* spring-6-data-rest:0.0.1-SNAPSHOT
-
-### create image
-
-```shell
-.\mvnw clean package spring-boot:build-image
-```
-
-or just run
-
-```shell
-.\mvnw clean install
-```
-
-Do this for all above projects to get the images into the local docker registry
-
-## Kubernetes
-
-The approach having all kubernetes files of the other projects here should be reworked. the kubernetes files should go into the
-appropriate projects, templating with helm and deployment into a kubernetes environment should be considered.
-
-To run maven filtering for destination target/k8s and destination target/helm run:
-
-```bash
-mvn clean install -DskipTests 
 ```
 
 ## Sandbox (local dev environment)
@@ -179,25 +145,6 @@ sbx run opencode `
     "C:\development\maven-repo:ro"
 ```
 
-Start the sandbox with Kubernetes support:
-
-```powershell
-sbx run opencode `
-    --kit "git+https://codeberg.org/dboeckli/opencode-sandbox-kit.git#dir=opencode-agent" `
-    --template docker.io/domboeckli/sbx-opencode-tooling:latest `
-    --skills=off `
-    --static-mcp idea,k8s,docker `
-    . `
-    "$env:USERPROFILE\.kube:ro" `
-    "C:\development\maven-repo:ro"
-```
-
-Apply the kit to an existing sandbox (restarts the sandbox, VM state is kept):
-
-```powershell
-sbx kit add opencode-spring-6-gateway "git+https://codeberg.org/dboeckli/opencode-sandbox-kit.git#dir=opencode-agent"
-```
-
 ### Observability (ELK)
 
 The gateway and the upstream services export telemetry (traces, metrics, logs) to the ELK stack over
@@ -213,31 +160,6 @@ GUIs / endpoints (from the host):
 - Elasticsearch: <http://localhost:9200>
 - APM Server (OTLP HTTP intake): <http://localhost:8200>
 - OTel Collector OTLP intake: gRPC `:4317`, HTTP `:4318`
-
-### Deployment with Kubernetes
-
-Deployment goes into the default namespace.
-
-To deploy all resources:
-
-```bash
-kubectl apply -f target/k8s/ -R
-```
-
-To remove all resources:
-
-```bash
-kubectl delete -f target/k8s/ -R
-```
-
-Check
-
-```bash
-kubectl get deployments -o wide
-kubectl get pods -o wide
-```
-
-You can use the actuator rest call to verify via port 30080
 
 ### Deployment with Helm
 
@@ -277,7 +199,7 @@ kubectl logs $POD -n spring-6-gateway --all-containers
 
 Show Details and Event
 
-$POD_NAME can be: spring-6-gateway-mongodb, spring-6-gateway
+$POD_NAME can be: spring-6-gateway, spring-6-reactive-mongo-mongodb or spring-6-rest-mvc-mysql
 
 ```powershell
 kubectl describe pod $POD_NAME -n spring-6-gateway
