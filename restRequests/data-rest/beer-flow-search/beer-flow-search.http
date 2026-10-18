@@ -8,10 +8,12 @@ traceparent: 00-{{traceId}}-{{spanId}}-03
 baggage: testBaggage=spring-6-data-rest
 
 > {%
-    if (response.body && response.body.id) {
-        client.global.set("beerId", response.body.id);
+    const selfHref = response.body && response.body._links && response.body._links.self && response.body._links.self.href;
+    if (selfHref) {
+        const beerId = selfHref.substring(selfHref.lastIndexOf("/") + 1);
+        client.global.set("beerId", beerId);
         client.global.set("beerStyle", response.body.beerStyle);
-        client.log("findByUpc -> saved beerId=" + response.body.id + ", beerStyle=" + response.body.beerStyle);
+        client.log("findByUpc -> saved beerId=" + beerId + ", beerStyle=" + response.body.beerStyle);
     } else {
         client.log("findByUpc -> no beer found");
     }
@@ -48,7 +50,7 @@ traceparent: 00-{{traceId}}-{{spanId}}-03
 baggage: testBaggage=spring-6-data-rest
 
 > {%
-    const beers = (response.body._embedded && response.body._embedded.beer) || [];
+    const beers = (response.body._embedded && response.body._embedded.beers) || [];
     client.test("findAllByBeerStyle returns 200", function () {
         client.assert(response.status === 200, "expected 200 but got " + response.status);
     });

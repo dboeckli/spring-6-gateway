@@ -12,7 +12,8 @@ Server runs on port 8080. Requires that other projects are up and running.
 * spring-6-reactive-mongo on port 8083
 * spring-6-data-rest on port 8084
 Example requests can be found in the `restRequests/` directory, grouped per upstream service
-(`mvc/`, `reactive/`, `reactive-mongo/`, `data-rest/`).
+(`mvc/`, `reactive/`, `reactive-mongo/`, `data-rest/`). The IntelliJ `.http` files are the source of
+truth; a Bruno collection is derived from them in `restRequests/bruno/` (see its `README.md`).
 
 ## Urls
 
