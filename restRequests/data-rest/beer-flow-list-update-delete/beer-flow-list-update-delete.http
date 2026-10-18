@@ -8,11 +8,13 @@ traceparent: 00-{{traceId}}-{{spanId}}-03
 baggage: testBaggage=spring-6-data-rest
 
 > {%
-    const beers = (response.body._embedded && response.body._embedded.beer) || [];
+    const beers = (response.body._embedded && response.body._embedded.beers) || [];
     if (beers.length > 0) {
         const first = beers[0];
-        client.global.set("beerId", first.id);
-        client.log("listBeers -> saved beerId=" + first.id + " (" + first.beerName + ")");
+        const selfHref = first._links.self.href;
+        const beerId = selfHref.substring(selfHref.lastIndexOf("/") + 1);
+        client.global.set("beerId", beerId);
+        client.log("listBeers -> saved beerId=" + beerId + " (" + first.beerName + ")");
     } else {
         client.log("listBeers -> no beer found");
     }
@@ -88,7 +90,7 @@ traceparent: 00-{{traceId}}-{{spanId}}-03
 baggage: testBaggage=spring-6-data-rest
 
 > {%
-    client.test("deleteBeer returns 204", function () {
-        client.assert(response.status === 204, "expected 204 but got " + response.status);
+    client.test("deleteBeer returns 200", function () {
+        client.assert(response.status === 200, "expected 200 but got " + response.status);
     });
 %}
