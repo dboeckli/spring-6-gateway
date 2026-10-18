@@ -1,0 +1,135 @@
+# Flow: listCustomers -> patchCustomer -> verify -> restoreCustomer — see restRequests/reactive/customer-flow-patch/customer-flow-patch.md
+
+### 1) list customers (sets {{customerId}}, {{originalCustomerName}})
+< ../../scripts/traceparent.js
+GET http://localhost:{{gateway-port}}/api/v2/customer
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-reactive
+
+> {%
+    const customers = response.body || [];
+    if (customers.length > 0) {
+        const first = customers[0];
+        client.global.set("customerId", first.id);
+        client.global.set("originalCustomerName", first.customerName);
+        client.log("listCustomers -> saved customerId=" + first.id + " (" + first.customerName + ")");
+    } else {
+        client.log("listCustomers -> no customer found");
+    }
+    client.test("listCustomers returns 200", function () {
+        client.assert(response.status === 200, "expected 200 but got " + response.status);
+    });
+    client.test("listCustomers returns at least one customer", function () {
+        client.assert(customers.length > 0, "no customers returned");
+    });
+%}
+
+### 2) patch the customer (PATCH)
+< {%
+    function randomHex(length) {
+        let result = '';
+        const chars = '0123456789abcdef';
+        for (let i = 0; i < length; i++) {
+            result += chars[Math.floor(Math.random() * chars.length)];
+        }
+        return result;
+    }
+    request.variables.set("traceId", randomHex(32));
+    request.variables.set("spanId", randomHex(16));
+
+    const customerId = client.global.get("customerId");
+    client.log("patchCustomer -> customerId=" + customerId);
+    if (!customerId) {
+        throw new Error("customerId is not set - run 'list customers' first");
+    }
+%}
+PATCH http://localhost:{{gateway-port}}/api/v2/customer/{{customerId}}
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-reactive
+
+{
+    "customerName": "Patched Customer"
+}
+
+> {%
+    client.test("patchCustomer returns 200", function () {
+        client.assert(response.status === 200, "expected 200 but got " + response.status);
+    });
+%}
+
+### 3) verify the patch (GET)
+< {%
+    function randomHex(length) {
+        let result = '';
+        const chars = '0123456789abcdef';
+        for (let i = 0; i < length; i++) {
+            result += chars[Math.floor(Math.random() * chars.length)];
+        }
+        return result;
+    }
+    request.variables.set("traceId", randomHex(32));
+    request.variables.set("spanId", randomHex(16));
+
+    const customerId = client.global.get("customerId");
+    client.log("getCustomerById -> customerId=" + customerId);
+    if (!customerId) {
+        throw new Error("customerId is not set - run 'list customers' first");
+    }
+%}
+GET http://localhost:{{gateway-port}}/api/v2/customer/{{customerId}}
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-reactive
+
+> {%
+    client.test("getCustomerById returns 200", function () {
+        client.assert(response.status === 200, "expected 200 but got " + response.status);
+    });
+    client.test("customerName was patched", function () {
+        client.assert(response.body.customerName === "Patched Customer", "customerName mismatch");
+    });
+%}
+
+### 4) restore the original customer name (PATCH)
+< {%
+    function randomHex(length) {
+        let result = '';
+        const chars = '0123456789abcdef';
+        for (let i = 0; i < length; i++) {
+            result += chars[Math.floor(Math.random() * chars.length)];
+        }
+        return result;
+    }
+    request.variables.set("traceId", randomHex(32));
+    request.variables.set("spanId", randomHex(16));
+
+    const customerId = client.global.get("customerId");
+    const originalCustomerName = client.global.get("originalCustomerName");
+    request.variables.set("originalCustomerName", originalCustomerName);
+    client.log("restoreCustomer -> customerId=" + customerId + ", customerName=" + originalCustomerName);
+    if (!customerId || !originalCustomerName) {
+        throw new Error("customerId/originalCustomerName is not set - run 'list customers' first");
+    }
+%}
+PATCH http://localhost:{{gateway-port}}/api/v2/customer/{{customerId}}
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-reactive
+
+{
+    "customerName": "{{originalCustomerName}}"
+}
+
+> {%
+    client.test("restoreCustomer returns 200", function () {
+        client.assert(response.status === 200, "expected 200 but got " + response.status);
+    });
+%}

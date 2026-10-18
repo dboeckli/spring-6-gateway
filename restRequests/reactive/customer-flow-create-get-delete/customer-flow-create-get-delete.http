@@ -1,0 +1,96 @@
+# Flow: createCustomer -> getCustomer -> deleteCustomer — see restRequests/reactive/customer-flow-create-get-delete/customer-flow-create-get-delete.md
+
+### 1) create a customer (sets {{customerId}} from the Location header)
+< ../../scripts/traceparent.js
+POST http://localhost:{{gateway-port}}/api/v2/customer
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-reactive
+
+{
+    "customerName": "Flow Customer"
+}
+
+> {%
+    const location = response.headers.valueOf("Location");
+    if (location) {
+        const customerId = location.substring(location.lastIndexOf("/") + 1);
+        client.global.set("customerId", customerId);
+        client.log("createCustomer -> saved customerId=" + customerId + " from " + location);
+    } else {
+        client.log("createCustomer -> no Location header");
+    }
+    client.test("createCustomer returns 201", function () {
+        client.assert(response.status === 201, "expected 201 but got " + response.status);
+    });
+    client.test("createCustomer returns a Location header", function () {
+        client.assert(!!location, "Location header missing");
+    });
+%}
+
+### 2) get the created customer (uses {{customerId}})
+< {%
+    function randomHex(length) {
+        let result = '';
+        const chars = '0123456789abcdef';
+        for (let i = 0; i < length; i++) {
+            result += chars[Math.floor(Math.random() * chars.length)];
+        }
+        return result;
+    }
+    request.variables.set("traceId", randomHex(32));
+    request.variables.set("spanId", randomHex(16));
+
+    const customerId = client.global.get("customerId");
+    client.log("getCustomerById -> customerId=" + customerId);
+    if (!customerId) {
+        throw new Error("customerId is not set - run 'create a customer' first");
+    }
+%}
+GET http://localhost:{{gateway-port}}/api/v2/customer/{{customerId}}
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-reactive
+
+> {%
+    client.test("getCustomerById returns 200", function () {
+        client.assert(response.status === 200, "expected 200 but got " + response.status);
+    });
+    client.test("customerName matches the created customer", function () {
+        client.assert(response.body.customerName === "Flow Customer", "customerName mismatch");
+    });
+%}
+
+### 3) delete the created customer (uses {{customerId}})
+< {%
+    function randomHex(length) {
+        let result = '';
+        const chars = '0123456789abcdef';
+        for (let i = 0; i < length; i++) {
+            result += chars[Math.floor(Math.random() * chars.length)];
+        }
+        return result;
+    }
+    request.variables.set("traceId", randomHex(32));
+    request.variables.set("spanId", randomHex(16));
+
+    const customerId = client.global.get("customerId");
+    client.log("deleteCustomer -> customerId=" + customerId);
+    if (!customerId) {
+        throw new Error("customerId is not set - run 'create a customer' first");
+    }
+%}
+DELETE http://localhost:{{gateway-port}}/api/v2/customer/{{customerId}}
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-reactive
+
+> {%
+    client.test("deleteCustomer returns 204", function () {
+        client.assert(response.status === 204, "expected 204 but got " + response.status);
+    });
+%}

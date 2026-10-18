@@ -1,0 +1,139 @@
+# Flow: listBeers -> patchBeer -> verify -> restoreBeer — see restRequests/reactive/beer-flow-patch/beer-flow-patch.md
+
+### 1) list beers (sets {{beerId}}, {{originalBeerName}}, {{originalBeerStyle}})
+< ../../scripts/traceparent.js
+GET http://localhost:{{gateway-port}}/api/v2/beer
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-reactive
+
+> {%
+    const beers = response.body || [];
+    if (beers.length > 0) {
+        const first = beers[0];
+        client.global.set("beerId", first.id);
+        client.global.set("originalBeerName", first.beerName);
+        client.global.set("originalBeerStyle", first.beerStyle);
+        client.log("listBeers -> saved beerId=" + first.id + " (" + first.beerName + ", " + first.beerStyle + ")");
+    } else {
+        client.log("listBeers -> no beer found");
+    }
+    client.test("listBeers returns 200", function () {
+        client.assert(response.status === 200, "expected 200 but got " + response.status);
+    });
+    client.test("listBeers returns at least one beer", function () {
+        client.assert(beers.length > 0, "no beers returned");
+    });
+%}
+
+### 2) patch the beer (PATCH, only beerName is sent)
+< {%
+    function randomHex(length) {
+        let result = '';
+        const chars = '0123456789abcdef';
+        for (let i = 0; i < length; i++) {
+            result += chars[Math.floor(Math.random() * chars.length)];
+        }
+        return result;
+    }
+    request.variables.set("traceId", randomHex(32));
+    request.variables.set("spanId", randomHex(16));
+
+    const beerId = client.global.get("beerId");
+    client.log("patchBeer -> beerId=" + beerId);
+    if (!beerId) {
+        throw new Error("beerId is not set - run 'list beers' first");
+    }
+%}
+PATCH http://localhost:{{gateway-port}}/api/v2/beer/{{beerId}}
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-reactive
+
+{
+    "beerName": "Blessed Patched"
+}
+
+> {%
+    client.test("patchBeer returns 200", function () {
+        client.assert(response.status === 200, "expected 200 but got " + response.status);
+    });
+%}
+
+### 3) verify the patch (GET, other fields must be unchanged)
+< {%
+    function randomHex(length) {
+        let result = '';
+        const chars = '0123456789abcdef';
+        for (let i = 0; i < length; i++) {
+            result += chars[Math.floor(Math.random() * chars.length)];
+        }
+        return result;
+    }
+    request.variables.set("traceId", randomHex(32));
+    request.variables.set("spanId", randomHex(16));
+
+    const beerId = client.global.get("beerId");
+    client.log("getBeerById -> beerId=" + beerId);
+    if (!beerId) {
+        throw new Error("beerId is not set - run 'list beers' first");
+    }
+%}
+GET http://localhost:{{gateway-port}}/api/v2/beer/{{beerId}}
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-reactive
+
+> {%
+    client.test("getBeerById returns 200", function () {
+        client.assert(response.status === 200, "expected 200 but got " + response.status);
+    });
+    client.test("beerName was patched", function () {
+        client.assert(response.body.beerName === "Blessed Patched", "beerName mismatch");
+    });
+    client.test("beerStyle was not modified", function () {
+        client.assert(response.body.beerStyle === client.global.get("originalBeerStyle"), "beerStyle changed");
+    });
+%}
+
+### 4) restore the original beer name (PATCH)
+< {%
+    function randomHex(length) {
+        let result = '';
+        const chars = '0123456789abcdef';
+        for (let i = 0; i < length; i++) {
+            result += chars[Math.floor(Math.random() * chars.length)];
+        }
+        return result;
+    }
+    request.variables.set("traceId", randomHex(32));
+    request.variables.set("spanId", randomHex(16));
+
+    const beerId = client.global.get("beerId");
+    const originalBeerName = client.global.get("originalBeerName");
+    request.variables.set("originalBeerName", originalBeerName);
+    client.log("restoreBeer -> beerId=" + beerId + ", beerName=" + originalBeerName);
+    if (!beerId || !originalBeerName) {
+        throw new Error("beerId/originalBeerName is not set - run 'list beers' first");
+    }
+%}
+PATCH http://localhost:{{gateway-port}}/api/v2/beer/{{beerId}}
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-reactive
+
+{
+    "beerName": "{{originalBeerName}}"
+}
+
+> {%
+    client.test("restoreBeer returns 200", function () {
+        client.assert(response.status === 200, "expected 200 but got " + response.status);
+    });
+%}
