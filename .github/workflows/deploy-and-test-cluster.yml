@@ -165,10 +165,14 @@ jobs:
           done
 
           mkdir -p "$GITHUB_WORKSPACE/bru-reports"
-          bru run data-rest reactive -r --env local \
-            --reporter-skip-all-headers \
-            --reporter-junit "$GITHUB_WORKSPACE/bru-reports/TEST-bruno.xml" \
-            --reporter-html "$GITHUB_WORKSPACE/bru-reports/bru-report.html"
+          for service in data-rest reactive reactive-mongo mvc; do
+            echo "::group::Bruno smoke tests: $service"
+            bru run "$service" -r --env local \
+              --reporter-skip-all-headers \
+              --reporter-junit "$GITHUB_WORKSPACE/bru-reports/TEST-bruno-$service.xml" \
+              --reporter-html "$GITHUB_WORKSPACE/bru-reports/bru-report-$service.html"
+            echo "::endgroup::"
+          done
 
       - name: Upload Bruno reports
         if: always()
@@ -182,8 +186,8 @@ jobs:
         if: always()
         uses: EnricoMi/publish-unit-test-result-action@v2.25.0
         with:
-          files: bru-reports/TEST-bruno.xml
-          check_name: Bruno smoke tests (data-rest, reactive)
+          files: bru-reports/TEST-bruno-*.xml
+          check_name: Bruno API smoke tests
           comment_mode: "off"
           fail_on: test failures
           action_fail: true

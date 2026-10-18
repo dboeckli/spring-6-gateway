@@ -4,8 +4,8 @@ Die IntelliJ-HTTP-Requests unter `restRequests/` bleiben der Master (Source of T
 Bruno-Collection wird daraus generiert und dient als Alternative zum IntelliJ HTTP Client sowie zur
 Automatisierung per CLI.
 
-Aktueller Stand: **`data-rest`** (12 Requests) und **`reactive`** (26 Requests, inkl. OAuth2) sind
-konvertiert. Die übrigen Service-Ordner (`reactive-mongo`, `mvc`) folgen.
+Aktueller Stand: alle Service-Ordner sind konvertiert — `data-rest` (12 Requests), `reactive`
+(26), `reactive-mongo` (22) und `mvc` (26), inkl. OAuth2 für `reactive`/`reactive-mongo`/`mvc`.
 
 ## Struktur
 
@@ -23,6 +23,8 @@ restRequests/bruno/
 ├── reactive/                   # 1:1 aus restRequests/reactive abgeleitet
 │   ├── folder.bru              # OAuth2 (Client Credentials) für alle Unterordner
 │   └── …
+├── reactive-mongo/             # analog, inkl. folder.bru
+├── mvc/                        # analog, inkl. folder.bru
 └── tools/
     └── http-to-bru.mjs         # Generator .http -> .bru
 ```
@@ -195,7 +197,7 @@ Werden die Tokens in Reports nicht benötigt, Reports mit `--reporter-skip-all-h
 5. `collection.bru` ist handgepflegt und spiegelt `restRequests/scripts/traceparent.js` — bei
    Änderungen am Traceparent-Script dort nachziehen.
 
-## Evaluation (Stand: data-rest, reactive)
+## Evaluation (Stand: alle Service-Ordner)
 
 |         Kriterium         |                                           Ergebnis                                           |
 |---------------------------|----------------------------------------------------------------------------------------------|
@@ -245,10 +247,11 @@ Bruno-Smoke-Test als Pflicht-Gate aus:
 
 1. `actions/setup-node` + `npm install -g @usebruno/cli@4.2.1`
 2. `kubectl port-forward svc/spring-6-gateway 8080:8080`
-3. `bru run data-rest reactive -r --env local`
-4. JUnit-/HTML-Report als Artifact `bruno-reports` (`--reporter-skip-all-headers`)
+3. Pro Service ein eigener Lauf (isoliert Runtime-Variablen):
+   `bru run <service> -r --env local` für `data-rest`, `reactive`, `reactive-mongo`, `mvc`
+4. JUnit-/HTML-Report pro Service als Artifact `bruno-reports` (`--reporter-skip-all-headers`)
 5. JUnit-Ergebnisse via `EnricoMi/publish-unit-test-result-action` im **Checks**-Tab
-   (`Bruno smoke tests (data-rest, reactive)`), ohne Download des Artifacts
+   (`Bruno API smoke tests`), ohne Download des Artifacts
 
 `BRUNO_CLIENT_ID` (Repository-Variable) und `BRUNO_CLIENT_SECRET` (Secret) werden in den Bruno-Step
 durchgereicht; sie werden für `reactive` benötigt und stehen später auch für `mvc` bereit.
@@ -259,9 +262,9 @@ publiziert (`if: always()`). Der Port-Forward wird per `trap` beendet.
 
 ## Offene Punkte
 
-- `reactive-mongo` und `mvc` konvertieren (OAuth2-Mapping ist vorhanden; Credentials aus
-  `http-client.env.json`).
 - Bruno-Smoke-Test ist im Deploy-Workflow ein Pflicht-Gate; bei Flakiness ggf. wieder lockern oder
   in einen separaten Nightly-Job verschieben.
+- `data-rest`/`reactive` sind gegen die echten Services verifiziert; `reactive-mongo`/`mvc` werden
+  über den Deploy-Workflow validiert (Host-Stack war beim Konvertieren aus).
 - `bru`-Version im Sandbox-Kit versioniert aufnehmen, falls Bruno bleibt.
 
