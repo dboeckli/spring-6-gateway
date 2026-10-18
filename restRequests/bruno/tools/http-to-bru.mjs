@@ -405,8 +405,13 @@ function extractAuthId(request) {
   return null;
 }
 
-function renderFolderAuth(authId, config) {
+function renderFolderAuth(authId, config, name) {
   return [
+    'meta {',
+    `  name: ${name}`,
+    '  type: folder',
+    '}',
+    '',
     'auth {',
     '  mode: oauth2',
     '}',
@@ -601,7 +606,7 @@ async function buildExpected(files, collectionRoot, source, format) {
       const [authId] = [...globalAuthIds];
       const serviceRoot = await serviceRootForSource(source, collectionRoot);
       const folderName = format === 'yml' ? 'folder.yml' : 'folder.bru';
-      const folderBru = renderFolderAuth(authId, authConfigs.get(authId));
+      const folderBru = renderFolderAuth(authId, authConfigs.get(authId), path.basename(serviceRoot));
       expected.set(path.join(serviceRoot, folderName), format === 'yml' ? toYaml(folderBru, 'folder') : folderBru);
     } else {
       for (const [directory, authIds] of directoryAuthIds) {
@@ -610,7 +615,7 @@ async function buildExpected(files, collectionRoot, source, format) {
         }
         const [authId] = [...authIds];
         const folderName = format === 'yml' ? 'folder.yml' : 'folder.bru';
-        const folderBru = renderFolderAuth(authId, authConfigs.get(authId));
+        const folderBru = renderFolderAuth(authId, authConfigs.get(authId), path.basename(directory));
         expected.set(path.join(directory, folderName), format === 'yml' ? toYaml(folderBru, 'folder') : folderBru);
       }
     }
