@@ -181,8 +181,9 @@ jobs:
         with:
           files: bru-reports/TEST-bruno.xml
           check_name: Bruno data-rest smoke test
-          comment_mode: off
-          fail_on: anything
+          comment_mode: "off"
+          fail_on: test failures
+          action_fail: true
 
       - name: Display Deployment Information
         env:
