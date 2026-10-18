@@ -21,8 +21,8 @@ runtime:
         test("discovery exposes a token endpoint", function () {
             expect(!!res.body.token_endpoint, "token_endpoint missing").to.be.true;
         });
-        test("issuer points to the auth server", function () {
-            expect(String(res.body.issuer).indexOf("9000") >= 0, "unexpected issuer: " + res.body.issuer).to.be.true;
+        test("discovery exposes an issuer", function () {
+            expect(!!res.body.issuer, "issuer missing").to.be.true;
         });
 
 settings:

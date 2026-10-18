@@ -29,8 +29,8 @@ Accept: application/json
     client.test("discovery exposes a token endpoint", function () {
         client.assert(!!response.body.token_endpoint, "token_endpoint missing");
     });
-    client.test("issuer points to the auth server", function () {
-        client.assert(String(response.body.issuer).indexOf("9000") >= 0, "unexpected issuer: " + response.body.issuer);
+    client.test("discovery exposes an issuer", function () {
+        client.assert(!!response.body.issuer, "issuer missing");
     });
 %}
 

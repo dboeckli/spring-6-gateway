@@ -58,7 +58,7 @@ sequenceDiagram
 ## Asserts
 
 - Token → `200`, `access_token` vorhanden.
-- Discovery → `200`, `token_endpoint` vorhanden, Issuer enthält den Auth-Server-Port `9000`.
+- Discovery → `200`, `token_endpoint` und Issuer vorhanden.
 - Actuator → `200`.
 - Protected Call → `200`, `content` vorhanden.
 
