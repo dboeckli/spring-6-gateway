@@ -1,6 +1,0 @@
-### customers
-< ../scripts/traceparent.js
-GET http://localhost:{{gateway-port}}/api/v4/customer
-Accept: application/json
-traceparent: 00-{{traceId}}-{{spanId}}-03
-baggage: testBaggage=spring-6-data-rest

@@ -1,0 +1,94 @@
+# Flow: listBeers -> updateBeer -> deleteBeer — see restRequests/data-rest/beer-flow-list-update-delete/beer-flow-list-update-delete.md
+
+### 1) list beers (sets {{beerId}})
+< ../../scripts/traceparent.js
+GET http://localhost:{{gateway-port}}/api/v4/beer
+Accept: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-data-rest
+
+> {%
+    const beers = (response.body._embedded && response.body._embedded.beer) || [];
+    if (beers.length > 0) {
+        const first = beers[0];
+        client.global.set("beerId", first.id);
+        client.log("listBeers -> saved beerId=" + first.id + " (" + first.beerName + ")");
+    } else {
+        client.log("listBeers -> no beer found");
+    }
+    client.test("listBeers returns 200", function () {
+        client.assert(response.status === 200, "expected 200 but got " + response.status);
+    });
+%}
+
+### 2) update the beer (PUT, uses {{beerId}})
+< {%
+    function randomHex(length) {
+        let result = '';
+        const chars = '0123456789abcdef';
+        for (let i = 0; i < length; i++) {
+            result += chars[Math.floor(Math.random() * chars.length)];
+        }
+        return result;
+    }
+    request.variables.set("traceId", randomHex(32));
+    request.variables.set("spanId", randomHex(16));
+
+    const beerId = client.global.get("beerId");
+    client.log("updateBeer -> beerId=" + beerId);
+    if (!beerId) {
+        throw new Error("beerId is not set - run 'list beers' first");
+    }
+%}
+PUT http://localhost:{{gateway-port}}/api/v4/beer/{{beerId}}
+Accept: application/json
+Content-Type: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-data-rest
+
+{
+    "beerName": "Blessed Changed",
+    "beerStyle": "STOUT",
+    "upc": "4666337557578",
+    "quantityOnHand": 2877,
+    "price": 51.10
+}
+
+> {%
+    client.test("updateBeer returns 200", function () {
+        client.assert(response.status === 200, "expected 200 but got " + response.status);
+    });
+    client.test("updated beer name matches", function () {
+        client.assert(response.body.beerName === "Blessed Changed", "beerName mismatch");
+    });
+%}
+
+### 3) delete the beer (uses {{beerId}})
+< {%
+    function randomHex(length) {
+        let result = '';
+        const chars = '0123456789abcdef';
+        for (let i = 0; i < length; i++) {
+            result += chars[Math.floor(Math.random() * chars.length)];
+        }
+        return result;
+    }
+    request.variables.set("traceId", randomHex(32));
+    request.variables.set("spanId", randomHex(16));
+
+    const beerId = client.global.get("beerId");
+    client.log("deleteBeer -> beerId=" + beerId);
+    if (!beerId) {
+        throw new Error("beerId is not set - run 'list beers' first");
+    }
+%}
+DELETE http://localhost:{{gateway-port}}/api/v4/beer/{{beerId}}
+Accept: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-data-rest
+
+> {%
+    client.test("deleteBeer returns 204", function () {
+        client.assert(response.status === 204, "expected 204 but got " + response.status);
+    });
+%}
