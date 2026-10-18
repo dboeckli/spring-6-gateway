@@ -224,3 +224,80 @@ jobs:
             kubectl get pods -n $NAMESPACE
           fi          
 
+
+  publish-bruno-report:
+    needs: deploy-app-with-helm
+    if: always()
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+
+    steps:
+      - name: Download Bruno reports
+        uses: actions/download-artifact@v8.0.2
+        continue-on-error: true
+        with:
+          name: bruno-reports
+          path: bru-reports
+
+      - name: Build Pages site
+        env:
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -o nounset
+          set -o errexit
+
+          mkdir -p _site
+          shopt -s nullglob
+          reports=(bru-reports/*.html)
+
+          if [ "${#reports[@]}" -eq 0 ]; then
+            printf '%s\n' '<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Bruno reports</title></head><body><h1>Bruno smoke test reports</h1><p>No report available for this run.</p></body></html>' > _site/index.html
+            exit 0
+          fi
+
+          cp "${reports[@]}" _site/
+          {
+            printf '%s\n' '<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Bruno reports</title></head><body>'
+            printf '<h1>Bruno smoke test reports</h1>\n'
+            printf '<p>Workflow run: <a href="%s">%s</a></p>\n' "$RUN_URL" "$RUN_URL"
+            printf '<ul>\n'
+            for report in "${reports[@]}"; do
+              name=$(basename "$report")
+              printf '  <li><a href="%s">%s</a></li>\n' "$name" "$name"
+            done
+            printf '</ul>\n</body></html>\n'
+          } > _site/index.html
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v6.0.0
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v5.0.0
+        with:
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5.0.1
+
+      - name: Add report link to summary
+        if: always()
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          if [ -n "${PAGE_URL:-}" ]; then
+            echo "### Bruno reports" >> "$GITHUB_STEP_SUMMARY"
+            echo "$PAGE_URL" >> "$GITHUB_STEP_SUMMARY"
+          fi

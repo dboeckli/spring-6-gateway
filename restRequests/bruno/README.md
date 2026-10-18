@@ -252,13 +252,33 @@ Bruno-Smoke-Test als Pflicht-Gate aus:
 4. JUnit-/HTML-Report pro Service als Artifact `bruno-reports` (`--reporter-skip-all-headers`)
 5. JUnit-Ergebnisse via `EnricoMi/publish-unit-test-result-action` im **Checks**-Tab
    (`Bruno API smoke tests`), ohne Download des Artifacts
+6. HTML-Reports zusätzlich auf **GitHub Pages** (Job `publish-bruno-report`)
 
 `BRUNO_CLIENT_ID` (Repository-Variable) und `BRUNO_CLIENT_SECRET` (Secret) werden in den Bruno-Step
-durchgereicht; sie werden für `reactive` benötigt und stehen später auch für `mvc` bereit.
+durchgereicht; sie werden für `reactive`, `reactive-mongo` und `mvc` benötigt.
 
 Der Bruno-Step ist ein **Pflicht-Gate**: Schlägt ein Request/Test fehl, schlägt der Deploy-Job fehl
-(`fail_on: anything`, kein `continue-on-error`). Reports werden trotzdem hochgeladen und als Check
-publiziert (`if: always()`). Der Port-Forward wird per `trap` beendet.
+(`fail_on: test failures`, `action_fail: true`). Reports werden trotzdem hochgeladen, als Check
+publiziert und auf Pages deployed (`if: always()`). Der Port-Forward wird per `trap` beendet.
+
+### GitHub Pages
+
+Nach dem Deploy wird ein `_site` mit `index.html` und den HTML-Reports aller Services gebaut und
+über die offiziellen Pages-Actions veröffentlicht:
+
+<https://dboeckli.github.io/spring-6-gateway/>
+
+Einmalige Voraussetzungen:
+
+- **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+- Falls das `github-pages`-Environment Branch-Regeln hat: den deployenden Branch erlauben.
+
+Hinweise:
+
+- Es wird immer der **letzte Lauf** veröffentlicht (vorherige Reports werden überschrieben).
+- Die Bruno-HTML-Reports laden Vue/Naive UI von `unpkg.com` — der Browser braucht Internetzugang.
+- `--reporter-skip-all-headers` entfernt Auth-Header; Request-/Response-Bodies sind weiterhin im
+  Report. Bei öffentlichem Repo sind die Pages damit öffentlich.
 
 ## Offene Punkte
 
