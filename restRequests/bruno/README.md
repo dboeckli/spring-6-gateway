@@ -4,8 +4,8 @@ Die IntelliJ-HTTP-Requests unter `restRequests/` bleiben der Master (Source of T
 Bruno-Collection wird daraus generiert und dient als Alternative zum IntelliJ HTTP Client sowie zur
 Automatisierung per CLI.
 
-Aktueller Stand: **`data-rest`** ist konvertiert (12 Requests, 2 Flows + 7 Einzelrequests). Die
-übrigen Service-Ordner (`reactive`, `reactive-mongo`, `mvc`) folgen.
+Aktueller Stand: **`data-rest`** (12 Requests) und **`reactive`** (26 Requests, inkl. OAuth2) sind
+konvertiert. Die übrigen Service-Ordner (`reactive-mongo`, `mvc`) folgen.
 
 ## Struktur
 
@@ -20,6 +20,9 @@ restRequests/bruno/
 │   ├── beer-flow-list-update-delete/
 │   ├── beer-flow-search/
 │   └── beer/
+├── reactive/                   # 1:1 aus restRequests/reactive abgeleitet
+│   ├── folder.bru              # OAuth2 (Client Credentials) für alle Unterordner
+│   └── …
 └── tools/
     └── http-to-bru.mjs         # Generator .http -> .bru
 ```
@@ -32,11 +35,9 @@ Dateinamen (z. B. `beer.http` → `data-rest/beer/`).
 
 - Bruno CLI `4.2.1` (`@usebruno/cli`), Node.js ≥ 18: `npm i -g @usebruno/cli@4.2.1`
 - Bruno Desktop (optional, für GUI-Nutzung), siehe „Öffnen in Bruno Desktop“.
-- `data-rest` (Port 8084) bzw. der Gateway-Stack muss laufen, z. B.:
-
-  ```bash
-  docker compose up -d auth-server data-rest
-  ```
+- Für `data-rest`: `data-rest` (Port 8084) bzw. der Gateway-Stack, z. B.
+  `docker compose up -d auth-server data-rest`.
+- Für `reactive`: `auth-server` + `reactive` (Port 8082) bzw. der Gateway-Stack.
 
 ## Öffnen in Bruno Desktop
 
@@ -80,28 +81,106 @@ allein gestartet werden, sondern nur im Flow-Verbund.
 
 ## Konvertierung (IntelliJ → Bruno)
 
-```bash
-# aus restRequests/bruno
-node tools/http-to-bru.mjs --source ../data-rest
+Aus dem Collection-Root `restRequests/bruno`:
 
-# nur prüfen (CI-tauglich, Exit 1 bei Abweichung)
-node tools/http-to-bru.mjs --source ../data-rest --check
+```bash
+node tools/http-to-bru.mjs --source ../data-rest
+node tools/http-to-bru.mjs --source ../data-rest --check   # nur prüfen, Exit 1 bei Abweichung
 ```
+
+Alternativ vom Repo-Root:
+
+```bash
+node restRequests/bruno/tools/http-to-bru.mjs \
+  --source restRequests/data-rest \
+  --collection restRequests/bruno
+```
+
+Optionen:
+
+- `--source <pfad>`: `.http`-Datei oder Ordner (Default `../data-rest`).
+- `--collection <pfad>`: Collection-Root (Default: Elternordner von `tools/`).
+- `--check`: schreibt nichts, Exit 1 bei Abweichung.
+- `--help`: Hilfe.
+
+Beispiel für einen weiteren Service-Ordner (`reactive`) — PowerShell vom Repo-Root:
+
+```powershell
+node .\restRequests\bruno\tools\http-to-bru.mjs --source .\restRequests\reactive
+```
+
+Oder aus `restRequests/bruno` (bash/PowerShell):
+
+```bash
+node tools/http-to-bru.mjs --source ../reactive
+node tools/http-to-bru.mjs --source ../reactive --check
+```
+
+Das konvertiert rekursiv alle `.http`-Dateien nach `restRequests/bruno/reactive/…`; andere
+Service-Ordner bleiben unberührt. Der IntelliJ-Header `{{$auth.token("auth-id")}}` wird entfernt
+und durch OAuth2 auf Folder-Ebene ersetzt (siehe unten).
 
 Der Generator übersetzt:
 
-|             IntelliJ             |                     Bruno                     |
-|----------------------------------|-----------------------------------------------|
-| `### Name` + Request-Zeile       | `meta.name` + `get/post/put/...`-Block        |
-| Header                           | `headers`-Block                               |
-| JSON-Body                        | `body:json`                                   |
-| `< ../../scripts/traceparent.js` | Collection-Pre-Request in `collection.bru`    |
-| `< {% ... %}`                    | `script:pre-request`                          |
-| `> {% ... %}`                    | `tests`                                       |
-| `client.global.set/get`          | `bru.setVar/getVar`                           |
-| `client.test` / `client.assert`  | `test(...)` / `expect(...).to.be.true`        |
-| `response.body/status/headers`   | `res.body/res.status/res.getHeader(...)`      |
-| `Content-Type: application/json` | entfällt bei `body:json` (setzt Bruno selbst) |
+|                   IntelliJ                    |                           Bruno                           |
+|-----------------------------------------------|-----------------------------------------------------------|
+| `### Name` + Request-Zeile                    | `meta.name` + `get/post/put/...`-Block                    |
+| Header                                        | `headers`-Block                                           |
+| JSON-Body                                     | `body:json`                                               |
+| `< ../../scripts/traceparent.js`              | Collection-Pre-Request in `collection.bru`                |
+| `< {% ... %}`                                 | `script:pre-request`                                      |
+| `> {% ... %}`                                 | `tests`                                                   |
+| `client.global.set/get`                       | `bru.setVar/getVar`                                       |
+| `client.test` / `client.assert`               | `test(...)` / `expect(...).to.be.true`                    |
+| `response.body/status/headers`                | `res.body/res.status/res.getHeader(...)`                  |
+| `Content-Type: application/json`              | entfällt bei `body:json` (setzt Bruno selbst)             |
+| `Authorization: Bearer {{$auth.token("id")}}` | `folder.bru` mit `auth: oauth2`, Requests `auth: inherit` |
+
+## OAuth2 (reactive/mvc)
+
+Der Generator liest die OAuth2-Definitionen aus `restRequests/http-client.env.json`
+(Profil `local`, `Security.Auth`) und erzeugt pro Service-Ordner ein `folder.bru`:
+
+```bru
+auth {
+  mode: oauth2
+}
+
+auth:oauth2 {
+  grant_type: client_credentials
+  access_token_url: {{tokenUrl}}
+  client_id: {{clientId}}
+  client_secret: {{clientSecret}}
+  scope: message.read message.write
+  credentials_placement: basic_auth_header
+  credentials_id: auth-id
+  token_placement: header
+  token_header_prefix: Bearer
+  auto_fetch_token: true
+  auto_refresh_token: false
+}
+```
+
+Die Requests behalten `auth: inherit`. Client-ID/Scope/Token-URL kommen aus dem IntelliJ-Master
+(Generierungszeit); der Secret wird **nicht** in die Collection geschrieben.
+
+Secret-Auflösung (Collection-Pre-Request in `collection.bru`):
+
+```text
+BRUNO_CLIENT_ID     → clientId     (Fallback: clientId aus dem Environment)
+BRUNO_CLIENT_SECRET → clientSecret (Fallback: "secret" für die lokale Dev-Umgebung)
+```
+
+Lokal reicht der Dev-Default. In CI:
+
+```yaml
+env:
+  BRUNO_CLIENT_ID: ${{ vars.BRUNO_CLIENT_ID }}
+  BRUNO_CLIENT_SECRET: ${{ secrets.BRUNO_CLIENT_SECRET }}
+```
+
+Oder pro Lauf: `bru run reactive -r --env local --env-var clientSecret=...`.
+Werden die Tokens in Reports nicht benötigt, Reports mit `--reporter-skip-all-headers` erzeugen.
 
 ## Pflege-Workflow
 
@@ -116,18 +195,18 @@ Der Generator übersetzt:
 5. `collection.bru` ist handgepflegt und spiegelt `restRequests/scripts/traceparent.js` — bei
    Änderungen am Traceparent-Script dort nachziehen.
 
-## Evaluation (Stand: data-rest)
+## Evaluation (Stand: data-rest, reactive)
 
-|         Kriterium         |                                           Ergebnis                                            |
-|---------------------------|-----------------------------------------------------------------------------------------------|
-| Git-Freundlichkeit        | Sehr gut: `.bru` ist Plain Text, ein Request pro Datei, gut reviewbar.                        |
-| Collection-/Env-Struktur  | Klar: `bruno.json`, `collection.bru`, `environments/*.bru`; ein Env-File pro Zielumgebung.    |
-| OAuth2 Client Credentials | Noch offen für `mvc`/`reactive`; Bruno unterstützt `auth: oauth2` (Client Credentials).       |
-| Pre-/Post-Request-Scripts | Voll nutzbar; IntelliJ-API muss übersetzt werden (siehe Tabelle).                             |
-| Assertions                | `test(...)` + Chai-`expect`; Ausgabe im CLI-Report, JUnit-Reporter vorhanden.                 |
-| CLI-/CI-Tauglichkeit      | Sehr gut: `bru run`, `--env`, `--env-var`, `--reporter-junit`, `--bail`, Exit-Code.           |
-| Secret-Handling           | `vars:secret` oder `.env`/`bru.getProcessEnv`; aktuell keine Secrets im data-rest-Flow nötig. |
-| Import aus IntelliJ       | Nicht vorhanden (Bruno importiert nur OpenAPI/WSDL/Postman/Insomnia) → eigener Generator.     |
+|         Kriterium         |                                           Ergebnis                                           |
+|---------------------------|----------------------------------------------------------------------------------------------|
+| Git-Freundlichkeit        | Sehr gut: `.bru` ist Plain Text, ein Request pro Datei, gut reviewbar.                       |
+| Collection-/Env-Struktur  | Klar: `bruno.json`, `collection.bru`, `environments/*.bru`; ein Env-File pro Zielumgebung.   |
+| OAuth2 Client Credentials | Umgesetzt für `reactive` (Folder-Auth, Client Credentials, Secret per Env/CI).               |
+| Pre-/Post-Request-Scripts | Voll nutzbar; IntelliJ-API muss übersetzt werden (siehe Tabelle).                            |
+| Assertions                | `test(...)` + Chai-`expect`; Ausgabe im CLI-Report, JUnit-Reporter vorhanden.                |
+| CLI-/CI-Tauglichkeit      | Sehr gut: `bru run`, `--env`, `--env-var`, `--reporter-junit`, `--bail`, Exit-Code.          |
+| Secret-Handling           | `bru.getProcessEnv` (`BRUNO_CLIENT_SECRET`) mit Dev-Fallback; kein Secret in `.bru`-Dateien. |
+| Import aus IntelliJ       | Nicht vorhanden (Bruno importiert nur OpenAPI/WSDL/Postman/Insomnia) → eigener Generator.    |
 
 **Entscheid:** Bruno wird als abgeleitete Alternative eingeführt; IntelliJ bleibt Master. Die
 Konvertierung erfolgt skriptbasiert (Option 1), damit keine manuelle Doppelpflege entsteht.
@@ -166,10 +245,13 @@ Bruno-Smoke-Test als Pflicht-Gate aus:
 
 1. `actions/setup-node` + `npm install -g @usebruno/cli@4.2.1`
 2. `kubectl port-forward svc/spring-6-gateway 8080:8080`
-3. `bru run data-rest -r --env local`
-4. JUnit-/HTML-Report als Artifact `bruno-reports`
+3. `bru run data-rest reactive -r --env local`
+4. JUnit-/HTML-Report als Artifact `bruno-reports` (`--reporter-skip-all-headers`)
 5. JUnit-Ergebnisse via `EnricoMi/publish-unit-test-result-action` im **Checks**-Tab
-   (`Bruno data-rest smoke test`), ohne Download des Artifacts
+   (`Bruno smoke tests (data-rest, reactive)`), ohne Download des Artifacts
+
+`BRUNO_CLIENT_ID` (Repository-Variable) und `BRUNO_CLIENT_SECRET` (Secret) werden in den Bruno-Step
+durchgereicht; sie werden für `reactive` benötigt und stehen später auch für `mvc` bereit.
 
 Der Bruno-Step ist ein **Pflicht-Gate**: Schlägt ein Request/Test fehl, schlägt der Deploy-Job fehl
 (`fail_on: anything`, kein `continue-on-error`). Reports werden trotzdem hochgeladen und als Check
@@ -177,7 +259,8 @@ publiziert (`if: always()`). Der Port-Forward wird per `trap` beendet.
 
 ## Offene Punkte
 
-- `reactive`, `reactive-mongo`, `mvc` konvertieren (OAuth2-Auth-Mapping, `{{$auth.token(...)}}`).
+- `reactive-mongo` und `mvc` konvertieren (OAuth2-Mapping ist vorhanden; Credentials aus
+  `http-client.env.json`).
 - Bruno-Smoke-Test ist im Deploy-Workflow ein Pflicht-Gate; bei Flakiness ggf. wieder lockern oder
   in einen separaten Nightly-Job verschieben.
 - `bru`-Version im Sandbox-Kit versioniert aufnehmen, falls Bruno bleibt.

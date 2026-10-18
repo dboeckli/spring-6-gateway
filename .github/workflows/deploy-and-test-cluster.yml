@@ -140,6 +140,8 @@ jobs:
         env:
           NAMESPACE: ${{ inputs.namespace }}
           APPLICATION_NAME: ${{ inputs.application-name }}
+          BRUNO_CLIENT_ID: ${{ vars.BRUNO_CLIENT_ID }}
+          BRUNO_CLIENT_SECRET: ${{ secrets.BRUNO_CLIENT_SECRET }}
         run: |
           set -o pipefail
           set -o nounset
@@ -163,7 +165,8 @@ jobs:
           done
 
           mkdir -p "$GITHUB_WORKSPACE/bru-reports"
-          bru run data-rest -r --env local \
+          bru run data-rest reactive -r --env local \
+            --reporter-skip-all-headers \
             --reporter-junit "$GITHUB_WORKSPACE/bru-reports/TEST-bruno.xml" \
             --reporter-html "$GITHUB_WORKSPACE/bru-reports/bru-report.html"
 
@@ -180,7 +183,7 @@ jobs:
         uses: EnricoMi/publish-unit-test-result-action@v2.25.0
         with:
           files: bru-reports/TEST-bruno.xml
-          check_name: Bruno data-rest smoke test
+          check_name: Bruno smoke tests (data-rest, reactive)
           comment_mode: "off"
           fail_on: test failures
           action_fail: true

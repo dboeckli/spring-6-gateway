@@ -10,4 +10,9 @@ script:pre-request {
 
   bru.setVar("traceId", randomHex(32));
   bru.setVar("spanId", randomHex(16));
+
+  const clientId = bru.getProcessEnv("BRUNO_CLIENT_ID") || bru.getEnvVar("clientId") || "messaging-client";
+  const clientSecret = bru.getProcessEnv("BRUNO_CLIENT_SECRET") || bru.getEnvVar("clientSecret") || "secret";
+  bru.setEnvVar("clientId", clientId);
+  bru.setEnvVar("clientSecret", clientSecret);
 }
