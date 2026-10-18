@@ -287,10 +287,14 @@ jobs:
         uses: actions/upload-pages-artifact@v5.0.0
         with:
           path: _site
+          # Unique per attempt: re-runs would otherwise leave a second "github-pages" artifact.
+          name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
 
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5.0.1
+        with:
+          artifact_name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
 
       - name: Add report link to summary
         if: always()
