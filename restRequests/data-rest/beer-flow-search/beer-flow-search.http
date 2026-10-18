@@ -1,0 +1,63 @@
+# Flow: findByUpc -> findAllByBeerStyle — see restRequests/data-rest/beer-flow-search/beer-flow-search.md
+
+### 1) find a beer by UPC (sets {{beerId}} and {{beerStyle}})
+< ../../scripts/traceparent.js
+GET http://localhost:{{gateway-port}}/api/v4/beer/search/findByUpc?upc=2380867498485
+Accept: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-data-rest
+
+> {%
+    if (response.body && response.body.id) {
+        client.global.set("beerId", response.body.id);
+        client.global.set("beerStyle", response.body.beerStyle);
+        client.log("findByUpc -> saved beerId=" + response.body.id + ", beerStyle=" + response.body.beerStyle);
+    } else {
+        client.log("findByUpc -> no beer found");
+    }
+    client.test("findByUpc returns 200", function () {
+        client.assert(response.status === 200, "expected 200 but got " + response.status);
+    });
+    client.test("findByUpc returns the requested upc", function () {
+        client.assert(response.body.upc === "2380867498485", "upc mismatch");
+    });
+%}
+
+### 2) find beers by the beer style from step 1 (uses {{beerStyle}})
+< {%
+    function randomHex(length) {
+        let result = '';
+        const chars = '0123456789abcdef';
+        for (let i = 0; i < length; i++) {
+            result += chars[Math.floor(Math.random() * chars.length)];
+        }
+        return result;
+    }
+    request.variables.set("traceId", randomHex(32));
+    request.variables.set("spanId", randomHex(16));
+
+    const beerStyle = client.global.get("beerStyle");
+    client.log("findAllByBeerStyle -> beerStyle=" + beerStyle);
+    if (!beerStyle) {
+        throw new Error("beerStyle is not set - run 'find a beer by UPC' first");
+    }
+%}
+GET http://localhost:{{gateway-port}}/api/v4/beer/search/findAllByBeerStyle?beerStyle={{beerStyle}}
+Accept: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-data-rest
+
+> {%
+    const beers = (response.body._embedded && response.body._embedded.beer) || [];
+    client.test("findAllByBeerStyle returns 200", function () {
+        client.assert(response.status === 200, "expected 200 but got " + response.status);
+    });
+    client.test("findAllByBeerStyle returns at least one beer", function () {
+        client.assert(beers.length > 0, "no beers returned");
+    });
+    client.test("all returned beers have the requested style", function () {
+        beers.forEach(function (beer) {
+            client.assert(beer.beerStyle === client.global.get("beerStyle"), "beerStyle mismatch: " + beer.beerStyle);
+        });
+    });
+%}

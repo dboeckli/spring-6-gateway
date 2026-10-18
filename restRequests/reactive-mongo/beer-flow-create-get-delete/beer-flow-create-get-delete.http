@@ -1,0 +1,103 @@
+# Flow: createBeer -> getBeer -> deleteBeer — see restRequests/reactive-mongo/beer-flow-create-get-delete/beer-flow-create-get-delete.md
+
+### 1) create a beer (sets {{beerId}} from the Location header)
+< ../../scripts/traceparent.js
+POST http://localhost:{{gateway-port}}/api/v3/beer
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-reactive-mongo
+
+{
+    "beerName": "Flow Beer",
+    "beerStyle": "LAGER",
+    "upc": "0631234200042",
+    "quantityOnHand": 42,
+    "price": 12.50
+}
+
+> {%
+    const location = response.headers.valueOf("Location");
+    if (location) {
+        const beerId = location.substring(location.lastIndexOf("/") + 1);
+        client.global.set("beerId", beerId);
+        client.log("createBeer -> saved beerId=" + beerId + " from " + location);
+    } else {
+        client.log("createBeer -> no Location header");
+    }
+    client.test("createBeer returns 201", function () {
+        client.assert(response.status === 201, "expected 201 but got " + response.status);
+    });
+    client.test("createBeer returns a Location header", function () {
+        client.assert(!!location, "Location header missing");
+    });
+%}
+
+### 2) get the created beer (uses {{beerId}})
+< {%
+    function randomHex(length) {
+        let result = '';
+        const chars = '0123456789abcdef';
+        for (let i = 0; i < length; i++) {
+            result += chars[Math.floor(Math.random() * chars.length)];
+        }
+        return result;
+    }
+    request.variables.set("traceId", randomHex(32));
+    request.variables.set("spanId", randomHex(16));
+
+    const beerId = client.global.get("beerId");
+    client.log("getBeerById -> beerId=" + beerId);
+    if (!beerId) {
+        throw new Error("beerId is not set - run 'create a beer' first");
+    }
+%}
+GET http://localhost:{{gateway-port}}/api/v3/beer/{{beerId}}
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-reactive-mongo
+
+> {%
+    client.test("getBeerById returns 200", function () {
+        client.assert(response.status === 200, "expected 200 but got " + response.status);
+    });
+    client.test("beerName matches the created beer", function () {
+        client.assert(response.body.beerName === "Flow Beer", "beerName mismatch");
+    });
+    client.test("beerStyle matches the created beer", function () {
+        client.assert(response.body.beerStyle === "LAGER", "beerStyle mismatch");
+    });
+%}
+
+### 3) delete the created beer (uses {{beerId}})
+< {%
+    function randomHex(length) {
+        let result = '';
+        const chars = '0123456789abcdef';
+        for (let i = 0; i < length; i++) {
+            result += chars[Math.floor(Math.random() * chars.length)];
+        }
+        return result;
+    }
+    request.variables.set("traceId", randomHex(32));
+    request.variables.set("spanId", randomHex(16));
+
+    const beerId = client.global.get("beerId");
+    client.log("deleteBeer -> beerId=" + beerId);
+    if (!beerId) {
+        throw new Error("beerId is not set - run 'create a beer' first");
+    }
+%}
+DELETE http://localhost:{{gateway-port}}/api/v3/beer/{{beerId}}
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-reactive-mongo
+
+> {%
+    client.test("deleteBeer returns 204", function () {
+        client.assert(response.status === 204, "expected 204 but got " + response.status);
+    });
+%}

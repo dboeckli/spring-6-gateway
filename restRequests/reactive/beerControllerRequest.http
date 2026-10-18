@@ -1,0 +1,49 @@
+### Create Beer returns BAD REQUEST, beerName is to short
+< ../scripts/traceparent.js
+POST http://localhost:{{gateway-port}}/api/v2/beer
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+Content-Type: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-reactive
+
+{
+    "beerName": "p",
+    "beerStyle": "LAGER",
+    "upc": "xx",
+    "quantityOnHand": 5,
+    "price": 27.16
+}
+
+### Update Beer by ID returns BAD REQUEST, beerStyle is empty
+< ../scripts/traceparent.js
+PUT http://localhost:{{gateway-port}}/api/v2/beer/1
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+Content-Type: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-reactive
+
+{
+    "beerName": "presidenteEdited",
+    "beerStyle": "",
+    "upc": "xx",
+    "quantityOnHand": 5,
+    "price": 27.16
+}
+
+### Patch Beer by ID returns BAD REQUEST, beerName is missing
+< ../scripts/traceparent.js
+PATCH http://localhost:{{gateway-port}}/api/v2/beer/1
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+Content-Type: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-reactive
+
+{
+    "beerStyle": "LAGER",
+    "upc": "xx",
+    "quantityOnHand": 5,
+    "price": 27.16
+}

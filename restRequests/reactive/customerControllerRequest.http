@@ -1,0 +1,38 @@
+### Create Customer returns BAD REQUEST, customerName is to short
+< ../scripts/traceparent.js
+POST http://localhost:{{gateway-port}}/api/v2/customer
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+Content-Type: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-reactive
+
+{
+    "customerName": "p"
+}
+
+### Update Customer by ID returns BAD REQUEST, customerName is empty
+< ../scripts/traceparent.js
+PUT http://localhost:{{gateway-port}}/api/v2/customer/1
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+Content-Type: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-reactive
+
+{
+    "customerName": ""
+}
+
+### Patch Customer by ID returns BAD REQUEST, customerName is too short
+< ../scripts/traceparent.js
+PATCH http://localhost:{{gateway-port}}/api/v2/customer/1
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+Content-Type: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-reactive
+
+{
+    "customerName": ""
+}

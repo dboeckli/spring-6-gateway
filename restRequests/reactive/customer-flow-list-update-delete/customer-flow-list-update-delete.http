@@ -1,0 +1,93 @@
+# Flow: listCustomers -> updateCustomer -> deleteCustomer — see restRequests/reactive/customer-flow-list-update-delete/customer-flow-list-update-delete.md
+
+### 1) list customers (sets {{customerId}})
+< ../../scripts/traceparent.js
+GET http://localhost:{{gateway-port}}/api/v2/customer
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-reactive
+
+> {%
+    const customers = response.body || [];
+    if (customers.length > 0) {
+        const first = customers[0];
+        client.global.set("customerId", first.id);
+        client.log("listCustomers -> saved customerId=" + first.id + " (" + first.customerName + ")");
+    } else {
+        client.log("listCustomers -> no customer found");
+    }
+    client.test("listCustomers returns 200", function () {
+        client.assert(response.status === 200, "expected 200 but got " + response.status);
+    });
+    client.test("listCustomers returns at least one customer", function () {
+        client.assert(customers.length > 0, "no customers returned");
+    });
+%}
+
+### 2) update the customer (PUT, uses {{customerId}})
+< {%
+    function randomHex(length) {
+        let result = '';
+        const chars = '0123456789abcdef';
+        for (let i = 0; i < length; i++) {
+            result += chars[Math.floor(Math.random() * chars.length)];
+        }
+        return result;
+    }
+    request.variables.set("traceId", randomHex(32));
+    request.variables.set("spanId", randomHex(16));
+
+    const customerId = client.global.get("customerId");
+    client.log("updateCustomer -> customerId=" + customerId);
+    if (!customerId) {
+        throw new Error("customerId is not set - run 'list customers' first");
+    }
+%}
+PUT http://localhost:{{gateway-port}}/api/v2/customer/{{customerId}}
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-reactive
+
+{
+    "customerName": "Changed Customer"
+}
+
+> {%
+    client.test("updateCustomer returns 200", function () {
+        client.assert(response.status === 200, "expected 200 but got " + response.status);
+    });
+%}
+
+### 3) delete the customer (uses {{customerId}})
+< {%
+    function randomHex(length) {
+        let result = '';
+        const chars = '0123456789abcdef';
+        for (let i = 0; i < length; i++) {
+            result += chars[Math.floor(Math.random() * chars.length)];
+        }
+        return result;
+    }
+    request.variables.set("traceId", randomHex(32));
+    request.variables.set("spanId", randomHex(16));
+
+    const customerId = client.global.get("customerId");
+    client.log("deleteCustomer -> customerId=" + customerId);
+    if (!customerId) {
+        throw new Error("customerId is not set - run 'list customers' first");
+    }
+%}
+DELETE http://localhost:{{gateway-port}}/api/v2/customer/{{customerId}}
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-reactive
+
+> {%
+    client.test("deleteCustomer returns 204", function () {
+        client.assert(response.status === 204, "expected 204 but got " + response.status);
+    });
+%}

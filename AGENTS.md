@@ -31,7 +31,7 @@ is needed here. On a normal host (Windows/CI) this does not apply either.
 - Java: Spring Java Format → fix with `./mvnw spring-javaformat:apply`.
 - Everything else (pom.xml, `**/*.md`, json, `src/main/resources/application*.yaml`, `**/*.sh`):
   Spotless → fix with `./mvnw spotless:apply`. Spotless uses shfmt `3.13.1` for shell scripts.
-- Spotless excludes `AGENTS.md`/`CLAUDE.md` from flexmark (markdown) formatting.
+- Spotless excludes `AGENTS.md` from flexmark (markdown) formatting.
 
 ## External dependency gotcha
 
