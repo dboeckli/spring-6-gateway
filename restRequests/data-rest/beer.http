@@ -1,17 +1,26 @@
 ### Profile
+< ../scripts/traceparent.js
 GET http://localhost:{{gateway-port}}/api/v4/profile/beer
 Accept: application/json
 Content-Type: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-data-rest
 
 ### Get all beers
+< ../scripts/traceparent.js
 GET http://localhost:{{gateway-port}}/api/v4/beer
 Accept: application/json
 Content-Type: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-data-rest
 
 ### Create new Beer
+< ../scripts/traceparent.js
 POST http://localhost:{{gateway-port}}/api/v4/beer
 Accept: application/json
 Content-Type: application/json; charset=utf-8
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-data-rest
 
 {
     "beerName": "Mango Bobs New",
@@ -22,9 +31,12 @@ Content-Type: application/json; charset=utf-8
 }
 
 ### Change an existing beer. do a get first to retrieve the correct id
+< ../scripts/traceparent.js
 PUT http://localhost:{{gateway-port}}/api/v4/beer/2edca6a7-5b39-481b-9a27-cb83fda82b91
 Accept: application/json
 Content-Type: application/json; charset=utf-8
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-data-rest
 
 {
     "beerName": "Blessed Changed",
@@ -35,16 +47,25 @@ Content-Type: application/json; charset=utf-8
 }
 
 ### DELETE existing beer. do a get first to retrieve the correct id
+< ../scripts/traceparent.js
 DELETE http://localhost:{{gateway-port}}/api/v4/beer/2edca6a7-5b39-481b-9a27-cb83fda82b91
 Accept: application/json
 Content-Type: application/json; charset=utf-8
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-data-rest
 
 ### Find by UPC. Check method in BeerRepository: findByUpc. do a get first to retrieve an existing upc
+< ../scripts/traceparent.js
 GET http://localhost:{{gateway-port}}/api/v4/beer/search/findByUpc?upc=2380867498485
 Accept: application/json
 Content-Type: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-data-rest
 
 ### Find by Beerstyle. Check method in BeerRepository: findAllByBeerStyle. do a get first to retrieve an existing beerstyle
+< ../scripts/traceparent.js
 GET http://localhost:{{gateway-port}}/api/v4/beer/search/findAllByBeerStyle?beerStyle=ALE
 Accept: application/json
 Content-Type: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-data-rest
