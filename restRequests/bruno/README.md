@@ -162,7 +162,7 @@ Die Bruno-Dateien wurden danach neu generiert.
 ## CI (Deploy-Workflow)
 
 `.github/workflows/deploy-and-test-cluster.yml` führt nach Helm-Deploy und `helm test` einen
-optionalen Bruno-Smoke-Test aus:
+Bruno-Smoke-Test als Pflicht-Gate aus:
 
 1. `actions/setup-node` + `npm install -g @usebruno/cli@4.2.1`
 2. `kubectl port-forward svc/spring-6-gateway 8080:8080`
@@ -171,13 +171,14 @@ optionalen Bruno-Smoke-Test aus:
 5. JUnit-Ergebnisse via `EnricoMi/publish-unit-test-result-action` im **Checks**-Tab
    (`Bruno data-rest smoke test`), ohne Download des Artifacts
 
-Der Bruno-Step ist mit `continue-on-error: true` markiert und blockiert das Deployment noch nicht
-(`fail_on: nothing`). Der Port-Forward wird per `trap` beendet.
+Der Bruno-Step ist ein **Pflicht-Gate**: Schlägt ein Request/Test fehl, schlägt der Deploy-Job fehl
+(`fail_on: anything`, kein `continue-on-error`). Reports werden trotzdem hochgeladen und als Check
+publiziert (`if: always()`). Der Port-Forward wird per `trap` beendet.
 
 ## Offene Punkte
 
 - `reactive`, `reactive-mongo`, `mvc` konvertieren (OAuth2-Auth-Mapping, `{{$auth.token(...)}}`).
-- Bruno-Smoke-Test im Deploy-Workflow zunächst beobachten; danach ggf. als Pflicht-Gate oder
-  separater Nightly-Job.
+- Bruno-Smoke-Test ist im Deploy-Workflow ein Pflicht-Gate; bei Flakiness ggf. wieder lockern oder
+  in einen separaten Nightly-Job verschieben.
 - `bru`-Version im Sandbox-Kit versioniert aufnehmen, falls Bruno bleibt.
 

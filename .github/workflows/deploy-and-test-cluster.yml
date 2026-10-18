@@ -136,8 +136,6 @@ jobs:
         run: npm install -g @usebruno/cli@4.2.1
 
       - name: Run Bruno smoke tests
-        # Optional smoke test: do not block the deployment on Bruno flakiness yet.
-        continue-on-error: true
         working-directory: restRequests/bruno
         env:
           NAMESPACE: ${{ inputs.namespace }}
@@ -178,15 +176,13 @@ jobs:
           if-no-files-found: warn
 
       - name: Publish Bruno test results
-        # Optional smoke test: report results, but never fail the deployment.
         if: always()
-        continue-on-error: true
-        uses: EnricoMi/publish-unit-test-result-action@v2
+        uses: EnricoMi/publish-unit-test-result-action@v2.25.0
         with:
           files: bru-reports/TEST-bruno.xml
           check_name: Bruno data-rest smoke test
           comment_mode: off
-          fail_on: nothing
+          fail_on: anything
 
       - name: Display Deployment Information
         env:
