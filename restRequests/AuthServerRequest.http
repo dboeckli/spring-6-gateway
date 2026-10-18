@@ -3,55 +3,39 @@ POST http://localhost:{{auth-server-port}}/oauth2/token
 Authorization: Basic messaging-client secret
 Content-Type: application/x-www-form-urlencoded
 
-grant_type=client_credentials&scope=message.read message.write
+grant_type=client_credentials&scope=message.read%20message.write
 
 ### this retrieves the bearer token. use the token in the request below
 POST http://host.docker.internal:{{auth-server-port}}/oauth2/token
 Authorization: Basic messaging-client secret
 Content-Type: application/x-www-form-urlencoded
 
-grant_type=client_credentials&scope=message.read message.write
+grant_type=client_credentials&scope=message.read%20message.write
 
 ### this retrieves the bearer token. use the token in the request below
 POST http://host.docker.internal:{{gateway-port}}/oauth2/token
 Authorization: Basic messaging-client secret
 Content-Type: application/x-www-form-urlencoded
 
-grant_type=client_credentials&scope=message.read message.write
+grant_type=client_credentials&scope=message.read%20message.write
 
 ### this retrieves the bearer token. use the token in the request below. When running via gateway we need to retrieve the token via gateway!
 POST http://localhost:{{gateway-port}}/oauth2/token
 Authorization: Basic messaging-client secret
 Content-Type: application/x-www-form-urlencoded
 
-grant_type=client_credentials&scope=message.read message.write
-
-### this retrieves the bearer token. use the token in the request below. When running via gateway we need to retrieve the token via gateway!
-POST http://host.docker.internal:{{auth-server-port}}/oauth2/token
-Authorization: Basic messaging-client secret
-Content-Type: application/x-www-form-urlencoded
-
-grant_type=client_credentials&scope=message.read message.write
+grant_type=client_credentials&scope=message.read%20message.write
 
 ###
 GET http://localhost:{{gateway-port}}/.well-known/openid-configuration
-Authorization: Basic messaging-client secret
-Content-Type: application/x-www-form-urlencoded
+Accept: application/json
 
 ###
-GET http://localhost:{{gateway-port}}//.well-known/oauth-authorization-server
-Authorization: Basic messaging-client secret
-Content-Type: application/x-www-form-urlencoded
-
-### ist zurzeit nicht aufgesetzt in auth server
-GET http://localhost:{{auth-server-port}}/userinfo
+GET http://localhost:{{gateway-port}}/.well-known/oauth-authorization-server
 Accept: application/json
-Authorization: Bearer {{$auth.token("open-id")}}
 
-### ist zurzeit nicht aufgesetzt in auth server
-GET http://localhost:{{gateway-port}}/userinfo
-Accept: application/json
-Authorization: Bearer {{$auth.token("open-id")}}
+### UserInfo is only available with an authorization_code token (openid scope).
+### Client-credentials tokens are rejected with 401 invalid_token, so no request is provided here.
 
 ### actuator
 GET http://localhost:{{auth-server-port}}/actuator/info

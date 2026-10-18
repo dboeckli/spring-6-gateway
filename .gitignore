@@ -34,3 +34,6 @@ build/
 
 ### Review ###
 .review/
+
+### Bruno tools ###
+restRequests/bruno/tools/node_modules/

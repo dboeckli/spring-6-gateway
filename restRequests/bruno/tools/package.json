@@ -1,0 +1,9 @@
+{
+  "name": "spring-6-gateway-bruno-tools",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@usebruno/filestore": "0.13.0",
+    "nanoid": "3.3.20"
+  }
+}

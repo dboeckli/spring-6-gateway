@@ -165,7 +165,7 @@ jobs:
           done
 
           mkdir -p "$GITHUB_WORKSPACE/bru-reports"
-          for service in data-rest reactive reactive-mongo mvc; do
+          for service in data-rest reactive reactive-mongo mvc auth-server; do
             echo "::group::Bruno smoke tests: $service"
             bru run "$service" -r --env local \
               --reporter-skip-all-headers \
@@ -287,10 +287,14 @@ jobs:
         uses: actions/upload-pages-artifact@v5.0.0
         with:
           path: _site
+          # Unique per attempt: re-runs would otherwise leave a second "github-pages" artifact.
+          name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
 
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5.0.1
+        with:
+          artifact_name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
 
       - name: Add report link to summary
         if: always()
