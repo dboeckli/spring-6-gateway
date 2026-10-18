@@ -603,6 +603,28 @@
               </portNames>
             </configuration>
           </execution>
+          <execution>
+            <id>attach-openapi-artifacts</id>
+            <goals>
+              <goal>attach-artifact</goal>
+            </goals>
+            <phase>verify</phase>
+            <configuration>
+              <skipAttach>${skip.start.stop.springboot}</skipAttach>
+              <artifacts>
+                <artifact>
+                  <file>${project.build.directory}/openapi.json</file>
+                  <type>json</type>
+                  <classifier>openapi</classifier>
+                </artifact>
+                <artifact>
+                  <file>${project.build.directory}/openapi.yaml</file>
+                  <type>yaml</type>
+                  <classifier>openapi</classifier>
+                </artifact>
+              </artifacts>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
 
@@ -930,6 +952,40 @@
             <configuration>
               <!--suppress UnresolvedMavenProperty. argline is set by jacoco -->
               <argLine>${argLine} -XX:+EnableDynamicAgentLoading -Xshare:off</argLine>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.springdoc</groupId>
+        <artifactId>springdoc-openapi-maven-plugin</artifactId>
+        <version>${springdoc-openapi-maven-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>generate-open-api.json</id>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <phase>integration-test</phase>
+            <configuration>
+              <apiDocsUrl>http://localhost:${tomcat.http.port}/v3/api-docs</apiDocsUrl>
+              <outputFileName>openapi.json</outputFileName>
+              <outputDir>${project.build.directory}</outputDir>
+              <skip>${skip.start.stop.springboot}</skip>
+            </configuration>
+          </execution>
+          <execution>
+            <id>generate-open-api.yaml</id>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <phase>integration-test</phase>
+            <configuration>
+              <apiDocsUrl>http://localhost:${tomcat.http.port}/v3/api-docs.yaml</apiDocsUrl>
+              <outputFileName>openapi.yaml</outputFileName>
+              <outputDir>${project.build.directory}</outputDir>
+              <skip>${skip.start.stop.springboot}</skip>
             </configuration>
           </execution>
         </executions>
