@@ -159,9 +159,23 @@ Beim Lauf gegen den echten `data-rest`-Container wurden die data-rest-Flows korr
 
 Die Bruno-Dateien wurden danach neu generiert.
 
+## CI (Deploy-Workflow)
+
+`.github/workflows/deploy-and-test-cluster.yml` führt nach Helm-Deploy und `helm test` einen
+optionalen Bruno-Smoke-Test aus:
+
+1. `actions/setup-node` + `npm install -g @usebruno/cli@4.2.1`
+2. `kubectl port-forward svc/spring-6-gateway 8080:8080`
+3. `bru run data-rest -r --env local`
+4. JUnit-/HTML-Report als Artifact `bruno-reports`
+
+Der Step ist mit `continue-on-error: true` markiert und blockiert das Deployment noch nicht. Der
+Port-Forward wird per `trap` beendet.
+
 ## Offene Punkte
 
 - `reactive`, `reactive-mongo`, `mvc` konvertieren (OAuth2-Auth-Mapping, `{{$auth.token(...)}}`).
-- Optionaler CI-Job (nightly, Compose-Stack, JUnit-Reporter); kein Pflicht-Gate.
+- Bruno-Smoke-Test im Deploy-Workflow zunächst beobachten; danach ggf. als Pflicht-Gate oder
+  separater Nightly-Job.
 - `bru`-Version im Sandbox-Kit versioniert aufnehmen, falls Bruno bleibt.
 

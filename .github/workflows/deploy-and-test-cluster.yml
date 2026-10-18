@@ -122,6 +122,56 @@ jobs:
             echo "All Helm tests passed successfully."
           fi    
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v7.1.0
+        with:
+          node-version: '24'
+
+      - name: Install Bruno CLI
+        run: npm install -g @usebruno/cli@4.2.1
+
+      - name: Run Bruno smoke tests
+        # Optional smoke test: do not block the deployment on Bruno flakiness yet.
+        continue-on-error: true
+        working-directory: restRequests/bruno
+        env:
+          NAMESPACE: ${{ inputs.namespace }}
+          APPLICATION_NAME: ${{ inputs.application-name }}
+        run: |
+          set -o pipefail
+          set -o nounset
+          set -o errexit
+
+          kubectl port-forward svc/"$APPLICATION_NAME" 8080:8080 -n "$NAMESPACE" > /tmp/port-forward.log 2>&1 &
+          PORT_FORWARD_PID=$!
+          trap 'kill $PORT_FORWARD_PID 2>/dev/null || true' EXIT
+
+          for attempt in $(seq 1 30); do
+            if curl -fsS http://localhost:8080/actuator/health/readiness > /dev/null; then
+              echo "Gateway reachable via port-forward (attempt $attempt)"
+              break
+            fi
+            if [ "$attempt" -eq 30 ]; then
+              echo "::error::Gateway not reachable via port-forward"
+              cat /tmp/port-forward.log
+              exit 1
+            fi
+            sleep 2
+          done
+
+          mkdir -p "$GITHUB_WORKSPACE/bru-reports"
+          bru run data-rest -r --env local \
+            --reporter-junit "$GITHUB_WORKSPACE/bru-reports/TEST-bruno.xml" \
+            --reporter-html "$GITHUB_WORKSPACE/bru-reports/bru-report.html"
+
+      - name: Upload Bruno reports
+        if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: bruno-reports
+          path: bru-reports/
+          if-no-files-found: warn
+
       - name: Display Deployment Information
         env:
           NAMESPACE: ${{ inputs.namespace }}
