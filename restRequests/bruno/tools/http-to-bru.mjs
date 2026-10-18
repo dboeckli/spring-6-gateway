@@ -392,6 +392,14 @@ function toYamlCollection(content, config) {
   return withTrailingNewline(library.stringifyCollection(data, config, { format: 'yml' }));
 }
 
+function encodeBasicAuthorization(value) {
+  const match = value.match(/^Basic\s+(\S+)\s+(\S+)$/i);
+  if (!match) {
+    return value;
+  }
+  return `Basic ${Buffer.from(`${match[1]}:${match[2]}`).toString('base64')}`;
+}
+
 function extractAuthId(request) {
   for (const [name, value] of request.headers) {
     if (name.toLowerCase() !== 'authorization') {
@@ -511,7 +519,7 @@ function renderRequest(request, sequence, metadata) {
     out.push('');
     out.push('headers {');
     for (const [name, value] of headers) {
-      out.push(`  ${name}: ${value}`);
+      out.push(`  ${name}: ${name.toLowerCase() === 'authorization' ? encodeBasicAuthorization(value) : value}`);
     }
     out.push('}');
   }

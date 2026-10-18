@@ -1,0 +1,66 @@
+# Flow: token -> discovery -> actuator -> protected call — see restRequests/auth-server/token-flow/token-flow.md
+
+### 1) get an access token via the gateway (sets {{accessToken}})
+POST http://localhost:{{gateway-port}}/oauth2/token
+Authorization: Basic messaging-client secret
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=client_credentials&scope=message.read%20message.write
+
+> {%
+    client.global.set("accessToken", response.body.access_token);
+    client.log("token -> accessToken set: " + (!!response.body.access_token));
+    client.test("token returns 200", function () {
+        client.assert(response.status === 200, "expected 200 but got " + response.status);
+    });
+    client.test("token returns an access_token", function () {
+        client.assert(!!response.body.access_token, "access_token missing");
+    });
+%}
+
+### 2) discovery document (.well-known/openid-configuration)
+GET http://localhost:{{gateway-port}}/.well-known/openid-configuration
+Accept: application/json
+
+> {%
+    client.test("discovery returns 200", function () {
+        client.assert(response.status === 200, "expected 200 but got " + response.status);
+    });
+    client.test("discovery exposes a token endpoint", function () {
+        client.assert(!!response.body.token_endpoint, "token_endpoint missing");
+    });
+    client.test("issuer points to the auth server", function () {
+        client.assert(String(response.body.issuer).indexOf("9000") >= 0, "unexpected issuer: " + response.body.issuer);
+    });
+%}
+
+### 3) auth-server actuator via the gateway
+GET http://localhost:{{gateway-port}}/oauth2/actuator/info
+Accept: application/json
+
+> {%
+    client.test("auth-server actuator returns 200", function () {
+        client.assert(response.status === 200, "expected 200 but got " + response.status);
+    });
+%}
+
+### 4) protected call via the gateway (uses {{accessToken}})
+< {%
+    const accessToken = client.global.get("accessToken");
+    client.log("protected call -> accessToken set: " + (!!accessToken));
+    if (!accessToken) {
+        throw new Error("accessToken is not set - run 'get an access token' first");
+    }
+%}
+GET http://localhost:{{gateway-port}}/api/v1/beer/listBeers
+Accept: application/json
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.test("protected call returns 200", function () {
+        client.assert(response.status === 200, "expected 200 but got " + response.status);
+    });
+    client.test("protected call returns a page", function () {
+        client.assert(!!(response.body.content), "content missing");
+    });
+%}

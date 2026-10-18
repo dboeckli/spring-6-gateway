@@ -165,7 +165,7 @@ jobs:
           done
 
           mkdir -p "$GITHUB_WORKSPACE/bru-reports"
-          for service in data-rest reactive reactive-mongo mvc; do
+          for service in data-rest reactive reactive-mongo mvc auth-server; do
             echo "::group::Bruno smoke tests: $service"
             bru run "$service" -r --env local \
               --reporter-skip-all-headers \

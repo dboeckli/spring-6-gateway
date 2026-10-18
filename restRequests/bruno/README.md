@@ -6,6 +6,7 @@ IntelliJ HTTP Client sowie zur Automatisierung per CLI.
 
 Aktueller Stand: alle Service-Ordner sind konvertiert — `data-rest` (12 Requests), `reactive`
 (26), `reactive-mongo` (22) und `mvc` (26), inkl. OAuth2 für `reactive`/`reactive-mongo`/`mvc`.
+Zusätzlich gibt es einen Auth-Server-Smoke-Flow (`auth-server/token-flow`, 4 Requests).
 Das Bruno-Format ist YAML (`.yml`); `.bru` ist optional (`--format bru`).
 
 ## Struktur
@@ -25,6 +26,8 @@ restRequests/bruno/
 │   └── …
 ├── reactive-mongo/             # analog, inkl. folder.yml
 ├── mvc/                        # analog, inkl. folder.yml
+├── auth-server/                # Token-/Discovery-/Actuator-Smoke-Flow
+│   └── token-flow/
 └── tools/
     ├── http-to-bru.mjs         # Generator .http -> .yml (Default), optional .bru
     ├── package.json            # @usebruno/filestore
@@ -219,6 +222,19 @@ Wichtig:
 - Test: `cd restRequests/bruno && bru run data-rest -r --env local --env-var gateway-port=8084`.
 - Der IntelliJ-`.http`-Master bleibt unverändert.
 
+## Auth-Server-Flow
+
+`restRequests/auth-server/token-flow/token-flow.http` (und das Bruno-Pendant unter
+`restRequests/bruno/auth-server/token-flow/`) prüft:
+
+1. Client-Credentials-Token über das Gateway holen (`accessToken`)
+2. Discovery-Dokument (`/.well-known/openid-configuration`)
+3. Auth-Server-Activator über `/oauth2/actuator/info`
+4. Geschützten Aufruf `/api/v1/beer/listBeers` mit dem Token
+
+Die Varianten in `restRequests/AuthServerRequest.http` (localhost, host.docker.internal, direkt vs.
+Gateway) bleiben als Utility-Sammlung bestehen.
+
 ## Pflege-Workflow
 
 1. Änderung am Master in `restRequests/<service>/...http` (und ggf. `.md`).
@@ -283,7 +299,8 @@ Bruno-Smoke-Test als Pflicht-Gate aus:
 1. `actions/setup-node` + `npm install -g @usebruno/cli@4.2.1`
 2. `kubectl port-forward svc/spring-6-gateway 8080:8080`
 3. Pro Service ein eigener Lauf (isoliert Runtime-Variablen):
-   `bru run <service> -r --env local` für `data-rest`, `reactive`, `reactive-mongo`, `mvc`
+   `bru run <service> -r --env local` für `data-rest`, `reactive`, `reactive-mongo`, `mvc`,
+   `auth-server`
 4. JUnit-/HTML-Report pro Service als Artifact `bruno-reports` (`--reporter-skip-all-headers`)
 5. JUnit-Ergebnisse via `EnricoMi/publish-unit-test-result-action` im **Checks**-Tab
    (`Bruno API smoke tests`), ohne Download des Artifacts
