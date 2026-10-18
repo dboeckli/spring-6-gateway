@@ -168,9 +168,11 @@ optionalen Bruno-Smoke-Test aus:
 2. `kubectl port-forward svc/spring-6-gateway 8080:8080`
 3. `bru run data-rest -r --env local`
 4. JUnit-/HTML-Report als Artifact `bruno-reports`
+5. JUnit-Ergebnisse via `EnricoMi/publish-unit-test-result-action` im **Checks**-Tab
+   (`Bruno data-rest smoke test`), ohne Download des Artifacts
 
-Der Step ist mit `continue-on-error: true` markiert und blockiert das Deployment noch nicht. Der
-Port-Forward wird per `trap` beendet.
+Der Bruno-Step ist mit `continue-on-error: true` markiert und blockiert das Deployment noch nicht
+(`fail_on: nothing`). Der Port-Forward wird per `trap` beendet.
 
 ## Offene Punkte
 

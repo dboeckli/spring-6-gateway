@@ -36,6 +36,11 @@ jobs:
   deploy-app-with-helm:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      checks: write
+      pull-requests: write
+
     steps:
       - name: Show Version
         run: |
@@ -171,6 +176,17 @@ jobs:
           name: bruno-reports
           path: bru-reports/
           if-no-files-found: warn
+
+      - name: Publish Bruno test results
+        # Optional smoke test: report results, but never fail the deployment.
+        if: always()
+        continue-on-error: true
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          files: bru-reports/TEST-bruno.xml
+          check_name: Bruno data-rest smoke test
+          comment_mode: off
+          fail_on: nothing
 
       - name: Display Deployment Information
         env:
