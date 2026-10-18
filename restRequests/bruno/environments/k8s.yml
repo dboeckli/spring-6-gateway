@@ -1,0 +1,19 @@
+variables:
+  - name: gateway-port
+    value: "30080"
+  - name: auth-server-port
+    value: "30900"
+  - name: rest-mvc-port
+    value: "30081"
+  - name: reactive-port
+    value: "30082"
+  - name: reactive-mongo-port
+    value: "30083"
+  - name: clientId
+    value: messaging-client
+  - name: data-rest
+    value: "30084"
+  - name: tokenUrl
+    value: http://localhost:30080/oauth2/token
+  - name: authUrl
+    value: http://localhost:30080/oauth2/auth
