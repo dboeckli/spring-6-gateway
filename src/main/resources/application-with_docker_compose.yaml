@@ -20,6 +20,13 @@ spring:
       enabled: true
       stop:
         command: down
+        # Also tear down the opt-in observability stack. A plain "down" only
+        # touches services without a Compose profile, so otel-collector,
+        # Elasticsearch, Kibana and APM Server would keep running after the
+        # Maven build (spring-boot:start/stop).
+        arguments:
+          - --profile
+          - observability
       readiness:
         wait: always
         timeout: 4m
