@@ -1,0 +1,8 @@
+spring:
+  docker:
+    compose:
+      # Teardown is done explicitly by the Maven build (exec-maven-plugin,
+      # post-integration-test). The JVM shutdown hook is not reliable when
+      # spring-boot:stop closes the context, so the containers would otherwise
+      # keep running after the build.
+      lifecycle-management: start-only

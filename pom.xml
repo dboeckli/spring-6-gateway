@@ -704,7 +704,7 @@
               <!-- 1000 milliseconds is default -->
               <maxAttempts>240</maxAttempts>
               <!-- 30 attempts is default, combined with wait it results to 30 sec. We wait 720 seconds. -->
-              <profiles>with_docker_compose</profiles>
+              <profiles>with_docker_compose,maven-build</profiles>
               <arguments>
                 <argument>-Xmx1024m</argument>
                 <argument>--server.port=${tomcat.http.port}</argument>
@@ -800,6 +800,25 @@
         <artifactId>exec-maven-plugin</artifactId>
         <version>${exec-maven-plugin.version}</version>
         <executions>
+          <execution>
+            <id>stop-docker-compose</id>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+            <phase>post-integration-test</phase>
+            <configuration>
+              <skip>${skip.start.stop.springboot}</skip>
+              <executable>docker</executable>
+              <workingDirectory>${project.basedir}</workingDirectory>
+              <arguments>
+                <argument>compose</argument>
+                <argument>--profile</argument>
+                <argument>observability</argument>
+                <argument>down</argument>
+                <argument>--remove-orphans</argument>
+              </arguments>
+            </configuration>
+          </execution>
           <execution>
             <id>execute-helm-dependencies</id>
             <goals>
