@@ -17,6 +17,7 @@ import io.swagger.v3.parser.OpenAPIV3Parser;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.customizers.GlobalOpenApiCustomizer;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -24,6 +25,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,6 +34,7 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.springdoc.core.utils.Constants.DEFAULT_API_DOCS_URL;
@@ -79,6 +82,13 @@ public class OpenApiConfiguration {
     @Value("${springdoc.api-docs.path:#{null}}")
     public String apiDocsPath;
 
+    /**
+     * External server URL written into the generated OpenAPI documents. When empty, the
+     * runtime server URL is used.
+     */
+    @Value("${openapi.server-url:}")
+    private String openApiServerUrl;
+
     public static final String SECURITY_SCHEME_NAME = "Bearer Authentication";
 
     @PostConstruct
@@ -86,6 +96,15 @@ public class OpenApiConfiguration {
         if (apiDocsPath == null || apiDocsPath.trim().isEmpty()) {
             apiDocsPath = DEFAULT_API_DOCS_URL;
         }
+    }
+
+    @Bean
+    public GlobalOpenApiCustomizer openApiServerCustomizer() {
+        return openApi -> {
+            if (StringUtils.hasText(openApiServerUrl)) {
+                openApi.setServers(List.of(new Server().url(openApiServerUrl)));
+            }
+        };
     }
 
     @Bean
@@ -274,9 +293,11 @@ public class OpenApiConfiguration {
     private void setOpenApiServer(OpenAPI openApi, String description, StringBuilder content) {
         OpenAPI externalOpenApi = new OpenAPIV3Parser().readContents(content.toString()).getOpenAPI();
 
-        // Set the correct server URL
+        // Set the correct server URL (configured external URL wins over the runtime port)
         externalOpenApi.getServers().clear();
-        Server server = new Server().url(openApi.getServers().getFirst().getUrl());
+        String serverUrl = StringUtils.hasText(openApiServerUrl) ? openApiServerUrl
+                : openApi.getServers().getFirst().getUrl();
+        Server server = new Server().url(serverUrl);
         server.description(description);
         log.info("Setting openapi server for rest service {}: {}", description, server);
         externalOpenApi.addServersItem(server);

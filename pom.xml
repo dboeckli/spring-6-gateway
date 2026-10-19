@@ -72,6 +72,7 @@
     <!-- https://springdoc.org/#what-is-the-compatibility-matrix-of-springdoc-openapi-with-spring-boot -->
     <springdoc.openapi.version>3.1.1</springdoc.openapi.version>
     <springdoc-openapi-maven-plugin.version>1.5</springdoc-openapi-maven-plugin.version>
+    <openapi.server.url>http://localhost:8080</openapi.server.url>
 
     <wiremock.version>4.4.3</wiremock.version>
 
@@ -613,14 +614,34 @@
               <skipAttach>${skip.start.stop.springboot}</skipAttach>
               <artifacts>
                 <artifact>
-                  <file>${project.build.directory}/openapi.json</file>
+                  <file>${project.build.directory}/openapi/openapi.json</file>
                   <type>json</type>
                   <classifier>openapi</classifier>
                 </artifact>
                 <artifact>
-                  <file>${project.build.directory}/openapi.yaml</file>
-                  <type>yaml</type>
-                  <classifier>openapi</classifier>
+                  <file>${project.build.directory}/openapi/openapi-spring-6-rest-mvc.json</file>
+                  <type>json</type>
+                  <classifier>openapi-spring-6-rest-mvc</classifier>
+                </artifact>
+                <artifact>
+                  <file>${project.build.directory}/openapi/openapi-spring-6-reactive.json</file>
+                  <type>json</type>
+                  <classifier>openapi-spring-6-reactive</classifier>
+                </artifact>
+                <artifact>
+                  <file>${project.build.directory}/openapi/openapi-spring-6-reactive-mongo.json</file>
+                  <type>json</type>
+                  <classifier>openapi-spring-6-reactive-mongo</classifier>
+                </artifact>
+                <artifact>
+                  <file>${project.build.directory}/openapi/openapi-spring-6-data-rest.json</file>
+                  <type>json</type>
+                  <classifier>openapi-spring-6-data-rest</classifier>
+                </artifact>
+                <artifact>
+                  <file>${project.build.directory}/openapi/openapi-spring-6-auth-server.json</file>
+                  <type>json</type>
+                  <classifier>openapi-spring-6-auth-server</classifier>
                 </artifact>
               </artifacts>
             </configuration>
@@ -683,11 +704,17 @@
               <!-- 1000 milliseconds is default -->
               <maxAttempts>240</maxAttempts>
               <!-- 30 attempts is default, combined with wait it results to 30 sec. We wait 720 seconds. -->
-              <profiles>docker</profiles>
+              <profiles>with_docker_compose</profiles>
               <arguments>
                 <argument>-Xmx1024m</argument>
                 <argument>--server.port=${tomcat.http.port}</argument>
                 <argument>--spring.cloud.kubernetes.enabled=false</argument>
+                <argument>--security.auth-server-health-url=http://localhost:9000</argument>
+                <argument>--security.mvc-health-url=http://localhost:8081</argument>
+                <argument>--security.reactive-health-url=http://localhost:8082</argument>
+                <argument>--security.reactiveMongo-health-url=http://localhost:8083</argument>
+                <argument>--security.dataRest-health-url=http://localhost:8084</argument>
+                <argument>--openapi.server-url=${openapi.server.url}</argument>
               </arguments>
               <jmxPort>${jmx.server.port}</jmxPort>
             </configuration>
@@ -967,25 +994,82 @@
             <goals>
               <goal>generate</goal>
             </goals>
-            <phase>integration-test</phase>
+            <phase>pre-integration-test</phase>
             <configuration>
               <apiDocsUrl>http://localhost:${tomcat.http.port}/v3/api-docs</apiDocsUrl>
               <outputFileName>openapi.json</outputFileName>
-              <outputDir>${project.build.directory}</outputDir>
+              <outputDir>${project.build.directory}/openapi</outputDir>
               <skip>${skip.start.stop.springboot}</skip>
             </configuration>
           </execution>
           <execution>
-            <id>generate-open-api.yaml</id>
+            <id>generate-open-api-spring-6-rest-mvc.json</id>
             <goals>
               <goal>generate</goal>
             </goals>
-            <phase>integration-test</phase>
+            <phase>pre-integration-test</phase>
             <configuration>
-              <apiDocsUrl>http://localhost:${tomcat.http.port}/v3/api-docs.yaml</apiDocsUrl>
-              <outputFileName>openapi.yaml</outputFileName>
-              <outputDir>${project.build.directory}</outputDir>
+              <apiDocsUrl>http://localhost:${tomcat.http.port}/v3/api-docs/spring-6-rest-mvc</apiDocsUrl>
+              <outputFileName>openapi-spring-6-rest-mvc.json</outputFileName>
+              <outputDir>${project.build.directory}/openapi</outputDir>
               <skip>${skip.start.stop.springboot}</skip>
+              <failOnError>true</failOnError>
+            </configuration>
+          </execution>
+          <execution>
+            <id>generate-open-api-spring-6-reactive.json</id>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <phase>pre-integration-test</phase>
+            <configuration>
+              <apiDocsUrl>http://localhost:${tomcat.http.port}/v3/api-docs/spring-6-reactive</apiDocsUrl>
+              <outputFileName>openapi-spring-6-reactive.json</outputFileName>
+              <outputDir>${project.build.directory}/openapi</outputDir>
+              <skip>${skip.start.stop.springboot}</skip>
+              <failOnError>true</failOnError>
+            </configuration>
+          </execution>
+          <execution>
+            <id>generate-open-api-spring-6-reactive-mongo.json</id>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <phase>pre-integration-test</phase>
+            <configuration>
+              <apiDocsUrl>http://localhost:${tomcat.http.port}/v3/api-docs/spring-6-reactive-mongo</apiDocsUrl>
+              <outputFileName>openapi-spring-6-reactive-mongo.json</outputFileName>
+              <outputDir>${project.build.directory}/openapi</outputDir>
+              <skip>${skip.start.stop.springboot}</skip>
+              <failOnError>true</failOnError>
+            </configuration>
+          </execution>
+          <execution>
+            <id>generate-open-api-spring-6-data-rest.json</id>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <phase>pre-integration-test</phase>
+            <configuration>
+              <apiDocsUrl>http://localhost:${tomcat.http.port}/v3/api-docs/spring-6-data-rest</apiDocsUrl>
+              <outputFileName>openapi-spring-6-data-rest.json</outputFileName>
+              <outputDir>${project.build.directory}/openapi</outputDir>
+              <skip>${skip.start.stop.springboot}</skip>
+              <failOnError>true</failOnError>
+            </configuration>
+          </execution>
+          <execution>
+            <id>generate-open-api-spring-6-auth-server.json</id>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <phase>pre-integration-test</phase>
+            <configuration>
+              <apiDocsUrl>http://localhost:${tomcat.http.port}/v3/api-docs/spring-6-auth-server</apiDocsUrl>
+              <outputFileName>openapi-spring-6-auth-server.json</outputFileName>
+              <outputDir>${project.build.directory}/openapi</outputDir>
+              <skip>${skip.start.stop.springboot}</skip>
+              <failOnError>true</failOnError>
             </configuration>
           </execution>
         </executions>
