@@ -1,0 +1,24 @@
+info:
+  name: data-rest
+  type: folder
+
+docs:
+  content: |-
+    Generated from the data-rest OpenAPI spec
+    (`target/openapi/openapi-spring-6-data-rest.json`, Maven classifier
+    `openapi-data-rest`) with:
+
+    ```bash
+    bru import openapi \
+      --source target/openapi/openapi-spring-6-data-rest.json \
+      --output /tmp/bru-openapi \
+      --collection-name "data-rest" \
+      --collection-format opencollection \
+      --group-by path
+    ```
+
+    The import is an OpenCollection root; only its `api/` tree is copied here.
+    `{{baseUrl}}` is rewritten to `http://localhost:{{gateway-port}}` so the
+    requests use the existing `local`/`k8s` environments. Do not edit these
+    files by hand; regenerate instead.
+  type: text/markdown

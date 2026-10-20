@@ -1,0 +1,68 @@
+info:
+  name: getBeerById
+  type: http
+  seq: 1
+  tags:
+    - beer-controller
+
+http:
+  method: GET
+  url: "http://localhost:{{gateway-port}}/api/v2/beer/:beerId"
+  params:
+    - name: beerId
+      value: ""
+      type: path
+  auth:
+    type: oauth2
+    flow: client_credentials
+    accessTokenUrl: http://localhost:8080/oauth2/token
+    refreshTokenUrl: http://localhost:8080/oauth2/refresh-token
+    credentials:
+      clientId: "{{oauth_client_id}}"
+      clientSecret: "{{oauth_client_secret}}"
+      placement: header
+    scope: message.read message.write
+    tokenConfig:
+      placement:
+        header: Bearer
+      source: access_token
+    settings:
+      autoFetchToken: false
+      autoRefreshToken: true
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+examples:
+  - name: 200 Response
+    description: OK
+    request:
+      url: "http://localhost:{{gateway-port}}/api/v2/beer/:beerId"
+      method: GET
+      params:
+        - name: beerId
+          value: ""
+          type: path
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: "*/*"
+      body:
+        type: text
+        data: |-
+          {
+            "id": 0,
+            "beerName": "",
+            "beerStyle": "",
+            "upc": "",
+            "quantityOnHand": 0,
+            "price": 0,
+            "createdDate": "",
+            "lastModifiedDate": ""
+          }

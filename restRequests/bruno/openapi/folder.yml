@@ -1,0 +1,10 @@
+info:
+  name: openapi
+  type: folder
+
+docs:
+  content: |-
+    Requests generated from the spring-6-gateway OpenAPI service specs
+    (Maven artifacts, classifier `openapi-<service>`). These folders are
+    separate from the hand-written flows derived from `restRequests/`.
+  type: text/markdown

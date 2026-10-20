@@ -1,0 +1,6 @@
+info:
+  name: createCustomer
+  type: folder
+
+request:
+  auth: inherit

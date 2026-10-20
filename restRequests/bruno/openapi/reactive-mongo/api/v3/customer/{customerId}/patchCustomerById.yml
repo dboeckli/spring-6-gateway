@@ -1,0 +1,57 @@
+info:
+  name: patchCustomerById
+  type: http
+  seq: 4
+  tags:
+    - customer-controller
+
+http:
+  method: PATCH
+  url: "http://localhost:{{gateway-port}}/api/v3/customer/:customerId"
+  params:
+    - name: customerId
+      value: ""
+      type: path
+  body:
+    type: json
+    data: |-
+      {
+        "id": "",
+        "customerName": "",
+        "createdDate": "",
+        "lastModifiedDate": ""
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+examples:
+  - name: 204 Response
+    description: No Content
+    request:
+      url: "http://localhost:{{gateway-port}}/api/v3/customer/:customerId"
+      method: PATCH
+      params:
+        - name: customerId
+          value: ""
+          type: path
+      body:
+        type: json
+        data: |-
+          {
+            "id": "",
+            "customerName": "",
+            "createdDate": "",
+            "lastModifiedDate": ""
+          }
+    response:
+      status: 204
+      statusText: No Content
+      body:
+        type: text
+        data: ""

@@ -1,0 +1,6 @@
+info:
+  name: findByUpc
+  type: folder
+
+request:
+  auth: inherit

@@ -1,0 +1,6 @@
+info:
+  name: introspect
+  type: folder
+
+request:
+  auth: inherit

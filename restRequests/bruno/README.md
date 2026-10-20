@@ -9,6 +9,9 @@ Aktueller Stand: alle Service-Ordner sind konvertiert — `data-rest` (12 Reques
 Zusätzlich gibt es einen Auth-Server-Smoke-Flow (`auth-server/token-flow`, 4 Requests).
 Das Bruno-Format ist YAML (`.yml`); `.bru` ist optional (`--format bru`).
 
+Unter `openapi/` liegen zusätzlich aus den Service-Specs generierte Requests (`auth-server`,
+`data-rest`, `reactive`, `reactive-mongo`, `rest-mvc`, siehe „OpenAPI-Import“).
+
 ## Struktur
 
 ```text
@@ -21,6 +24,13 @@ restRequests/bruno/
 │   ├── beer-flow-list-update-delete/
 │   ├── beer-flow-search/
 │   └── beer/
+├── openapi/                    # aus OpenAPI-Specs generiert (nicht handgepflegt)
+│   ├── auth-server/            # Spec: openapi-auth-server (ohne /oauth2/actuator)
+│   ├── data-rest/              # Spec: openapi-data-rest
+│   │   └── api/v4/…            # Gruppierung nach URL-Pfad
+│   ├── reactive/               # Spec: openapi-reactive
+│   ├── reactive-mongo/         # Spec: openapi-reactive-mongo
+│   └── rest-mvc/               # Spec: openapi-rest-mvc
 ├── reactive/                   # 1:1 aus restRequests/reactive abgeleitet
 │   ├── folder.yml              # OAuth2 (Client Credentials) für alle Unterordner
 │   └── …
@@ -86,6 +96,68 @@ Hinweis: `bru run .` über die ganze Collection nur bewusst nutzen — die Flows
 zustandsbehaftet (Runtime-Variablen, create/delete, Token). Runtime-Variablen (`bru.setVar`)
 überleben nur einen CLI-Lauf: Ein späterer Flow-Schritt (z. B. `02-update-the-beer`) kann nicht
 allein gestartet werden, sondern nur im Flow-Verbund.
+
+## OpenAPI-Import
+
+Die Requests unter `openapi/<service>/` werden aus den vom Maven-Build erzeugten bzw. als
+Maven-Artefakt publizierten OpenAPI-Specs generiert und nicht handgepflegt.
+
+|   Bruno-Ordner   |     Spec-Datei (`target/openapi/`)     |     Maven-Classifier     |          Auth          |
+|------------------|----------------------------------------|--------------------------|------------------------|
+| `rest-mvc`       | `openapi-spring-6-rest-mvc.json`       | `openapi-rest-mvc`       | OAuth2 (Folder)        |
+| `reactive`       | `openapi-spring-6-reactive.json`       | `openapi-reactive`       | OAuth2 (Folder)        |
+| `reactive-mongo` | `openapi-spring-6-reactive-mongo.json` | `openapi-reactive-mongo` | OAuth2 (Folder)        |
+| `data-rest`      | `openapi-spring-6-data-rest.json`      | `openapi-data-rest`      | `inherit` (keine Auth) |
+| `auth-server`    | `openapi-spring-6-auth-server.json`    | `openapi-auth-server`    | keine                  |
+
+```bash
+# Specs erzeugen (oder via Maven-Dependency holen)
+./mvnw -DskipTests -Dskip.docker.build=true -Dhelm.executable=true verify
+
+# Beispiel data-rest; analog für rest-mvc, reactive, reactive-mongo
+bru import openapi \
+  --source target/openapi/openapi-spring-6-data-rest.json \
+  --output /tmp/bru-openapi-data-rest \
+  --collection-name "data-rest" \
+  --collection-format opencollection \
+  --group-by path
+
+# Nur den api/-Baum übernehmen (kein eigenes opencollection.yml/Environment)
+cp -r /tmp/bru-openapi-data-rest/api restRequests/bruno/openapi/data-rest/
+```
+
+`auth-server` wird ohne die `/oauth2/actuator/**`-Pfade importiert (sonst landen u. a.
+`actuator/shutdown` und `heapdump` in der Collection) und hat keinen `api/`-Präfix; der komplette
+Import-Baum wird übernommen:
+
+```bash
+python3 - <<'PY'
+import json
+d = json.load(open('target/openapi/openapi-spring-6-auth-server.json'))
+for p in [p for p in d['paths'] if '/actuator' in p]:
+    del d['paths'][p]
+json.dump(d, open('/tmp/openapi-auth-server.json', 'w'), indent=2)
+PY
+
+bru import openapi --source /tmp/openapi-auth-server.json \
+  --output /tmp/bru-openapi-auth-server --collection-name "auth-server" \
+  --collection-format opencollection --group-by path
+cp -r /tmp/bru-openapi-auth-server/oauth2 /tmp/bru-openapi-auth-server/userinfo \
+  /tmp/bru-openapi-auth-server/well-known /tmp/bru-openapi-auth-server/'{subpath}' \
+  restRequests/bruno/openapi/auth-server/
+```
+
+`--group-by path` erzeugt die Ordnerstruktur entlang der URL (`api/v4/beer/…`). URLs werden auf
+die bestehenden Environments gemappt:
+
+```bash
+grep -rl '{{baseUrl}}' restRequests/bruno/openapi | while read -r f; do
+  sed -i 's|{{baseUrl}}|http://localhost:{{gateway-port}}|g' "$f"
+done
+```
+
+Die Requests verwenden `auth: inherit`; `rest-mvc`, `reactive` und `reactive-mongo` haben dafür
+Folder-Auth (OAuth2 Client Credentials) im jeweiligen `folder.yml`.
 
 ## Konvertierung (IntelliJ → Bruno)
 

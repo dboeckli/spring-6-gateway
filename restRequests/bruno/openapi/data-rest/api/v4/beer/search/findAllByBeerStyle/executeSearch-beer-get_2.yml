@@ -1,0 +1,231 @@
+info:
+  name: executeSearch-beer-get_2
+  type: http
+  seq: 1
+  tags:
+    - beer-search-controller
+
+http:
+  method: GET
+  url: "http://localhost:{{gateway-port}}/api/v4/beer/search/findAllByBeerStyle"
+  params:
+    - name: beerStyle
+      value: LAGER
+      type: query
+      disabled: true
+    - name: beerStyle
+      value: PILSNER
+      type: query
+      disabled: true
+    - name: beerStyle
+      value: STOUT
+      type: query
+      disabled: true
+    - name: beerStyle
+      value: GOSE
+      type: query
+      disabled: true
+    - name: beerStyle
+      value: PORTER
+      type: query
+      disabled: true
+    - name: beerStyle
+      value: ALE
+      type: query
+      disabled: true
+    - name: beerStyle
+      value: WHEAT
+      type: query
+      disabled: true
+    - name: beerStyle
+      value: IPA
+      type: query
+      disabled: true
+    - name: beerStyle
+      value: PALE_ALE
+      type: query
+      disabled: true
+    - name: beerStyle
+      value: SAISON
+      type: query
+      disabled: true
+    - name: page
+      value: "0"
+      type: query
+      description: Zero-based page index (0..N)
+    - name: size
+      value: "20"
+      type: query
+      description: The size of the page to be returned
+    - name: sort
+      value: "[]"
+      type: query
+      description: "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported."
+      disabled: true
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+examples:
+  - name: 200 Response
+    description: OK
+    request:
+      url: "http://localhost:{{gateway-port}}/api/v4/beer/search/findAllByBeerStyle"
+      method: GET
+      params:
+        - name: beerStyle
+          value: LAGER
+          type: query
+          disabled: true
+        - name: beerStyle
+          value: PILSNER
+          type: query
+          disabled: true
+        - name: beerStyle
+          value: STOUT
+          type: query
+          disabled: true
+        - name: beerStyle
+          value: GOSE
+          type: query
+          disabled: true
+        - name: beerStyle
+          value: PORTER
+          type: query
+          disabled: true
+        - name: beerStyle
+          value: ALE
+          type: query
+          disabled: true
+        - name: beerStyle
+          value: WHEAT
+          type: query
+          disabled: true
+        - name: beerStyle
+          value: IPA
+          type: query
+          disabled: true
+        - name: beerStyle
+          value: PALE_ALE
+          type: query
+          disabled: true
+        - name: beerStyle
+          value: SAISON
+          type: query
+          disabled: true
+        - name: page
+          value: "0"
+          type: query
+          description: Zero-based page index (0..N)
+        - name: size
+          value: "20"
+          type: query
+          description: The size of the page to be returned
+        - name: sort
+          value: "[]"
+          type: query
+          description: "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported."
+          disabled: true
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/vnd.hal+json
+      body:
+        type: json
+        data: |-
+          {
+            "_embedded": {
+              "beers": [
+                {
+                  "version": 0,
+                  "beerName": "",
+                  "beerStyle": "LAGER",
+                  "upc": "",
+                  "quantityOnHand": 0,
+                  "price": 0,
+                  "createdDate": "",
+                  "lastModifiedDate": "",
+                  "_links": {}
+                }
+              ]
+            },
+            "_links": {},
+            "page": {
+              "size": 0,
+              "totalElements": 0,
+              "totalPages": 0,
+              "number": 0
+            }
+          }
+  - name: 404 Response
+    description: Not Found
+    request:
+      url: "http://localhost:{{gateway-port}}/api/v4/beer/search/findAllByBeerStyle"
+      method: GET
+      params:
+        - name: beerStyle
+          value: LAGER
+          type: query
+          disabled: true
+        - name: beerStyle
+          value: PILSNER
+          type: query
+          disabled: true
+        - name: beerStyle
+          value: STOUT
+          type: query
+          disabled: true
+        - name: beerStyle
+          value: GOSE
+          type: query
+          disabled: true
+        - name: beerStyle
+          value: PORTER
+          type: query
+          disabled: true
+        - name: beerStyle
+          value: ALE
+          type: query
+          disabled: true
+        - name: beerStyle
+          value: WHEAT
+          type: query
+          disabled: true
+        - name: beerStyle
+          value: IPA
+          type: query
+          disabled: true
+        - name: beerStyle
+          value: PALE_ALE
+          type: query
+          disabled: true
+        - name: beerStyle
+          value: SAISON
+          type: query
+          disabled: true
+        - name: page
+          value: "0"
+          type: query
+          description: Zero-based page index (0..N)
+        - name: size
+          value: "20"
+          type: query
+          description: The size of the page to be returned
+        - name: sort
+          value: "[]"
+          type: query
+          description: "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported."
+          disabled: true
+    response:
+      status: 404
+      statusText: Not Found
+      body:
+        type: text
+        data: ""

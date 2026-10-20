@@ -1,0 +1,6 @@
+info:
+  name: openid-configuration
+  type: folder
+
+request:
+  auth: inherit

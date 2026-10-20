@@ -1,0 +1,6 @@
+info:
+  name: "{subpath}"
+  type: folder
+
+request:
+  auth: inherit

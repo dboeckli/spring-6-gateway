@@ -1,0 +1,6 @@
+info:
+  name: beer
+  type: folder
+
+request:
+  auth: inherit
