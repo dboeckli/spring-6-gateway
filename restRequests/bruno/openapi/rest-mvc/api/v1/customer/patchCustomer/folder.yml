@@ -1,0 +1,6 @@
+info:
+  name: patchCustomer
+  type: folder
+
+request:
+  auth: inherit

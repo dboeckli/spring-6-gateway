@@ -1,0 +1,6 @@
+info:
+  name: v3
+  type: folder
+
+request:
+  auth: inherit

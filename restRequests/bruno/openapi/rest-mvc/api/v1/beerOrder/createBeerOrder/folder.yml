@@ -1,0 +1,6 @@
+info:
+  name: createBeerOrder
+  type: folder
+
+request:
+  auth: inherit

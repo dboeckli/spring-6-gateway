@@ -1,0 +1,6 @@
+info:
+  name: .well-known
+  type: folder
+
+request:
+  auth: inherit

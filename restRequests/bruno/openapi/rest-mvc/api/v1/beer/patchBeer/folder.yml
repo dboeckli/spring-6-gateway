@@ -1,0 +1,6 @@
+info:
+  name: patchBeer
+  type: folder
+
+request:
+  auth: inherit

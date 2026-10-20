@@ -1,0 +1,13 @@
+info:
+  name: auth-server
+  type: folder
+
+docs:
+  content: |-
+    Generated from the auth-server OpenAPI spec
+    (`target/openapi/openapi-spring-6-auth-server.json`, Maven classifier
+    `openapi-auth-server`) with `bru import openapi --group-by path`.
+    The `/oauth2/actuator/**` paths are filtered out before the import.
+    `{{baseUrl}}` is rewritten to `http://localhost:{{gateway-port}}`.
+    Do not edit these files by hand; regenerate instead.
+  type: text/markdown

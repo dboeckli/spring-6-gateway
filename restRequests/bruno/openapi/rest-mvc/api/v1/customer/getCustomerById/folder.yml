@@ -1,0 +1,6 @@
+info:
+  name: getCustomerById
+  type: folder
+
+request:
+  auth: inherit

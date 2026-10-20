@@ -1,0 +1,52 @@
+info:
+  name: listCustomers
+  type: http
+  seq: 1
+  tags:
+    - customer-controller
+
+http:
+  method: GET
+  url: "http://localhost:{{gateway-port}}/api/v3/customer"
+  params:
+    - name: customerName
+      value: ""
+      type: query
+      disabled: true
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+examples:
+  - name: 200 Response
+    description: OK
+    request:
+      url: "http://localhost:{{gateway-port}}/api/v3/customer"
+      method: GET
+      params:
+        - name: customerName
+          value: ""
+          type: query
+          disabled: true
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: "*/*"
+      body:
+        type: text
+        data: |-
+          [
+            {
+              "id": "",
+              "customerName": "",
+              "createdDate": "",
+              "lastModifiedDate": ""
+            }
+          ]

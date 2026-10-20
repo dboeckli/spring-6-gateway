@@ -1,0 +1,64 @@
+info:
+  name: listBeers
+  type: http
+  seq: 1
+  tags:
+    - beer-controller
+
+http:
+  method: GET
+  url: "http://localhost:{{gateway-port}}/api/v3/beer"
+  params:
+    - name: beerStyle
+      value: ""
+      type: query
+      disabled: true
+    - name: beerName
+      value: ""
+      type: query
+      disabled: true
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+examples:
+  - name: 200 Response
+    description: OK
+    request:
+      url: "http://localhost:{{gateway-port}}/api/v3/beer"
+      method: GET
+      params:
+        - name: beerStyle
+          value: ""
+          type: query
+          disabled: true
+        - name: beerName
+          value: ""
+          type: query
+          disabled: true
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: "*/*"
+      body:
+        type: text
+        data: |-
+          [
+            {
+              "id": "",
+              "beerName": "",
+              "beerStyle": "",
+              "upc": "",
+              "quantityOnHand": 0,
+              "price": 0,
+              "createdDate": "",
+              "lastModifiedDate": ""
+            }
+          ]

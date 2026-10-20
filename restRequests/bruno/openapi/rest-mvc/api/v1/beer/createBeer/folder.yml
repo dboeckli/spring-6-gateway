@@ -1,0 +1,6 @@
+info:
+  name: createBeer
+  type: folder
+
+request:
+  auth: inherit

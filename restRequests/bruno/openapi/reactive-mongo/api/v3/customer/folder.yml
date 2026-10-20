@@ -1,0 +1,6 @@
+info:
+  name: customer
+  type: folder
+
+request:
+  auth: inherit

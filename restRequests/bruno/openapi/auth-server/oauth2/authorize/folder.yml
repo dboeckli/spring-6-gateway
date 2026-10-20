@@ -1,0 +1,6 @@
+info:
+  name: authorize
+  type: folder
+
+request:
+  auth: inherit

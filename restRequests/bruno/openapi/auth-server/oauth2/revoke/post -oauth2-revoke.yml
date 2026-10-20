@@ -1,0 +1,89 @@
+info:
+  name: post /oauth2/revoke
+  type: http
+  seq: 1
+  tags:
+    - authorization-server-endpoints
+
+http:
+  method: POST
+  url: "http://localhost:{{gateway-port}}/oauth2/revoke"
+  body:
+    type: form-urlencoded
+    data:
+      - name: token
+        value: ""
+      - name: token_type_hint
+        value: ""
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+examples:
+  - name: 200 Response
+    description: OK
+    request:
+      url: "http://localhost:{{gateway-port}}/oauth2/revoke"
+      method: POST
+      body:
+        type: form-urlencoded
+        data:
+          - name: token
+            value: ""
+          - name: token_type_hint
+            value: ""
+    response:
+      status: 200
+      statusText: OK
+      body:
+        type: text
+        data: ""
+  - name: 400 Response
+    description: Bad Request
+    request:
+      url: "http://localhost:{{gateway-port}}/oauth2/revoke"
+      method: POST
+      body:
+        type: form-urlencoded
+        data:
+          - name: token
+            value: ""
+          - name: token_type_hint
+            value: ""
+    response:
+      status: 400
+      statusText: Bad Request
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "errorCode": "",
+            "description": "",
+            "uri": ""
+          }
+  - name: 500 Response
+    description: Internal Server Error
+    request:
+      url: "http://localhost:{{gateway-port}}/oauth2/revoke"
+      method: POST
+      body:
+        type: form-urlencoded
+        data:
+          - name: token
+            value: ""
+          - name: token_type_hint
+            value: ""
+    response:
+      status: 500
+      statusText: Internal Server Error
+      body:
+        type: text
+        data: ""
