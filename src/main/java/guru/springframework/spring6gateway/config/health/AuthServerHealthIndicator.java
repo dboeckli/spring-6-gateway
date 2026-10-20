@@ -26,7 +26,8 @@ public class AuthServerHealthIndicator implements ReactiveHealthIndicator {
 
     @Override
     public @NonNull Mono<Health> health() {
-        return checkAuthServerHealth().map(status -> status ? Health.up().build() : Health.down().build())
+        return checkAuthServerHealth()
+            .map(status -> Boolean.TRUE.equals(status) ? Health.up().build() : Health.down().build())
             .doOnNext(health -> {
                 if (health.getStatus().equals(Health.down().build().getStatus())) {
                     log.warn("Auth server is not reachable at {}", authServerUrl);

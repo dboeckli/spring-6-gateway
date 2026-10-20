@@ -48,7 +48,7 @@ class RouterConfigIT {
     private String authToken;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         checkAppReady("http://localhost:8081"); // spring-6-rest-mvc
         checkAppReady("http://localhost:8082"); // spring-6-reactive
         checkAppReady("http://localhost:8083"); // spring-6-reactive-mongo
@@ -264,7 +264,7 @@ class RouterConfigIT {
             .block();
     }
 
-    public static void checkAppReady(String url) {
+    static void checkAppReady(String url) {
         WebClient webClientForActuator = WebClient.create(url);
         log.info("readyness check for {}", url);
 

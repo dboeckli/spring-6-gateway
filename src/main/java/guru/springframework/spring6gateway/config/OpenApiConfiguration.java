@@ -108,8 +108,7 @@ public class OpenApiConfiguration {
     }
 
     @Bean
-    @Qualifier("customGlobalHeaderOpenApiCustomizer")
-    public OpenApiCustomizer customerGlobalHeaderOpenApiCustomizer() {
+    public OpenApiCustomizer customGlobalHeaderOpenApiCustomizer() {
         log.info("### authorizationUrl: " + authorizationUrl);
         log.info("### tokenUrl: " + authorizationUrl);
         log.info("### refreshUrl: " + authorizationUrl);
