@@ -1,0 +1,6 @@
+info:
+  name: updateBeerOrder
+  type: folder
+
+request:
+  auth: inherit

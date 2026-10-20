@@ -1,0 +1,75 @@
+info:
+  name: Valid when multiple issuers are allowed
+  type: http
+  seq: 1
+  tags:
+    - authorization-server-endpoints
+
+http:
+  method: GET
+  url: "http://localhost:{{gateway-port}}/:subpath/.well-known/openid-configuration"
+  params:
+    - name: subpath
+      value: ""
+      type: path
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+examples:
+  - name: 200 Response
+    description: OK
+    request:
+      url: "http://localhost:{{gateway-port}}/:subpath/.well-known/openid-configuration"
+      method: GET
+      params:
+        - name: subpath
+          value: ""
+          type: path
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "issuer": "",
+            "authorization_endpoint": "",
+            "token_endpoint": "",
+            "userinfo_endpoint": "",
+            "jwks_uri": "",
+            "token_endpoint_auth_methods_supported": [],
+            "grant_types_supported": [],
+            "revocation_endpoint": "",
+            "revocation_endpoint_auth_methods_supported": [],
+            "introspection_endpoint": "",
+            "introspection_endpoint_auth_methods_supported": [],
+            "code_challenge_methods_supported": [],
+            "response_types_supported": [],
+            "subject_types_supported": "",
+            "id_token_signing_alg_values_supported": "",
+            "scopes_supported": ""
+          }
+  - name: 500 Response
+    description: Internal Server Error
+    request:
+      url: "http://localhost:{{gateway-port}}/:subpath/.well-known/openid-configuration"
+      method: GET
+      params:
+        - name: subpath
+          value: ""
+          type: path
+    response:
+      status: 500
+      statusText: Internal Server Error
+      body:
+        type: text
+        data: ""

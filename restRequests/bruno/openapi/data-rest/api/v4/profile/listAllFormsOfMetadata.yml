@@ -1,0 +1,37 @@
+info:
+  name: listAllFormsOfMetadata
+  type: http
+  seq: 1
+  tags:
+    - profile-controller
+
+http:
+  method: GET
+  url: "http://localhost:{{gateway-port}}/api/v4/profile"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+examples:
+  - name: 200 Response
+    description: OK
+    request:
+      url: "http://localhost:{{gateway-port}}/api/v4/profile"
+      method: GET
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/vnd.hal+json
+      body:
+        type: json
+        data: |-
+          {
+            "_links": {}
+          }

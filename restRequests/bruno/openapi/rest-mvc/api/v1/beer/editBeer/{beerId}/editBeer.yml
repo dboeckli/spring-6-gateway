@@ -1,0 +1,97 @@
+info:
+  name: editBeer
+  type: http
+  seq: 1
+  tags:
+    - beer-controller
+
+http:
+  method: PUT
+  url: "http://localhost:{{gateway-port}}/api/v1/beer/editBeer/:beerId"
+  params:
+    - name: beerId
+      value: ""
+      type: path
+  body:
+    type: json
+    data: |-
+      {
+        "id": "",
+        "version": 0,
+        "beerName": "",
+        "beerStyle": "LAGER",
+        "upc": "",
+        "quantityOnHand": 0,
+        "price": 0,
+        "createdDate": "",
+        "updateDate": ""
+      }
+  auth:
+    type: oauth2
+    flow: client_credentials
+    accessTokenUrl: http://localhost:8080/oauth2/token
+    refreshTokenUrl: http://localhost:8080/oauth2/refresh-token
+    credentials:
+      clientId: "{{oauth_client_id}}"
+      clientSecret: "{{oauth_client_secret}}"
+      placement: header
+    scope: message.read message.write
+    tokenConfig:
+      placement:
+        header: Bearer
+      source: access_token
+    settings:
+      autoFetchToken: false
+      autoRefreshToken: true
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+examples:
+  - name: 200 Response
+    description: OK
+    request:
+      url: "http://localhost:{{gateway-port}}/api/v1/beer/editBeer/:beerId"
+      method: PUT
+      params:
+        - name: beerId
+          value: ""
+          type: path
+      body:
+        type: json
+        data: |-
+          {
+            "id": "",
+            "version": 0,
+            "beerName": "",
+            "beerStyle": "LAGER",
+            "upc": "",
+            "quantityOnHand": 0,
+            "price": 0,
+            "createdDate": "",
+            "updateDate": ""
+          }
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: "*/*"
+      body:
+        type: text
+        data: |-
+          {
+            "id": "",
+            "version": 0,
+            "beerName": "",
+            "beerStyle": "LAGER",
+            "upc": "",
+            "quantityOnHand": 0,
+            "price": 0,
+            "createdDate": "",
+            "updateDate": ""
+          }

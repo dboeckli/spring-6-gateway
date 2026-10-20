@@ -1,0 +1,6 @@
+info:
+  name: jwks
+  type: folder
+
+request:
+  auth: inherit

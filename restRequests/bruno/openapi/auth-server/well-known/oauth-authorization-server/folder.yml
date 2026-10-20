@@ -1,0 +1,6 @@
+info:
+  name: oauth-authorization-server
+  type: folder
+
+request:
+  auth: inherit

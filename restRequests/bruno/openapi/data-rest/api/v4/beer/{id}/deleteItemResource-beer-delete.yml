@@ -1,0 +1,56 @@
+info:
+  name: deleteItemResource-beer-delete
+  type: http
+  seq: 3
+  tags:
+    - beer-entity-controller
+
+http:
+  method: DELETE
+  url: "http://localhost:{{gateway-port}}/api/v4/beer/:id"
+  params:
+    - name: id
+      value: ""
+      type: path
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+examples:
+  - name: 204 Response
+    description: No Content
+    request:
+      url: "http://localhost:{{gateway-port}}/api/v4/beer/:id"
+      method: DELETE
+      params:
+        - name: id
+          value: ""
+          type: path
+    response:
+      status: 204
+      statusText: No Content
+      body:
+        type: text
+        data: ""
+  - name: 404 Response
+    description: Not Found
+    request:
+      url: "http://localhost:{{gateway-port}}/api/v4/beer/:id"
+      method: DELETE
+      params:
+        - name: id
+          value: ""
+          type: path
+    response:
+      status: 404
+      statusText: Not Found
+      body:
+        type: text
+        data: ""
+
+docs: delete-beer

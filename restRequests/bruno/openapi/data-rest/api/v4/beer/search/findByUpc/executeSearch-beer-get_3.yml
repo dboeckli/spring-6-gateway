@@ -1,0 +1,71 @@
+info:
+  name: executeSearch-beer-get_3
+  type: http
+  seq: 1
+  tags:
+    - beer-search-controller
+
+http:
+  method: GET
+  url: "http://localhost:{{gateway-port}}/api/v4/beer/search/findByUpc"
+  params:
+    - name: upc
+      value: ""
+      type: query
+      disabled: true
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+examples:
+  - name: 200 Response
+    description: OK
+    request:
+      url: "http://localhost:{{gateway-port}}/api/v4/beer/search/findByUpc"
+      method: GET
+      params:
+        - name: upc
+          value: ""
+          type: query
+          disabled: true
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/vnd.hal+json
+      body:
+        type: json
+        data: |-
+          {
+            "version": 0,
+            "beerName": "",
+            "beerStyle": "LAGER",
+            "upc": "",
+            "quantityOnHand": 0,
+            "price": 0,
+            "createdDate": "",
+            "lastModifiedDate": "",
+            "_links": {}
+          }
+  - name: 404 Response
+    description: Not Found
+    request:
+      url: "http://localhost:{{gateway-port}}/api/v4/beer/search/findByUpc"
+      method: GET
+      params:
+        - name: upc
+          value: ""
+          type: query
+          disabled: true
+    response:
+      status: 404
+      statusText: Not Found
+      body:
+        type: text
+        data: ""

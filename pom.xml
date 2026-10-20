@@ -621,27 +621,27 @@
                 <artifact>
                   <file>${project.build.directory}/openapi/openapi-spring-6-rest-mvc.json</file>
                   <type>json</type>
-                  <classifier>openapi-spring-6-rest-mvc</classifier>
+                  <classifier>openapi-rest-mvc</classifier>
                 </artifact>
                 <artifact>
                   <file>${project.build.directory}/openapi/openapi-spring-6-reactive.json</file>
                   <type>json</type>
-                  <classifier>openapi-spring-6-reactive</classifier>
+                  <classifier>openapi-reactive</classifier>
                 </artifact>
                 <artifact>
                   <file>${project.build.directory}/openapi/openapi-spring-6-reactive-mongo.json</file>
                   <type>json</type>
-                  <classifier>openapi-spring-6-reactive-mongo</classifier>
+                  <classifier>openapi-reactive-mongo</classifier>
                 </artifact>
                 <artifact>
                   <file>${project.build.directory}/openapi/openapi-spring-6-data-rest.json</file>
                   <type>json</type>
-                  <classifier>openapi-spring-6-data-rest</classifier>
+                  <classifier>openapi-data-rest</classifier>
                 </artifact>
                 <artifact>
                   <file>${project.build.directory}/openapi/openapi-spring-6-auth-server.json</file>
                   <type>json</type>
-                  <classifier>openapi-spring-6-auth-server</classifier>
+                  <classifier>openapi-auth-server</classifier>
                 </artifact>
               </artifacts>
             </configuration>

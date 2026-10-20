@@ -1,0 +1,6 @@
+info:
+  name: search
+  type: folder
+
+request:
+  auth: inherit

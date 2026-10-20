@@ -1,0 +1,39 @@
+info:
+  name: deleteBeerById
+  type: http
+  seq: 3
+  tags:
+    - beer-controller
+
+http:
+  method: DELETE
+  url: "http://localhost:{{gateway-port}}/api/v3/beer/:beerId"
+  params:
+    - name: beerId
+      value: ""
+      type: path
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+examples:
+  - name: 204 Response
+    description: No Content
+    request:
+      url: "http://localhost:{{gateway-port}}/api/v3/beer/:beerId"
+      method: DELETE
+      params:
+        - name: beerId
+          value: ""
+          type: path
+    response:
+      status: 204
+      statusText: No Content
+      body:
+        type: text
+        data: ""

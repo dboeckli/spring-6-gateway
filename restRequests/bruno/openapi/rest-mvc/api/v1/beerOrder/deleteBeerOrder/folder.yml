@@ -1,0 +1,6 @@
+info:
+  name: deleteBeerOrder
+  type: folder
+
+request:
+  auth: inherit

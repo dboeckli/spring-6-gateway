@@ -1,0 +1,6 @@
+info:
+  name: editBeer
+  type: folder
+
+request:
+  auth: inherit

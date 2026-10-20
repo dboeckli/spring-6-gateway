@@ -1,0 +1,6 @@
+info:
+  name: listBeers
+  type: folder
+
+request:
+  auth: inherit

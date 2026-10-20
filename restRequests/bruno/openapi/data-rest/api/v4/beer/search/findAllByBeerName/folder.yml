@@ -1,0 +1,6 @@
+info:
+  name: findAllByBeerName
+  type: folder
+
+request:
+  auth: inherit

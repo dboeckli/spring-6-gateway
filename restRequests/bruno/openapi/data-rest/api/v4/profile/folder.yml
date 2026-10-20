@@ -1,0 +1,6 @@
+info:
+  name: profile
+  type: folder
+
+request:
+  auth: inherit

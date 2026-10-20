@@ -1,0 +1,6 @@
+info:
+  name: getBeerOrderyById
+  type: folder
+
+request:
+  auth: inherit
