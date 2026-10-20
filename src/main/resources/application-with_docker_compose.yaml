@@ -20,6 +20,11 @@ spring:
       enabled: true
       stop:
         command: down
+        # A plain "down" only touches services without a Compose profile, so
+        # the opt-in observability stack would keep running.
+        arguments:
+          - --profile
+          - observability
       readiness:
         wait: always
         timeout: 4m

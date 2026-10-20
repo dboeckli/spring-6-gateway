@@ -133,7 +133,21 @@ jobs:
           node-version: '24'
 
       - name: Install Bruno CLI
-        run: npm install -g @usebruno/cli@4.2.1
+        run: |
+          # The npm registry occasionally serves package metadata before the
+          # tarball is available (e.g. @aws-sdk/credential-provider-http 404).
+          # npm does not retry 404s, so retry the whole install here.
+          for attempt in 1 2 3; do
+            if npm install -g @usebruno/cli@4.2.1; then
+              echo "Bruno CLI installed (attempt $attempt)"
+              exit 0
+            fi
+            echo "::warning::npm install failed (attempt $attempt), retrying..."
+            npm cache clean --force || true
+            sleep 15
+          done
+          echo "::error::Could not install @usebruno/cli after 3 attempts"
+          exit 1
 
       - name: Run Bruno smoke tests
         working-directory: restRequests/bruno

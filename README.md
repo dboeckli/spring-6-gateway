@@ -22,6 +22,25 @@ truth; a Bruno collection is derived from them in `restRequests/bruno/` (see its
   * http://localhost:30080/swagger-ui/index.html
 * actuator: http://localhost:8080/actuator/info
 
+### OpenAPI generation (Maven)
+
+The Maven build starts the application with the `with_docker_compose` profile and writes:
+
+- `target/openapi/openapi.json` (gateway/actuator spec)
+- `target/openapi/openapi-spring-6-{rest-mvc,reactive,reactive-mongo,data-rest,auth-server}.json` (service groups)
+
+The server URL written into the generated specs is configurable:
+
+- Docker Compose app: `-Dopenapi.server.url=http://localhost:8080`
+- Kubernetes NodePort: `-Dopenapi.server.url=http://localhost:30080`
+
+```bash
+./mvnw -DskipTests -DskipITs=true -Dskip.docker.build=true -Dhelm.executable=true \
+  -Dopenapi.server.url=http://localhost:8080 verify
+```
+
+The generated JSON files are attached as Maven artifacts in the `verify` phase.
+
 ## Architecture Overview
 
 ```mermaid
