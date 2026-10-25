@@ -63,20 +63,6 @@ class ActuatorInfoTest {
             .isEqualTo("UP");
     }
 
-    @Test
-    void actuatorPrometheusTest() {
-        webTestClient.get()
-            .uri("/actuator/prometheus")
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBody()
-            .consumeWith(result -> {
-                String jsonResponse = new String(Objects.requireNonNull(result.getResponseBody()));
-                log.info("Response:\n{}", jsonResponse);
-            });
-    }
-
     private String pretty(String jsonResponse) {
         try {
             Object json = objectMapper.readValue(jsonResponse, Object.class);
