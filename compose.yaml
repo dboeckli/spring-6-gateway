@@ -12,7 +12,7 @@ x-otel-env: &otel-env
 services:
   mysql:
     container_name: mysql
-    image: 'mysql:8.4.11'
+    image: 'mysql:8.4.13'
     environment:
       MYSQL_USER: restadmin
       MYSQL_PASSWORD: password
@@ -30,7 +30,7 @@ services:
       start_period: 30s
 
   kafka:
-    image: apache/kafka:4.3.2
+    image: apache/kafka:4.4.0
     container_name: kafka
     environment:
       KAFKA_PROCESS_ROLES: broker,controller
