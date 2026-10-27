@@ -349,7 +349,7 @@ services:
   # ---------------------------------------------------------------------------
   otel-collector:
     container_name: otel-collector
-    image: otel/opentelemetry-collector-contrib:0.163.2
+    image: otel/opentelemetry-collector-contrib:0.164.0
     profiles:
       - observability
     command:
