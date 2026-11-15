@@ -5,7 +5,7 @@ Bruno-Collection wird daraus als **OpenCollection YAML** generiert und dient als
 IntelliJ HTTP Client sowie zur Automatisierung per CLI.
 
 Aktueller Stand: alle Service-Ordner sind konvertiert — `data-rest` (12 Requests), `reactive`
-(26), `reactive-mongo` (22) und `mvc` (26), inkl. OAuth2 für `reactive`/`reactive-mongo`/`mvc`.
+(26), `reactive-mongo` (22) und `mvc` (27), inkl. OAuth2 für `reactive`/`reactive-mongo`/`mvc`.
 Zusätzlich gibt es einen Auth-Server-Smoke-Flow (`auth-server/token-flow`, 4 Requests).
 Das Bruno-Format ist YAML (`.yml`); `.bru` ist optional (`--format bru`).
 

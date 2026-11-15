@@ -1,11 +1,11 @@
 info:
-  name: 3) delete the beer by id
+  name: 3) get the created beer by id (logs and checks {{beerId}} before sending)
   type: http
   seq: 3
 
 http:
-  method: DELETE
-  url: http://localhost:{{gateway-port}}/api/v1/beer/deleteBeer/{{beerId}}
+  method: GET
+  url: http://localhost:{{gateway-port}}/api/v1/beer/getBeerById/{{beerId}}
   headers:
     - name: Accept
       value: application/json
@@ -21,8 +21,11 @@ runtime:
   scripts:
     - type: tests
       code: |-
-        test("deleteBeer returns 200", function () {
+        test("getBeerById returns 200", function () {
             expect(res.status === 200, "expected 200 but got " + res.status).to.be.true;
+        });
+        test("returned beer id matches", function () {
+            expect(res.body.id === bru.getVar("beerId"), "beerId mismatch").to.be.true;
         });
 
 settings:
