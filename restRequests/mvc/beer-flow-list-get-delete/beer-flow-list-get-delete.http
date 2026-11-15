@@ -1,6 +1,6 @@
-# Flow: listBeers -> getBeerById -> deleteBeer — see restRequest/beer-flow-list-get-delete/beer-flow-list-get-delete.md
+# Flow: listBeers -> createBeer -> getBeerById -> deleteBeer — see restRequest/beer-flow-list-get-delete/beer-flow-list-get-delete.md
 
-### 1) list beers (sets {{beerId}})
+### 1) list beers (smoke-checks the list endpoint)
 < ../../scripts/traceparent.js
 GET http://localhost:{{gateway-port}}/api/v1/beer/listBeers
 Accept: application/json
@@ -10,37 +10,44 @@ traceparent: 00-{{traceId}}-{{spanId}}-03
 baggage: testBaggage=spring-6-rest-mvc
 
 > {%
-    if (response.body.content.length > 0) {
-        const first = response.body.content[0];
-        client.global.set("beerId", first.id);
-        client.log("listBeers -> saved beerId=" + first.id + " (" + first.beerName + ")");
-    } else {
-        client.log("listBeers -> no beer found");
-    }
+    client.log("listBeers -> " + response.body.content.length + " beer(s) on first page");
     client.test("listBeers returns 200", function () {
         client.assert(response.status === 200, "expected 200 but got " + response.status);
     });
 %}
 
-### 2) get beer by id (logs and checks {{beerId}} before sending)
-< {%
-    function randomHex(length) {
-        let result = '';
-        const chars = '0123456789abcdef';
-        for (let i = 0; i < length; i++) {
-            result += chars[Math.floor(Math.random() * chars.length)];
-        }
-        return result;
-    }
-    request.variables.set("traceId", randomHex(32));
-    request.variables.set("spanId", randomHex(16));
+### 2) create a dedicated beer for the delete flow (sets {{beerId}})
+< ../../scripts/traceparent.js
+POST http://localhost:{{gateway-port}}/api/v1/beer/createBeer
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=spring-6-rest-mvc
 
-    const beerId = client.global.get("beerId");
-    client.log("getBeerById -> beerId=" + beerId);
-    if (!beerId) {
-        throw new Error("beerId is not set - run 'list beers' first");
-    }
+{
+  "version": 0,
+  "beerName": "delete-flow-beer",
+  "beerStyle": "LAGER",
+  "upc": "delete-flow",
+  "quantityOnHand": 1,
+  "price": 1.00
+}
+
+> {%
+    client.global.set("beerId", response.body.id);
+    client.log("Created beer id: " + response.body.id);
+
+    client.test("createBeer returns 201", function () {
+        client.assert(response.status === 201, "expected 201 but got " + response.status);
+    });
+    client.test("createBeer returns id", function () {
+        client.assert(!!response.body.id, "beerId missing");
+    });
 %}
+
+### 3) get the created beer by id (logs and checks {{beerId}} before sending)
+< ../../scripts/traceparent.js
 GET http://localhost:{{gateway-port}}/api/v1/beer/getBeerById/{{beerId}}
 Accept: application/json
 Content-Type: application/json
@@ -57,7 +64,7 @@ baggage: testBaggage=spring-6-rest-mvc
     });
 %}
 
-### 3) delete the beer by id
+### 4) delete the created beer by id
 < ../../scripts/traceparent.js
 DELETE http://localhost:{{gateway-port}}/api/v1/beer/deleteBeer/{{beerId}}
 Accept: application/json
