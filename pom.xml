@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>4.1.2</version>
+    <version>4.2.0</version>
     <!-- to avoid conflicts between sortpom and release maven plugin, we add here the space before the closing slash -->
     <relativePath />
   </parent>
@@ -45,7 +45,7 @@
            Please use the following instructions: https://spring.io/projects/spring-cloud
            Please refer to the section: "Table 1. Release train Spring Boot compatibility"
          -->
-    <spring-cloud.version>2025.1.4</spring-cloud.version>
+    <spring-cloud.version>2026.0.0</spring-cloud.version>
 
     <github.acions.build>false</github.acions.build>
     <skip.docker.publish>true</skip.docker.publish>
@@ -60,8 +60,8 @@
 
     <logstash-logback.version>9.0</logstash-logback.version>
 
-    <!-- 2.28.1-alpha depends on opentelemetry-api 1.62.0, matching Boot's managed ${opentelemetry.version} -->
-    <opentelemetry-logback-appender.version>2.28.1-alpha</opentelemetry-logback-appender.version>
+    <!-- 2.34.0-alpha depends on opentelemetry-api-incubator 1.68.0-alpha, matching Boot's managed ${opentelemetry.version} -->
+    <opentelemetry-logback-appender.version>2.34.0-alpha</opentelemetry-logback-appender.version>
     <spring-javaformat-maven-plugin.version>0.0.48</spring-javaformat-maven-plugin.version>
     <spotless-maven-plugin.version>3.12.0</spotless-maven-plugin.version>
     <properties-maven-plugin.version>1.4.0</properties-maven-plugin.version>
