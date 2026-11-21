@@ -1,5 +1,6 @@
 package guru.springframework.spring6gateway.config;
 
+import io.swagger.v3.core.util.Json;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.info.Info;
@@ -13,7 +14,6 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.servers.Server;
-import io.swagger.v3.parser.OpenAPIV3Parser;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -290,10 +290,12 @@ public class OpenApiConfiguration {
     }
 
     private void setOpenApiServer(OpenAPI openApi, String description, StringBuilder content) {
-        OpenAPI externalOpenApi = new OpenAPIV3Parser().readContents(content.toString()).getOpenAPI();
+        OpenAPI externalOpenApi = Json.mapper().readValue(content.toString(), OpenAPI.class);
 
         // Set the correct server URL (configured external URL wins over the runtime port)
-        externalOpenApi.getServers().clear();
+        if (externalOpenApi.getServers() != null) {
+            externalOpenApi.getServers().clear();
+        }
         String serverUrl = StringUtils.hasText(openApiServerUrl) ? openApiServerUrl
                 : openApi.getServers().getFirst().getUrl();
         Server server = new Server().url(serverUrl);
