@@ -75,5 +75,7 @@ is needed here. On a normal host (Windows/CI) this does not apply either.
   name = chart dir name, namespace `spring-6-gateway`.
 - CI (`.github/workflows/`): `maven-build.yml` builds + deploys snapshots and triggers
   `deploy-and-test-cluster.yml` (in-cluster, using the auth-server chart from Repsy).
+- CI pins Helm `v4.3.2` via `azure/setup-helm@v5.1.0` before the first Helm call (runner default is
+  Helm 3). The sandbox kit ships Helm 4 as `helm`, so `-Dhelm.executable=helm4` is no longer needed.
 - Dependency updates are managed via `.github/renovate.json`; validate changes with
   `renovate-config-validator`.
